@@ -1,6 +1,7 @@
 package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.CustomerDTO;
+import com.devak.mrdaebakdinner.dto.OrderDTO;
 import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
 import com.devak.mrdaebakdinner.exception.DatabaseException;
 import com.devak.mrdaebakdinner.exception.DuplicateCustomerIdException;
@@ -8,7 +9,6 @@ import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
 import com.devak.mrdaebakdinner.service.CustomerService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import jdk.jshell.spi.ExecutionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -117,32 +117,14 @@ public class CustomerController {
     public String showCustomerMain(HttpSession session, Model model) {
         // session에 로그인 정보 있는지 확인
         CustomerDTO loginCustomer = (CustomerDTO) session.getAttribute("loginCustomer");
+
         // 세션정보 없으면 로그인 페이지(/customer)로 GET요청
         if (loginCustomer == null) {
             return "redirect:/customer";
         }
-
         // 세션정보 있으면 Model에 담아서 활용
         model.addAttribute("user", loginCustomer);
         return "customer/main";
     }
 
-    // 주문 페이지 GET 요청
-    @GetMapping("/customer/order")
-    public String showOrderPage() {
-        return "customer/order";
-    }
-
-    // 주문 페이지 POST 요청
-    @PostMapping("/customer/order")
-    public String takeOrder() {
-
-        return "redirect:/customer/order/success";
-    }
-
-    // 이전주문기록 페이지 GET 요청
-    @GetMapping("/customer/order/history")
-    public String showCustomerOrderHistory() {
-        return "customer/orderhistory";
-    }
 }
