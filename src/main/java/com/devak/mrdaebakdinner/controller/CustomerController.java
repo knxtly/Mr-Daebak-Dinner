@@ -126,4 +126,10 @@ public class CustomerController {
         model.addAttribute("user", loginCustomer);
         return "customer/main";
     }
+
+    // 주문 페이지 GET 요청
+    @GetMapping("/customer/orders")
+    public String showOrderPage() {
+        return "customer/order";
+    }
 }
