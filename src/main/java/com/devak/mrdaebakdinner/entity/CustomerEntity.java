@@ -17,7 +17,7 @@ public class CustomerEntity {
     @Column(name = "customer_id", unique = true, nullable = false, length = 30)
     private String customerId; // 외부 비즈니스용 ID
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "name", nullable = false, length = 30)
@@ -38,13 +38,13 @@ public class CustomerEntity {
     // CustomerDTO => CustomerEntity
     public static CustomerEntity toCustomerEntity(CustomerDTO customerDTO) {
         CustomerEntity customerEntity = new CustomerEntity();
+
         customerEntity.setCustomerId(customerDTO.getCustomerId());
         customerEntity.setName(customerDTO.getName());
         customerEntity.setAddress(customerDTO.getAddress());
         customerEntity.setContact(customerDTO.getContact());
         customerEntity.setPassword(customerDTO.getPassword());
-        customerEntity.setOrderCount(customerDTO.getOrderCount());
-        customerEntity.setMembershipLevel(customerDTO.getMembershipLevel());
+        // orderCount, membershipLevel은 DB 기본값 사용
 
         return customerEntity;
     }

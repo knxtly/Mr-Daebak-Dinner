@@ -9,7 +9,7 @@
 <h1>Main Page!</h1>
 <div th:if="${user}">
     ID: <span th:text="${user.customerId}"></span><br>
-    Hi, <span th:text="${user.name}"></span>!
+    Hi <span th:text="${user.name}"></span>!
     User Information: <p th:text="${user}"></p>
 </div>
 <p>주문하기</p><br>

@@ -34,12 +34,12 @@ public class CustomerService {
 
     // Controller로부터 온 login요청 처리
     public CustomerDTO login(CustomerDTO customerDTO) {
-        Optional<CustomerEntity> result =
+        Optional<CustomerEntity> byCustomerId =
                 customerRepository.findByCustomerId(customerDTO.getCustomerId());
 
-        if (result.isPresent()) {
+        if (byCustomerId.isPresent()) {
             // ID exists
-            CustomerEntity customerEntity = result.get(); // .get(): Optional에서 꺼냄
+            CustomerEntity customerEntity = byCustomerId.get(); // .get(): Optional에서 꺼냄
             if (customerEntity.getPassword().equals(customerDTO.getPassword())) {
                 // correct password
                 return CustomerDTO.toCustomerDTO(customerEntity);
