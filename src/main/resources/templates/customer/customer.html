@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Customer Interface</h1>
+<form action="/customer/login" method="post">
+    ID: <input type="text" name="customerId"><br>
+    PW: <input type="password" name="password"><br>
+    <input type="submit" value="로그인">
+</form>
+<div th:if="${errorMessage}">
+    <p th:text="${errorMessage}" style="color: red;"></p>
+</div>
+<a href="/customer/signup">회원가입</a><br>
+<a href="/">Go to Index Page</a>
+</body>
+</html>

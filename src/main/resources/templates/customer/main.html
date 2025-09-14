@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <link rel="stylesheet" th:href="style.css">
+</head>
+<body>
+<h1>Main Page!</h1>
+<div th:if="${user}">
+    ID: <span th:text="${user.customerId}"></span><br>
+    Hi, <span th:text="${user.name}"></span>!
+    User Information: <p th:text="${user}"></p>
+</div>
+<p>주문하기</p><br>
+
+<a href="/customer/logout">로그아웃</a><br>
+</body>
+</html>

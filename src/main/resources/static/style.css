@@ -1,0 +1,40 @@
+/* 전체 레이아웃 */
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* 제목 */
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+/* 링크 버튼 묶음 */
+.link-container {
+    display: flex;
+    gap: 20px;
+}
+
+/* 버튼 스타일 */
+.btn {
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    background: #3730a3;
+    transform: translateY(-3px);
+}

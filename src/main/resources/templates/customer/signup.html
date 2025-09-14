@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Sign up Page</h1>
+<form action="/customer/signup" method="post">
+    ID: <input type="text" name="customerId"><br>
+    PW: <input type="password" name="password"><br>
+    Name: <input type="text" name="name"><br>
+    Address: <input type="text" name="address"><br>
+    Tel: <input type="tel" name="contact"><br>
+    <input type="submit" value="Sign up!">
+</form>
+<div th:if="${errorMessage}">
+    <p th:text="${errorMessage}" style="color: red;"></p>
+</div>
+<a href="/customer">이전</a><br>
+<a href="/">Go to Index Page</a>
+</body>
+</html>
