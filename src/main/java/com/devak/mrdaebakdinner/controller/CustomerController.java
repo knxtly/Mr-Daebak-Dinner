@@ -128,8 +128,21 @@ public class CustomerController {
     }
 
     // 주문 페이지 GET 요청
-    @GetMapping("/customer/orders")
+    @GetMapping("/customer/order")
     public String showOrderPage() {
         return "customer/order";
+    }
+
+    // 주문 페이지 POST 요청
+    @PostMapping("/customer/order")
+    public String takeOrder() {
+
+        return "redirect:/customer/order/success";
+    }
+
+    // 이전주문기록 페이지 GET 요청
+    @GetMapping("/customer/order/history")
+    public String showCustomerOrderHistory() {
+        return "customer/orderhistory";
     }
 }

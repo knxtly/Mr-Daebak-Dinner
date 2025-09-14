@@ -8,12 +8,12 @@
 <body>
 <h1>Main Page!</h1>
 <div th:if="${user}">
-    ID: <span th:text="${user.customerId}"></span><br>
-    Hi <span th:text="${user.name}"></span>!
+    ID: <span th:text="${user.customerId}" style="color: blue;"></span><br>
+    Hi <span th:text="${user.name}" style="color: blue;"></span>!<br>
     User Information: <p th:text="${user}"></p>
 </div>
-<a href="/customer/orders">주문하기</a><br>
-
-<a href="/customer/logout">로그아웃</a><br>
+<a href="/customer/order">주문하기</a><br>
+<a href="/customer/order/history">이전주문조회</a><br>
+<a href="/customer/logout">로그아웃</a>
 </body>
 </html>
