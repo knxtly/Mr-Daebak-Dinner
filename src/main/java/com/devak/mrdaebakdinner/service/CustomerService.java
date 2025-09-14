@@ -28,7 +28,7 @@ public class CustomerService {
             CustomerEntity customerEntity = CustomerEntity.toCustomerEntity(customerDTO);
             customerRepository.save(customerEntity);
         } catch (RuntimeException e) {
-            throw new DatabaseException("DB Error");
+            throw new DatabaseException("ID나 Name의 길이가 너무 깁니다");
         }
     }
 
