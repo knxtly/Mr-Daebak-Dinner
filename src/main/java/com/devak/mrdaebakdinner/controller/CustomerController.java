@@ -96,7 +96,7 @@ public class CustomerController {
         try {
             CustomerDTO loginResult = customerService.login(customerDTO);
             // 로그인 성공: 세션에 사용자 정보 저장
-            session.setAttribute("loginCustomer", loginResult);
+            session.setAttribute("loggedInCustomer", loginResult);
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -115,14 +115,14 @@ public class CustomerController {
     @GetMapping("/customer/main")
     public String showCustomerMain(HttpSession session, Model model) {
         // session에 로그인 정보 있는지 확인
-        CustomerDTO loginCustomer = (CustomerDTO) session.getAttribute("loginCustomer");
+        CustomerDTO loggedInCustomer = (CustomerDTO) session.getAttribute("loggedInCustomer");
 
         // 세션정보 없으면 로그인 페이지(/customer)로 GET요청
-        if (loginCustomer == null) {
+        if (loggedInCustomer == null) {
             return "redirect:/customer";
         }
         // 세션정보 있으면 Model에 담아서 활용
-        model.addAttribute("user", loginCustomer);
+        model.addAttribute("user", loggedInCustomer);
         return "customer/main";
     }
 
