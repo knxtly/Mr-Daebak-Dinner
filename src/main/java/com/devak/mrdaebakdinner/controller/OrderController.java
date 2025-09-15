@@ -26,6 +26,7 @@ public class OrderController {
     @PostMapping("/customer/order/new")
     public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult) {
+        // TODO: 재고가 충분하면 주문허가하는 로직
 
         return "redirect:/customer/order/success";
     }

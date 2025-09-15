@@ -2,11 +2,11 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Customer</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Login | Mr. Daebak Dinner</title>
+    <link rel="stylesheet" th:href="@{style.css}">
 </head>
 <body>
-<h1>Customer Interface</h1>
+<h1>Login</h1>
 <form action="/customer/login" method="post">
     ID: <input type="text" name="customerId"><br>
     PW: <input type="password" name="password"><br>
