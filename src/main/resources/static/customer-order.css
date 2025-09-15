@@ -1,0 +1,41 @@
+:root{
+  --bg:#0f1724; --card:#0b1220; --accent:#f59e0b; --muted:#9ca3af;
+  --glass: rgba(255,255,255,0.04);
+}
+body{
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg,#071027 0%, #081124 100%);
+  color:#e6eef6; margin:0; padding:32px;
+  display:flex; align-items:flex-start; justify-content:center; min-height:100vh;
+}
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:12px; padding:24px; width:840px; box-shadow:0 8px 30px rgba(2,6,23,0.7);
+  border:1px solid rgba(255,255,255,0.03);
+}
+h1{ margin:0 0 8px 0; font-size:20px;}
+p.lead{ margin:0 0 18px 0; color:var(--muted); font-size:13px;}
+form.grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+.field{ background:var(--glass); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); }
+label{ display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+select, input[type="number"]{
+  width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);
+  background:transparent; color:inherit; font-size:14px;
+}
+.components{ grid-column: span 2; display:grid; grid-template-columns: repeat(3,1fr); gap:12px; }
+.component{ padding:10px; border-radius:8px; background:rgba(255,255,255,0.015); border:1px solid rgba(255,255,255,0.02);}
+.component label{ margin-bottom:6px; display:block; }
+.component input[type="number"]{ width:100%; }
+.actions{ grid-column: span 2; display:flex; justify-content:flex-end; gap:12px; margin-top:6px;}
+button{ padding:10px 14px; border-radius:10px; border:0; cursor:pointer; font-weight:600;}
+.btn-secondary{ background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.03);}
+.btn-primary{ background:linear-gradient(90deg,var(--accent), #ffb86b); color:#07202a; }
+.small{ font-size:12px; color:var(--muted); margin-top:8px;}
+.locked{ opacity:0.7; }
+@media (max-width:720px){
+  .card{ width:100%; padding:16px }
+  form.grid{ grid-template-columns: 1fr; }
+  .components{ grid-column: auto; grid-template-columns: repeat(2,1fr); }
+  .actions{ justify-content:stretch; flex-direction:column-reverse; }
+  button{ width:100% }
+}

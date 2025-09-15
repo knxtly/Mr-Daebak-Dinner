@@ -22,12 +22,17 @@ public class OrderController {
         return "customer/order";
     }
 
-    // 주문 페이지 POST 요청
-    @PostMapping("/customer/order")
+    // 주문(POST) 요청
+    @PostMapping("/customer/order/new")
     public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult) {
 
         return "redirect:/customer/order/success";
+    }
+
+    @GetMapping("/customer/order/success")
+    public String showOrderSuccess() {
+        return "customer/order-success";
     }
 
     // 이전주문기록 페이지 GET 요청

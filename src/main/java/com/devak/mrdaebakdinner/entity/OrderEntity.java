@@ -16,28 +16,28 @@ public class OrderEntity {
     @Column(name = "order_id")
     private Long orderId; // PK
 
-    @Column(name = "delivery_address", nullable = false)
-    private String deliveryAddress;
-
-    @Column(name = "delivery_menu", nullable = false)
-    private String deliveryMenu; // FK → 일단 문자열로 저장
-
-    @Column(name = "delivery_style", nullable = false)
-    private String deliveryStyle;
-
-    @Column(name = "card_number", nullable = false)
-    private String cardNumber;
+    @Column(name = "order_time", nullable = false)
+    private LocalDateTime orderTime;
 
     // Customer FK (ManyToOne)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
+    @Column(name = "delivery_menu", nullable = false)
+    private String deliveryMenu; // FK => 일단 문자열로 저장
+
+    @Column(name = "delivery_style", nullable = false)
+    private String deliveryStyle;
+
+    @Column(name = "delivery_address", nullable = false)
+    private String deliveryAddress;
+
+    @Column(name = "card_number", nullable = false)
+    private String cardNumber;
+
     @Column(name = "delivery_time")
     private LocalDateTime deliveryTime;
-
-    @Column(name = "order_time", nullable = false)
-    private LocalDateTime orderTime;
 
     @Column(name = "total_price")
     private Integer totalPrice;

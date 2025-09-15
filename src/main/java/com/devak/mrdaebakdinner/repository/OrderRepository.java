@@ -1,8 +1,10 @@
 package com.devak.mrdaebakdinner.repository;
 
-import com.devak.mrdaebakdinner.dto.OrderDTO;
-import org.springframework.stereotype.Repository;
+import com.devak.mrdaebakdinner.entity.OrderEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class OrderRepository extends JpaRepository<OrderEntity, Long>{
+import java.util.Optional;
+
+public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
+    Optional<OrderEntity> findByOrderId(Long orderId);
 }
