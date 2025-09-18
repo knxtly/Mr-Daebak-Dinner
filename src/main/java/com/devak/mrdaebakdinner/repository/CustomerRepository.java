@@ -17,5 +17,5 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
     delete(entity) => 삭제
     count() => 개수 조회
      */
-    Optional<CustomerEntity> findByCustomerId(String customerId);
+    Optional<CustomerEntity> findByLoginId(String loginId);
 }

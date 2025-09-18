@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(DuplicateCustomerIdException.class)
-    public ResponseEntity<String> handleDuplicateCustomerIdException(DuplicateCustomerIdException e) {
+    @ExceptionHandler(DuplicateLoginIdException.class)
+    public ResponseEntity<String> handleDuplicateLoginIdException(DuplicateLoginIdException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 

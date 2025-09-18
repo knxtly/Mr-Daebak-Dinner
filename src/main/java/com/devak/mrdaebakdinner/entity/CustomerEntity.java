@@ -14,8 +14,8 @@ public class CustomerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto_increment
     private Long id; // 내부 관리용 ID
 
-    @Column(name = "customer_id", unique = true, nullable = false, length = 30)
-    private String customerId; // 외부 비즈니스용 ID
+    @Column(name = "login_id", unique = true, nullable = false, length = 30)
+    private String loginId; // 외부 비즈니스용 ID
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -38,14 +38,12 @@ public class CustomerEntity {
     // CustomerDTO => CustomerEntity
     public static CustomerEntity toCustomerEntity(CustomerDTO customerDTO) {
         CustomerEntity customerEntity = new CustomerEntity();
-
-        customerEntity.setCustomerId(customerDTO.getCustomerId());
+        customerEntity.setLoginId(customerDTO.getLoginId());
+        customerEntity.setPassword(customerDTO.getPassword());
         customerEntity.setName(customerDTO.getName());
         customerEntity.setAddress(customerDTO.getAddress());
         customerEntity.setContact(customerDTO.getContact());
-        customerEntity.setPassword(customerDTO.getPassword());
-        // orderCount, membershipLevel은 DB 기본값 사용
-
+        // id, orderCount, membershipLevel은 DB 기본값 사용
         return customerEntity;
     }
 }

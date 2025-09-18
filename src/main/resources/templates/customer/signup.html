@@ -8,15 +8,15 @@
 <body>
 <h1>Sign Up</h1>
 <form action="/customer/signup" method="post">
-    ID: <input type="text" name="customerId" placeholder="최대 30글자"><br>
-    PW: <input type="password" name="password"><br>
+    ID: <input type="text" name="loginId" placeholder="4 ~ 30글자"><br>
+    PW: <input type="password" name="password" placeholder="최소 4글자"><br>
     Name: <input type="text" name="name" placeholder="최대 30글자"><br>
     Address: <input type="text" name="address"><br>
     Tel: <input type="tel" name="contact"><br>
     <input type="submit" value="Sign up!">
 </form>
 <div th:if="${errorMessage}">
-    <p th:text="${errorMessage}" style="color: red;"></p>
+    <p th:utext="${errorMessage}" style="color: red;"></p>
 </div>
 <a href="/customer">이전</a><br>
 <a href="/">Go to Index Page</a>

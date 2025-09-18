@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Staff</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" th:href="@{style.css}">
 </head>
 <body>
 <h1>Staff Interface</h1>
-<a href="/staff/order">대기주문목록</a><br>
+<a href="/staff/chef">요리직원</a><br>
+<a href="/staff/delivery">배달직원</a><br>
 <a href="/staff/inventory">재고조회</a>
 <a href="/">Go to Index Page</a>
 </body>

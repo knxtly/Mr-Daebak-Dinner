@@ -1,15 +1,17 @@
 package com.devak.mrdaebakdinner.controller;
 
+import com.devak.mrdaebakdinner.dto.CustomerDTO;
 import com.devak.mrdaebakdinner.dto.OrderDTO;
-import com.devak.mrdaebakdinner.entity.CustomerEntity;
 import com.devak.mrdaebakdinner.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
@@ -21,38 +23,46 @@ public class OrderController {
     private final OrderService orderService;
 
     // 주문 페이지 GET 요청
-    @GetMapping("/customer/order")
+    @GetMapping("/customer/orders/new")
     public String showOrderPage(HttpSession session) {
-        CustomerEntity loggedInCustomer =
-                (CustomerEntity) session.getAttribute("loggedInCustomer");
-        if (loggedInCustomer == null) {
-            return "redirect:/customer"; // 로그인 페이지로 이동
+        // 로그인한 customer session이 없으면 로그인 페이지로 이동
+        if ((CustomerDTO) session.getAttribute("loggedInCustomer") == null) {
+            return "redirect:/customer";
         }
         return "customer/order";
     }
 
-    // 주문(POST) 요청
-    @PostMapping("/customer/order/new")
+    // 주문 요청
+    @PostMapping("/customer/orders/new")
     public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult) {
-        // TODO: 재고가 충분하면 주문허가하는 로직
 
-        return "redirect:/customer/order/success";
+        // TODO: 재고가 충분하면 주문허가하는 로직
+        return "redirect:/customer/orders/success";
+
+        // TODO: 재고가 충분하지 않을 시 주문불가 로직
     }
 
-    @GetMapping("/customer/order/success")
+    @GetMapping("/customer/orders/success")
     public String showOrderSuccess() {
         return "customer/order-success";
     }
 
     // 이전주문기록 페이지 GET 요청
-    @GetMapping("/customer/order/history")
-    public String showCustomerOrderHistory(HttpSession session) {
-        // TODO: List에 order목록 담아서 보냄
-        List<OrderDTO> orderDTOList = orderService.findAllByCustomerId(
-                (CustomerEntity) session.getAttribute("loggedInCustomer"));
+    @GetMapping("/customer/orders/history")
+    public String showCustomerOrderHistory(HttpSession session, Model model) {
+        // 로그인한 customer session이 없으면 로그인 페이지로 이동
+        if ((CustomerDTO) session.getAttribute("loggedInCustomer") == null) {
+            return "redirect:/customer";
+        }
+
+        // 고객의 order목록을 찾아서 보여주는 로직
+        List<OrderDTO> orderList = orderService.findAllByCustomerDTO(
+                (CustomerDTO) session.getAttribute("loggedInCustomer"));
+        // html에 "orderList"라는 속성으로 전달
+        model.addAttribute("orderList", orderList);
         return "customer/order-history";
     }
 
-    // TODO: 배달완료 시 deliveryTime set작업
+    // TODO: 배달완료 시 deliveryTime set
 }

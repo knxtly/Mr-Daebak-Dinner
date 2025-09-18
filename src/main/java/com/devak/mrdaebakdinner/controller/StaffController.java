@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class StaffController {
     @GetMapping("/staff")
     public String showStaffInterface() {
-        return "staff";
+        return "staff/staff";
     }
 }

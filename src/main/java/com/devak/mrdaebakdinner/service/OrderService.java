@@ -1,15 +1,12 @@
 package com.devak.mrdaebakdinner.service;
 
+import com.devak.mrdaebakdinner.dto.CustomerDTO;
 import com.devak.mrdaebakdinner.dto.OrderDTO;
-import com.devak.mrdaebakdinner.entity.CustomerEntity;
 import com.devak.mrdaebakdinner.entity.OrderEntity;
 import com.devak.mrdaebakdinner.repository.OrderRepository;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +16,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public List<OrderDTO> findAllByCustomerId(CustomerEntity loggedInCustomer) {
+    public List<OrderDTO> findAllByCustomerDTO(CustomerDTO loggedInCustomer) {
         // loggedInCustomer의 주문만을 담아 return
         List<OrderEntity> orderEntityList =
                 orderRepository.findAllByCustomerId(loggedInCustomer.getId());
@@ -27,4 +24,6 @@ public class OrderService {
                 .map(OrderDTO::toOrderDTO)
                 .collect(Collectors.toList());
     }
+
+
 }

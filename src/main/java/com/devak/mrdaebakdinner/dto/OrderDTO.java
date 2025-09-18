@@ -2,6 +2,7 @@ package com.devak.mrdaebakdinner.dto;
 
 import com.devak.mrdaebakdinner.entity.OrderEntity;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,35 +14,40 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class OrderDTO { //TODO: 데이터 아키텍쳐 수정 필요
-    private Long orderId;           // PK (auto_increment)
+public class OrderDTO {
+    private Long id;
+    @NotNull
+    private LocalDateTime orderTime;
+    // 보통 DTO에서는 **id(Long)**만 들고, 서비스에서 Entity로 변환하는 것이 깔끔
+    // 변환 시 서비스에서 customerId로 DB에서 CustomerEntity 조회 후 toOrderEntity에 전달
+    @NotNull
+    private Long customerId;
     @NotBlank
-    private LocalDateTime orderTime;    // 주문 시각 (NN)
+    private String dinnerKind;
     @NotBlank
-    private Long customerId;        // 고객 ID (FK)
+    private String dinnerStyle;
     @NotBlank
-    private String deliveryMenu;    // 메뉴명 or 메뉴ID (FK, NN)
+    private String deliveryAddress;
+    private LocalDateTime deliveryTime;
+    @NotNull
+    private Integer totalPrice;
     @NotBlank
-    private String deliveryStyle;   // 배달 방식 (예: 포장, 배달) (NN)
-    @NotBlank
-    private String deliveryAddress; // 배달 주소 (NN)
-    @NotBlank
-    private String cardNumber;      // 결제 카드 번호 (NN)
-    private LocalDateTime deliveryTime; // 배달 완료 시간
-    private Integer totalPrice;     // 총 가격
+    private String cardNumber;
+    private String status;
 
-    // TODO: toOrderDTO() 추가
+    // OrderEntity => OrderDTO
     public static OrderDTO toOrderDTO(OrderEntity orderEntity) {
         OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setOrderId(orderEntity.getOrderId());
+        orderDTO.setId(orderEntity.getId());
         orderDTO.setOrderTime(orderEntity.getOrderTime());
-        orderDTO.setCustomerId(orderEntity.getOrderId());
-        orderDTO.setDeliveryMenu(orderEntity.getDeliveryMenu());
-        orderDTO.setDeliveryStyle(orderEntity.getDeliveryStyle());
+        orderDTO.setCustomerId(orderEntity.getCustomer().getId());
+        orderDTO.setDinnerKind(orderEntity.getDinnerKind());
+        orderDTO.setDinnerStyle(orderEntity.getDinnerStyle());
         orderDTO.setDeliveryAddress(orderEntity.getDeliveryAddress());
-        orderDTO.setCardNumber(orderEntity.getCardNumber());
         orderDTO.setDeliveryTime(orderEntity.getDeliveryTime());
         orderDTO.setTotalPrice(orderEntity.getTotalPrice());
+        orderDTO.setCardNumber(orderEntity.getCardNumber());
+        orderDTO.setStatus(orderEntity.getStatus());
         return orderDTO;
     }
 }

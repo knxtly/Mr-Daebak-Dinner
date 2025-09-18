@@ -1,8 +1,8 @@
 package com.devak.mrdaebakdinner.dto;
 
 import com.devak.mrdaebakdinner.entity.CustomerEntity;
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,14 +13,20 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CustomerDTO {
-    private Long id;
-    @NotBlank
-    private String customerId;
-    @NotBlank
+    private Long id; // 내부 관리용 ID
+
+    @NotBlank(message = "로그인 ID는 필수 입력값입니다.")
+    @Size(min = 4, max = 30, message = "로그인 ID는 4~30자여야 합니다.")
+    private String loginId; // 외부 비즈니스용 ID
+
+    @NotBlank(message = "PW는 필수 입력값입니다.")
+    @Size(min = 4, message = "PW는 4자 이상이어야 합니다.")
     private String password;
-    @NotBlank
+
+    @NotBlank(message = "Name은 필수 입력값입니다.")
+    @Size(max = 30, message = "Name은 30자 이하여야 합니다.")
     private String name;
-    @NotBlank
+
     private String address;
     private String contact;
     private int orderCount;
@@ -30,14 +36,13 @@ public class CustomerDTO {
     public static CustomerDTO toCustomerDTO(CustomerEntity customerEntity) {
         CustomerDTO customerDTO = new CustomerDTO();
         customerDTO.setId(customerEntity.getId());
-        customerDTO.setCustomerId(customerEntity.getCustomerId());
+        customerDTO.setLoginId(customerEntity.getLoginId());
+        customerDTO.setPassword(customerEntity.getPassword());
         customerDTO.setName(customerEntity.getName());
         customerDTO.setAddress(customerEntity.getAddress());
         customerDTO.setContact(customerEntity.getContact());
-        customerDTO.setPassword(customerEntity.getPassword());
         customerDTO.setOrderCount(customerEntity.getOrderCount());
         customerDTO.setMembershipLevel(customerEntity.getMembershipLevel());
-
         return customerDTO;
     }
 }
