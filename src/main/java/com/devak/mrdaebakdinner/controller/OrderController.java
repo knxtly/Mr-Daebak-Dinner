@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -27,12 +24,6 @@ public class OrderController {
     // 주문 페이지 GET 요청
     @GetMapping("/customer/orders/new")
     public String showOrderPage(HttpSession session) {
-        // 로그인한 customer session이 없으면 로그인 페이지로 이동
-        // TODO: Interceptor로 나중에 바꿔보기
-        if (session.getAttribute("loggedInCustomer") == null) {
-            return "redirect:/customer";
-        }
-
         return "customer/order";
     }
 
@@ -42,11 +33,6 @@ public class OrderController {
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes,
                             HttpSession session) {
-        // 로그인한 customer session이 없으면 로그인 페이지로 이동
-        // TODO: Interceptor로 나중에 바꿔보기
-        if (session.getAttribute("loggedInCustomer") == null) {
-            return "redirect:/customer";
-        }
 
         if (bindingResult.hasErrors()) {
             // 오류 메시지 이어붙이기
@@ -75,16 +61,12 @@ public class OrderController {
 
     // 이전주문기록 조회 요청
     @GetMapping("/customer/orders/history")
-    public String showCustomerOrderHistory(HttpSession session, Model model) {
-        // 로그인한 customer session이 없으면 로그인 페이지로 이동
-        // TODO: Interceptor로 나중에 바꿔보기
-        if (session.getAttribute("loggedInCustomer") == null) {
-            return "redirect:/customer";
-        }
+    public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerDTO customer,
+                                           Model model) {
 
         // 고객의 order목록을 찾아서 보여주는 로직
-        List<OrderResponseDTO> orderList = orderService.findAllByCustomerId(
-                ((CustomerDTO) session.getAttribute("loggedInCustomer")).getId());
+        List<OrderResponseDTO> orderList =
+                orderService.findAllByCustomerId(customer.getId());
         // order-history.html에 "orderList"라는 속성으로 전달
         model.addAttribute("orderList", orderList);
         return "customer/order-history";
@@ -93,12 +75,6 @@ public class OrderController {
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId, HttpSession session) {
-        // 로그인한 customer session이 없으면 로그인 페이지로 이동
-        // TODO: Interceptor로 나중에 바꿔보기
-        if (session.getAttribute("loggedInCustomer") == null) {
-            return "redirect:/customer";
-        }
-
         orderService.placeOrder(orderService.buildReorderDTO(orderId),
                 (CustomerDTO) session.getAttribute("loggedInCustomer"));
 
