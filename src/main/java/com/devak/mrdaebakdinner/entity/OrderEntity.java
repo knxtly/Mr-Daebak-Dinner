@@ -35,7 +35,7 @@ public class OrderEntity {
     @Column(name = "delivery_time")
     private LocalDateTime deliveryTime;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
 
     @Column(name = "card_number", nullable = false)
@@ -45,7 +45,7 @@ public class OrderEntity {
     private String status = "주문완료";
 
     // OrderDTO => OrderEntity
-    public OrderEntity toOrderEntity(OrderDTO orderDTO, CustomerEntity customerEntity) {
+    public static OrderEntity toOrderEntity(OrderDTO orderDTO, CustomerEntity customerEntity) {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setCustomer(customerEntity);
         orderEntity.setDinnerKind(orderDTO.getDinnerKind());

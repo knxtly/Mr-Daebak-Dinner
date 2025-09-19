@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class OrderDTO {
+public class OrderResponseDTO { // 주문조회 시 정보를 담아올 객체
     private Long id;
     @NotNull
     private LocalDateTime orderTime;
-    // 보통 DTO에서는 **id(Long)**만 들고, 서비스에서 Entity로 변환하는 것이 깔끔
-    // 변환 시 Service에서 customerId로 DB에서 CustomerEntity 조회 후 toOrderEntity에 전달
-    @NotNull
-    private Long customerId;
+    @NotBlank
+    private String customerLoginId;
+    @NotBlank
+    private String customerName;
     @NotBlank
     private String dinnerKind;
     @NotBlank
@@ -36,12 +36,12 @@ public class OrderDTO {
     @NotBlank
     private String status;
 
-    // OrderEntity => OrderDTO
-    public static OrderDTO toOrderDTO(OrderEntity orderEntity) {
-        OrderDTO dto = new OrderDTO();
+    public static OrderResponseDTO toOrderResponseDTO(OrderEntity orderEntity) {
+        OrderResponseDTO dto = new OrderResponseDTO();
         dto.setId(orderEntity.getId());
         dto.setOrderTime(orderEntity.getOrderTime());
-        dto.setCustomerId(orderEntity.getCustomer().getId());
+        dto.setCustomerLoginId(orderEntity.getCustomer().getLoginId());
+        dto.setCustomerName(orderEntity.getCustomer().getName());
         dto.setDinnerKind(orderEntity.getDinnerKind());
         dto.setDinnerStyle(orderEntity.getDinnerStyle());
         dto.setDeliveryAddress(orderEntity.getDeliveryAddress());

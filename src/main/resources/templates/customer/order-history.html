@@ -7,7 +7,39 @@
 </head>
 <body>
 <h1>My Orders</h1>
-<!--TODO: Thymeleaf이용해서 고객의 주문목록 보여주는 로직 ${orderList}로 받아옴-->
+<!--Thymeleaf이용해서 특정 고객의 주문목록이 ${orderList}에 담김-->
+<!--https://changha-dev.tistory.com/150 -->
+<table>
+    <tr>
+        <th>순번</th>
+        <th>주문시각</th>
+        <th>주문고객 LoginID</th>
+        <th>주문고객 Name</th>
+        <th>Dinner 종류</th>
+        <th>Dinner 스타일</th>
+        <th>배달 주소</th>
+        <th>배달 시간</th>
+        <th>가격</th>
+        <th>결제카드번호</th>
+        <th>Status</th>
+        <th>재주문</th>
+    </tr>
+    <tr th:each="order : ${orderList}">
+        <td th:text="${stat.index + 1}"></td>
+        <td th:text="${order.orderTime}"></td>
+        <td th:text="${order.customerLoginId}"></td>
+        <td th:text="${order.customerName}"></td>
+        <td th:text="${order.dinnerKind}"></td>
+        <td th:text="${order.dinnerStyle}"></td>
+        <td th:text="${order.deliveryAddress}"></td>
+        <td th:text="${order.deliveryTime}"></td>
+        <td th:text="${order.totalPrice}"></td>
+        <td th:text="${order.cardNumber}"></td>
+        <td th:text="${order.status}"></td>
+        <td><a th:href="@{|/customer/order/reorder/${order.orderId}|}"></a></td>
+
+    </tr>
+</table>
 <a href="/customer/main">메인으로</a>
 </body>
 </html>
