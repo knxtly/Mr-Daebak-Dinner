@@ -4,171 +4,89 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>New Order | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/customer-order.css}">
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<main class="card" role="main">
+<main>
     <h1>New Order</h1>
-    <p class="lead">메뉴와 서빙 스타일을 선택하고 구성 요소별 수량을 지정한 뒤 제출하세요.</p>
+    <p>메뉴와 서빙 스타일을 선택하고 배달 정보를 입력한 뒤 제출하세요.</p>
 
-    <form id="orderForm" class="grid" action="/customer/orders/new" method="post" autocomplete="off" novalidate>
+    <form id="orderForm" action="/customer/orders/new" method="post" autocomplete="off" novalidate>
         <!-- 메뉴 선택 -->
-        <div class="field">
-            <label for="menuSelect">메뉴 선택 (menu)</label>
-            <select id="menuSelect" name="menu" required>
-                <option value="" selected disabled>메뉴를 선택하세요</option>
+        <div>
+            <label for="menuSelect">메뉴 선택</label>
+            <select id="menuSelect" name="dinnerKind" required>
+                <option value="" selected hidden>메뉴를 선택하세요</option>
                 <option value="valentine">Valentine dinner</option>
                 <option value="french">French dinner</option>
                 <option value="english">English dinner</option>
                 <option value="champagne">Champagne Feast dinner</option>
             </select>
-            <div class="small">선택하면 기본 구성(수량)이 자동으로 채워집니다.</div>
         </div>
 
         <!-- 서빙 스타일 선택 -->
-        <div class="field">
-            <label for="styleSelect">서빙 스타일 선택 (delivery_style)</label>
-            <select id="styleSelect" name="delivery_style" required>
-                <option value="" selected disabled>스타일을 선택하세요</option>
+        <div>
+            <label for="styleSelect">서빙 스타일 선택</label>
+            <select id="styleSelect" name="dinnerStyle" required>
+                <option value="" selected hidden>스타일을 선택하세요</option>
                 <option value="simple">simple</option>
                 <option value="grand">grand</option>
                 <option value="delux">delux</option>
             </select>
         </div>
 
-        <!-- 구성 요소 수량 -->
-        <div class="components" aria-live="polite">
-            <!-- wine -->
-            <div class="component">
-                <label for="wine">Wine (wine)</label>
-                <input type="number" id="wine" name="wine" min="0" step="1" value="0" />
-            </div>
-
-            <!-- steak -->
-            <div class="component">
-                <label for="steak">Steak (steak)</label>
-                <input type="number" id="steak" name="steak" min="0" step="1" value="0" />
-            </div>
-
-            <!-- coffee cup -->
-            <div class="component">
-                <label for="coffee_cup">Coffee Cup (coffee_cup)</label>
-                <input type="number" id="coffee_cup" name="coffee_cup" min="0" step="1" value="0" />
-            </div>
-
-            <!-- coffee pot -->
-            <div class="component">
-                <label for="coffee_pot">Coffee Pot (coffee_pot)</label>
-                <input type="number" id="coffee_pot" name="coffee_pot" min="0" step="1" value="0" />
-            </div>
-
-            <!-- salad -->
-            <div class="component">
-                <label for="salad">Salad (salad)</label>
-                <input type="number" id="salad" name="salad" min="0" step="1" value="0" />
-            </div>
-
-            <!-- eggscramble -->
-            <div class="component">
-                <label for="eggscramble">Egg Scramble (eggscramble)</label>
-                <input type="number" id="eggscramble" name="eggscramble" min="0" step="1" value="0" />
-            </div>
-
-            <!-- bacon -->
-            <div class="component">
-                <label for="bacon">Bacon (bacon)</label>
-                <input type="number" id="bacon" name="bacon" min="0" step="1" value="0" />
-            </div>
-
-            <!-- bread -->
-            <div class="component">
-                <label for="bread">Bread (bread)</label>
-                <input type="number" id="bread" name="bread" min="0" step="1" value="0" />
-            </div>
-
-            <!-- baguette -->
-            <div class="component">
-                <label for="baguette">Baguette (baguette)</label>
-                <input type="number" id="baguette" name="baguette" min="0" step="1" value="0" />
-            </div>
-
-            <!-- champagne -->
-            <div class="component">
-                <label for="champagne">Champagne (champagne)</label>
-                <input type="number" id="champagne" name="champagne" min="0" step="1" value="0" />
-            </div>
+        <!-- 배달 주소 -->
+        <div>
+            <label for="deliveryAddress">배달 주소</label>
+            <input type="text" id="deliveryAddress" name="deliveryAddress" required />
         </div>
 
-        <div class="actions">
-            <button type="button" class="btn-secondary" id="resetBtn">초기화</button>
-            <button type="submit" class="btn-primary">주문 제출</button>
+        <!-- 카드 번호 -->
+        <div>
+            <label for="cardNumber">카드 번호</label>
+            <input type="text" id="cardNumber" name="cardNumber" required />
+        </div>
+
+        <div>
+            <button type="reset" id="resetBtn">초기화</button>
+            <button type="submit">주문 제출</button>
+            <a href="/customer/main">이전</a>
         </div>
     </form>
-    <p class="small">※ Champagne Feast dinner 선택 시: 자동으로 2인 기준(샴페인 1병, 바게트 4개, 커피포트 1, 와인 1, 스테이크 1)이 설정되고 해당 항목은 잠깁니다.</p>
+    <div th:if="${errorMessage}">
+        <p th:utext="${errorMessage}" style="color: red;"></p>
+    </div>
 </main>
 
 <script>
     (function(){
-      const menuSelect = document.getElementById('menuSelect');
-      const resetBtn = document.getElementById('resetBtn');
+        const menuSelect = document.getElementById('menuSelect');
+        const styleSelect = document.getElementById('styleSelect');
+        const resetBtn = document.getElementById('resetBtn');
 
-      // map: 메뉴 -> 기본 구성 (key: input id, value: count)
-      const menuDefaults = {
-        valentine: { wine:1, steak:1, coffee_cup:0, coffee_pot:0, salad:0, eggscramble:0, bacon:0, bread:0, baguette:0, champagne:0 },
-        french:   { wine:1, steak:1, coffee_cup:1, coffee_pot:0, salad:1, eggscramble:0, bacon:0, bread:0, baguette:0, champagne:0 },
-        english:  { wine:0, steak:1, coffee_cup:0, coffee_pot:0, salad:0, eggscramble:1, bacon:1, bread:1, baguette:0, champagne:0 },
-        champagne:{ wine:1, steak:1, coffee_cup:0, coffee_pot:1, salad:0, eggscramble:0, bacon:0, bread:0, baguette:4, champagne:1 }
-      };
-
-      // When a menu is selected, fill defaults. For 'champagne', lock some fields.
-      menuSelect.addEventListener('change', () => {
-        const m = menuSelect.value;
-        if(!menuDefaults[m]) return;
-        Object.keys(menuDefaults[m]).forEach(key => {
-          const el = document.getElementById(key);
-          if(!el) return;
-          el.value = menuDefaults[m][key];
-          // lock required Champagne Feast items
-          if(m === 'champagne' && ['champagne','baguette','coffee_pot','wine','steak'].includes(key)){
-            el.readOnly = true;
-            el.classList.add('locked');
-          } else {
-            el.readOnly = false;
-            el.classList.remove('locked');
-          }
+        // Champagne Feast 선택 시 스타일 제한
+        menuSelect.addEventListener('change', () => {
+            if(menuSelect.value === 'champagne'){
+                Array.from(styleSelect.options).forEach(opt => {
+                    if(opt.value === 'simple'){
+                        opt.disabled = true;
+                    } else {
+                        opt.disabled = false;
+                    }
+                });
+                // 기본 선택 grand
+                styleSelect.value = 'grand';
+            } else {
+                Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
+                styleSelect.value = '';
+            }
         });
-      });
 
-      // reset button clears all inputs and re-enables locked fields
-      resetBtn.addEventListener('click', (e) => {
-        document.getElementById('orderForm').reset();
-        // ensure numeric inputs set to 0
-        ['wine','steak','coffee_cup','coffee_pot','salad','eggscramble','bacon','bread','baguette','champagne'].forEach(id=>{
-          const el = document.getElementById(id);
-          if(!el) return;
-          el.value = 0;
-          el.readOnly = false;
-          el.classList.remove('locked');
+        // reset 시 옵션 재설정
+        resetBtn.addEventListener('click', () => {
+            Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
+            styleSelect.value = '';
         });
-      });
-
-      // optional: prevent negative numbers on manual edit (extra guard)
-      document.querySelectorAll('input[type="number"]').forEach(inp=>{
-        inp.addEventListener('input', () => {
-          if(inp.value === '') return;
-          let v = parseInt(inp.value,10);
-          if(isNaN(v) || v < 0) inp.value = 0;
-        });
-      });
-
-      // on load, ensure numeric defaults are 0
-      window.addEventListener('DOMContentLoaded', ()=> {
-        ['wine','steak','coffee_cup','coffee_pot','salad','eggscramble','bacon','bread','baguette','champagne'].forEach(id=>{
-          const el = document.getElementById(id);
-          if(!el) return;
-          if(el.value === '') el.value = 0;
-        });
-      });
     })();
 </script>
 </body>

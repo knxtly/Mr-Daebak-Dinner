@@ -16,11 +16,9 @@ import java.time.LocalDateTime;
 @ToString
 public class OrderDTO {
     private Long id;
-    @NotNull
     private LocalDateTime orderTime;
     // 보통 DTO에서는 **id(Long)**만 들고, 서비스에서 Entity로 변환하는 것이 깔끔
     // 변환 시 Service에서 customerId로 DB에서 CustomerEntity 조회 후 toOrderEntity에 전달
-    @NotNull
     private Long customerId;
     @NotBlank
     private String dinnerKind;
@@ -29,11 +27,9 @@ public class OrderDTO {
     @NotBlank
     private String deliveryAddress;
     private LocalDateTime deliveryTime;
-    @NotNull
     private Integer totalPrice;
     @NotBlank
     private String cardNumber;
-    @NotBlank
     private String status;
 
     // OrderEntity => OrderDTO

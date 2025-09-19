@@ -29,11 +29,9 @@ public class OrderResponseDTO { // 주문조회 시 정보를 담아올 객체
     @NotBlank
     private String deliveryAddress;
     private LocalDateTime deliveryTime;
-    @NotNull
     private Integer totalPrice;
     @NotBlank
     private String cardNumber;
-    @NotBlank
     private String status;
 
     public static OrderResponseDTO toOrderResponseDTO(OrderEntity orderEntity) {

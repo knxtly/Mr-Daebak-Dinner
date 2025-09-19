@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class OrderController {
     @PostMapping("/customer/orders/new")
     public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult,
+                            RedirectAttributes redirectAttributes,
                             HttpSession session) {
         // 로그인한 customer session이 없으면 로그인 페이지로 이동
         // TODO: Interceptor로 나중에 바꿔보기
@@ -47,6 +49,16 @@ public class OrderController {
         }
 
         if (bindingResult.hasErrors()) {
+            // 오류 메시지 이어붙이기
+            StringBuilder errorMessage = new StringBuilder();
+            bindingResult.getFieldErrors().forEach(fieldError -> {
+                errorMessage.append(fieldError.getField()).append(": ");
+                errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
+            });
+
+            // redirectAttributes에 errorMessage 전달
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    errorMessage.toString().trim());
             return "redirect:/customer/orders/new";
         }
 
