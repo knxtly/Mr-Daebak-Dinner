@@ -79,7 +79,7 @@ public class OrderController {
     }
 
     // 재주문 요청
-    @GetMapping("/customer/order/reorder/${orderId}")
+    @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId, HttpSession session) {
         // 로그인한 customer session이 없으면 로그인 페이지로 이동
         // TODO: Interceptor로 나중에 바꿔보기
