@@ -35,17 +35,24 @@ public class OrderEntity {
     @Column(name = "delivery_time")
     private LocalDateTime deliveryTime;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price") // TODO: nullable 추가할 것. 계산 후 값 결정
     private Integer totalPrice;
 
     @Column(name = "card_number", nullable = false)
     private String cardNumber;
 
-    @Column(name = "status", nullable = false, columnDefinition = "varchar(255) default '주문완료'")
-    private String status = "주문완료";
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.status == null) {
+            this.status = "주문완료";
+        }
+    }
 
     // OrderDTO => OrderEntity
-    public OrderEntity toOrderEntity(OrderDTO orderDTO, CustomerEntity customerEntity) {
+    public static OrderEntity toOrderEntity(OrderDTO orderDTO, CustomerEntity customerEntity) {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setCustomer(customerEntity);
         orderEntity.setDinnerKind(orderDTO.getDinnerKind());
@@ -54,8 +61,7 @@ public class OrderEntity {
         orderEntity.setDeliveryTime(orderDTO.getDeliveryTime());
         orderEntity.setTotalPrice(orderDTO.getTotalPrice());
         orderEntity.setCardNumber(orderDTO.getCardNumber());
-        orderEntity.setStatus(orderDTO.getStatus());
-        // id, orderTime은 기본값 사용
+        // id, orderTime, status은 기본값 사용
         return orderEntity;
     }
 }

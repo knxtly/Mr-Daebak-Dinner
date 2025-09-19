@@ -34,15 +34,15 @@ public class CustomerDTO {
 
     // CustomerEntity => CustomerDTO
     public static CustomerDTO toCustomerDTO(CustomerEntity customerEntity) {
-        CustomerDTO customerDTO = new CustomerDTO();
-        customerDTO.setId(customerEntity.getId());
-        customerDTO.setLoginId(customerEntity.getLoginId());
-        customerDTO.setPassword(customerEntity.getPassword());
-        customerDTO.setName(customerEntity.getName());
-        customerDTO.setAddress(customerEntity.getAddress());
-        customerDTO.setContact(customerEntity.getContact());
-        customerDTO.setOrderCount(customerEntity.getOrderCount());
-        customerDTO.setMembershipLevel(customerEntity.getMembershipLevel());
-        return customerDTO;
+        CustomerDTO dto = new CustomerDTO();
+        dto.setId(customerEntity.getId());
+        dto.setLoginId(customerEntity.getLoginId());
+        dto.setPassword(customerEntity.getPassword());
+        dto.setName(customerEntity.getName());
+        dto.setAddress(customerEntity.getAddress());
+        dto.setContact(customerEntity.getContact());
+        dto.setOrderCount(customerEntity.getOrderCount());
+        dto.setMembershipLevel(customerEntity.getMembershipLevel());
+        return dto;
     }
 }

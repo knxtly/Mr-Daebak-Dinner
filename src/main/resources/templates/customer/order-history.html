@@ -7,7 +7,34 @@
 </head>
 <body>
 <h1>My Orders</h1>
-<!--TODO: Thymeleaf이용해서 고객의 주문목록 보여주는 로직 ${orderList}로 받아옴-->
+<table>
+    <tr>
+        <th>순번</th>
+        <th>주문시각</th>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Dinner 종류</th>
+        <th>Dinner 스타일</th>
+        <th>배달 주소</th>
+        <th>배달 시간</th>
+        <th>가격</th>
+        <th>결제카드번호</th>
+        <th>Status</th>
+        <th>재주문</th>
+    </tr>
+    <tr th:each="order, stat : ${orderList}">
+        <td th:text="${stat.index + 1}"></td>
+        <td th:text="${order.orderTime} ?: '-'"></td>
+        <td th:text="${order.dinnerKind} ?: '-'"></td>
+        <td th:text="${order.dinnerStyle} ?: '-'"></td>
+        <td th:text="${order.deliveryAddress} ?: '-'"></td>
+        <td th:text="${order.deliveryTime} ?: '-'"></td>
+        <td th:text="${order.totalPrice} ?: '-'"></td>
+        <td th:text="${order.cardNumber} ?: '-'"></td>
+        <td th:text="${order.status} ?: '-'"></td>
+        <td><a th:href="@{|/customer/order/reorder/${order.id}|}">재주문</a></td>
+    </tr>
+</table>
 <a href="/customer/main">메인으로</a>
 </body>
 </html>
