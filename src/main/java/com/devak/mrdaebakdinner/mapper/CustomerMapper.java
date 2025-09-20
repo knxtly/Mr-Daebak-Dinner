@@ -1,31 +1,26 @@
 package com.devak.mrdaebakdinner.mapper;
 
-import com.devak.mrdaebakdinner.dto.CustomerDTO;
+import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
+import com.devak.mrdaebakdinner.dto.CustomerSignUpDTO;
 import com.devak.mrdaebakdinner.entity.CustomerEntity;
 
 public class CustomerMapper {
     // CustomerEntity => CustomerDTO
-    public static CustomerDTO toCustomerDTO(CustomerEntity customerEntity) {
-        CustomerDTO customerDTO = new CustomerDTO();
-        customerDTO.setId(customerEntity.getId());
+    public static CustomerLoginDTO toCustomerLoginDTO(CustomerEntity customerEntity) {
+        CustomerLoginDTO customerDTO = new CustomerLoginDTO();
         customerDTO.setLoginId(customerEntity.getLoginId());
         customerDTO.setPassword(customerEntity.getPassword());
-        customerDTO.setName(customerEntity.getName());
-        customerDTO.setAddress(customerEntity.getAddress());
-        customerDTO.setContact(customerEntity.getContact());
-        customerDTO.setOrderCount(customerEntity.getOrderCount());
-        customerDTO.setMembershipLevel(customerEntity.getMembershipLevel());
         return customerDTO;
     }
 
     // CustomerDTO => CustomerEntity
-    public static CustomerEntity toCustomerEntity(CustomerDTO customerDTO) {
+    public static CustomerEntity toCustomerEntity(CustomerSignUpDTO customerSignUpDTO) {
         CustomerEntity customerEntity = new CustomerEntity();
-        customerEntity.setLoginId(customerDTO.getLoginId());
-        customerEntity.setPassword(customerDTO.getPassword());
-        customerEntity.setName(customerDTO.getName());
-        customerEntity.setAddress(customerDTO.getAddress());
-        customerEntity.setContact(customerDTO.getContact());
+        customerEntity.setLoginId(customerSignUpDTO.getLoginId());
+        customerEntity.setPassword(customerSignUpDTO.getPassword());
+        customerEntity.setName(customerSignUpDTO.getName());
+        customerEntity.setAddress(customerSignUpDTO.getAddress());
+        customerEntity.setContact(customerSignUpDTO.getContact());
         // id, orderCount, membershipLevel은 DB 기본값 사용
         return customerEntity;
     }

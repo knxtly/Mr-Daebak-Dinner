@@ -1,6 +1,6 @@
 package com.devak.mrdaebakdinner.controller;
 
-import com.devak.mrdaebakdinner.dto.CustomerDTO;
+import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
 import com.devak.mrdaebakdinner.dto.OrderDTO;
 import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
 import com.devak.mrdaebakdinner.service.OrderService;
@@ -49,7 +49,7 @@ public class OrderController {
         }
 
         orderService.placeOrder(orderDTO,
-                (CustomerDTO) session.getAttribute("loggedInCustomer"));
+                (CustomerLoginDTO) session.getAttribute("loggedInCustomer"));
 
         return "redirect:/customer/orders/success";
     }
@@ -61,7 +61,7 @@ public class OrderController {
 
     // 이전주문기록 조회 요청
     @GetMapping("/customer/orders/history")
-    public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerDTO customer,
+    public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerLoginDTO customer,
                                            Model model) {
 
         // 고객의 order목록을 찾아서 보여주는 로직
@@ -76,7 +76,7 @@ public class OrderController {
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId, HttpSession session) {
         orderService.placeOrder(orderService.buildReorderDTO(orderId),
-                (CustomerDTO) session.getAttribute("loggedInCustomer"));
+                (CustomerLoginDTO) session.getAttribute("loggedInCustomer"));
 
         return "redirect:/customer/orders/success";
     }
