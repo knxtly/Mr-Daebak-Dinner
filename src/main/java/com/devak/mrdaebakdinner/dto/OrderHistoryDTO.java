@@ -1,6 +1,7 @@
 package com.devak.mrdaebakdinner.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,12 +13,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class OrderDTO {
-    private Long id;
+public class OrderHistoryDTO { // 고객이 이전주문조회 시 정보를 담아올 객체
+    @NotNull
     private LocalDateTime orderTime;
-    // 보통 DTO에서는 **id(Long)**만 들고, 서비스에서 Entity로 변환하는 것이 깔끔
-    // 변환 시 Service에서 customerId로 DB에서 CustomerEntity 조회 후 toOrderEntity에 전달
-    private Long customerId;
     @NotBlank
     private String dinnerKind;
     @NotBlank

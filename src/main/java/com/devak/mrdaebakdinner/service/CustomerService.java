@@ -6,6 +6,7 @@ import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
 import com.devak.mrdaebakdinner.exception.DatabaseException;
 import com.devak.mrdaebakdinner.exception.DuplicateLoginIdException;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
+import com.devak.mrdaebakdinner.mapper.CustomerMapper;
 import com.devak.mrdaebakdinner.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -24,12 +25,11 @@ public class CustomerService {
         Optional<CustomerEntity> byLoginId =
                 customerRepository.findByLoginId(customerDTO.getLoginId());
 
-        if (byLoginId.isPresent()) {
-            // ID exists
+        if (byLoginId.isPresent()) { // ID exists
             CustomerEntity customerEntity = byLoginId.get(); // .get(): Optional에서 꺼냄
             if (customerEntity.getPassword().equals(customerDTO.getPassword())) {
                 // correct password
-                return CustomerDTO.toCustomerDTO(customerEntity);
+                return CustomerMapper.toCustomerDTO(customerEntity);
             } else {
                 // incorrect password
                 throw new IncorrectPasswordException("비밀번호가 일치하지 않습니다.");
@@ -47,7 +47,7 @@ public class CustomerService {
         }
         try {
             // 존재하지 않는 ID면 회원가입 시도
-            customerRepository.save(CustomerEntity.toCustomerEntity(customerDTO));
+            customerRepository.save(CustomerMapper.toCustomerEntity(customerDTO));
         } catch (DataAccessException e) {
             throw new DatabaseException("DB 처리 중 오류", e);
         }

@@ -1,9 +1,7 @@
 package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.CustomerDTO;
-import com.devak.mrdaebakdinner.entity.CustomerEntity;
 import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
-import com.devak.mrdaebakdinner.exception.DatabaseException;
 import com.devak.mrdaebakdinner.exception.DuplicateLoginIdException;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
 import com.devak.mrdaebakdinner.service.CustomerService;

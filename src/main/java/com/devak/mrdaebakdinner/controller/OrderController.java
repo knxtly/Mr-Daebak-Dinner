@@ -2,7 +2,7 @@ package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.CustomerDTO;
 import com.devak.mrdaebakdinner.dto.OrderDTO;
-import com.devak.mrdaebakdinner.dto.OrderResponseDTO;
+import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
 import com.devak.mrdaebakdinner.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -65,7 +65,7 @@ public class OrderController {
                                            Model model) {
 
         // 고객의 order목록을 찾아서 보여주는 로직
-        List<OrderResponseDTO> orderList =
+        List<OrderHistoryDTO> orderList =
                 orderService.findAllByCustomerId(customer.getId());
         // order-history.html에 "orderList"라는 속성으로 전달
         model.addAttribute("orderList", orderList);
