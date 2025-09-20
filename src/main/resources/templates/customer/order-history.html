@@ -32,6 +32,7 @@
         <td th:text="${order.cardNumber} ?: '-'"></td>
         <td><a>상세</a></td>
         <td th:text="${order.status} ?: '-'"></td>
+<!--        이게 곧 상세지만, 일부 필드만 노출하고 상세 필드 추가-->
         <td><a th:href="@{|/customer/order/reorder/${order.id}|}">재주문</a></td>
     </tr>
 </table>

@@ -28,9 +28,16 @@ public class CustomerEntity {
     @Column(name = "contact")
     private String contact;
 
-    @Column(name = "order_count", columnDefinition = "int default 0")
+    @Column(name = "order_count")
     private int orderCount = 0;
 
-    @Column(name = "membership_level", columnDefinition = "varchar(255) default 'Family'")
-    private String membershipLevel = "Family";
+    @Column(name = "membership_level")
+    private String membershipLevel;
+
+    @PrePersist
+    public void prePersist() {
+        if (membershipLevel == null) {
+            membershipLevel = "Family";
+        }
+    }
 }
