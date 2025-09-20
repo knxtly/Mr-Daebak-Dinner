@@ -1,6 +1,7 @@
 package com.devak.mrdaebakdinner.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,20 +14,14 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 public class OrderDTO {
-    private Long id;
-    private LocalDateTime orderTime;
-    // 보통 DTO에서는 **id(Long)**만 들고, 서비스에서 Entity로 변환하는 것이 깔끔
-    // 변환 시 Service에서 customerId로 DB에서 CustomerEntity 조회 후 toOrderEntity에 전달
-    private Long customerId;
-    @NotBlank
+    @NotBlank(message = "디너 종류를 선택해주세요.")
     private String dinnerKind;
-    @NotBlank
+    @NotBlank(message = "디너 스타일을 선택해주세요.")
     private String dinnerStyle;
-    @NotBlank
+    @NotBlank(message = "배달 주소를 입력해주세요.")
     private String deliveryAddress;
-    private LocalDateTime deliveryTime;
+//    @NotNull
     private Integer totalPrice;
-    @NotBlank
+    @NotBlank(message = "카드번호를 입력해주세요.")
     private String cardNumber;
-    private String status;
 }

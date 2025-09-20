@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 public class OrderHistoryDTO { // 고객이 이전주문조회 시 정보를 담아올 객체
+    private Long id;
     @NotNull
     private LocalDateTime orderTime;
     @NotBlank

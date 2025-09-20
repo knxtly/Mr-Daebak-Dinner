@@ -21,9 +21,9 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // 주문 페이지 GET 요청
+    // Customer: 주문 페이지 GET 요청
     @GetMapping("/customer/orders/new")
-    public String showOrderPage(HttpSession session) {
+    public String showOrderPage() {
         return "customer/order";
     }
 
@@ -32,13 +32,12 @@ public class OrderController {
     public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes,
-                            HttpSession session) {
+                            @SessionAttribute CustomerLoginDTO customerLoginDTO) {
 
         if (bindingResult.hasErrors()) {
             // 오류 메시지 이어붙이기
             StringBuilder errorMessage = new StringBuilder();
             bindingResult.getFieldErrors().forEach(fieldError -> {
-                errorMessage.append(fieldError.getField()).append(": ");
                 errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
             });
 
@@ -48,8 +47,7 @@ public class OrderController {
             return "redirect:/customer/orders/new";
         }
 
-        orderService.placeOrder(orderDTO,
-                (CustomerLoginDTO) session.getAttribute("loggedInCustomer"));
+        orderService.placeOrder(orderDTO, customerLoginDTO);
 
         return "redirect:/customer/orders/success";
     }
@@ -64,9 +62,9 @@ public class OrderController {
     public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerLoginDTO customer,
                                            Model model) {
 
-        // 고객의 order목록을 찾아서 보여주는 로직
+        // 고객의 loginId로 order목록을 찾아서 보여주는 로직
         List<OrderHistoryDTO> orderList =
-                orderService.findAllByCustomerId(customer.getId());
+                orderService.findAllByLoginId(customer.getLoginId());
         // order-history.html에 "orderList"라는 속성으로 전달
         model.addAttribute("orderList", orderList);
         return "customer/order-history";
@@ -74,9 +72,13 @@ public class OrderController {
 
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
-    public String takeReorder(@PathVariable Long orderId, HttpSession session) {
-        orderService.placeOrder(orderService.buildReorderDTO(orderId),
-                (CustomerLoginDTO) session.getAttribute("loggedInCustomer"));
+    public String takeReorder(@PathVariable Long orderId,
+                              @SessionAttribute CustomerLoginDTO customerLoginDTO) {
+
+        orderService.placeOrder(
+                orderService.buildReorderDTO(orderId),
+                customerLoginDTO
+        );
 
         return "redirect:/customer/orders/success";
     }
