@@ -1,6 +1,5 @@
 package com.devak.mrdaebakdinner.entity;
 
-import com.devak.mrdaebakdinner.dto.CustomerDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,16 +33,4 @@ public class CustomerEntity {
 
     @Column(name = "membership_level", columnDefinition = "varchar(255) default 'Family'")
     private String membershipLevel = "Family";
-
-    // CustomerDTO => CustomerEntity
-    public static CustomerEntity toCustomerEntity(CustomerDTO customerDTO) {
-        CustomerEntity customerEntity = new CustomerEntity();
-        customerEntity.setLoginId(customerDTO.getLoginId());
-        customerEntity.setPassword(customerDTO.getPassword());
-        customerEntity.setName(customerDTO.getName());
-        customerEntity.setAddress(customerDTO.getAddress());
-        customerEntity.setContact(customerDTO.getContact());
-        // id, orderCount, membershipLevel은 DB 기본값 사용
-        return customerEntity;
-    }
 }

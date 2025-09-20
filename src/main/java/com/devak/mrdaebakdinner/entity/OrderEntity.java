@@ -50,18 +50,4 @@ public class OrderEntity {
             this.status = "주문완료";
         }
     }
-
-    // OrderDTO => OrderEntity
-    public static OrderEntity toOrderEntity(OrderDTO orderDTO, CustomerEntity customerEntity) {
-        OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setCustomer(customerEntity);
-        orderEntity.setDinnerKind(orderDTO.getDinnerKind());
-        orderEntity.setDinnerStyle(orderDTO.getDinnerStyle());
-        orderEntity.setDeliveryAddress(orderDTO.getDeliveryAddress());
-        orderEntity.setDeliveryTime(orderDTO.getDeliveryTime());
-        orderEntity.setTotalPrice(orderDTO.getTotalPrice());
-        orderEntity.setCardNumber(orderDTO.getCardNumber());
-        // id, orderTime, status은 기본값 사용
-        return orderEntity;
-    }
 }

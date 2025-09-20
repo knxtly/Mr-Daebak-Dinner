@@ -1,6 +1,5 @@
 package com.devak.mrdaebakdinner.dto;
 
-import com.devak.mrdaebakdinner.entity.CustomerEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -31,18 +30,4 @@ public class CustomerDTO {
     private String contact;
     private int orderCount;
     private String membershipLevel;
-
-    // CustomerEntity => CustomerDTO
-    public static CustomerDTO toCustomerDTO(CustomerEntity customerEntity) {
-        CustomerDTO dto = new CustomerDTO();
-        dto.setId(customerEntity.getId());
-        dto.setLoginId(customerEntity.getLoginId());
-        dto.setPassword(customerEntity.getPassword());
-        dto.setName(customerEntity.getName());
-        dto.setAddress(customerEntity.getAddress());
-        dto.setContact(customerEntity.getContact());
-        dto.setOrderCount(customerEntity.getOrderCount());
-        dto.setMembershipLevel(customerEntity.getMembershipLevel());
-        return dto;
-    }
 }

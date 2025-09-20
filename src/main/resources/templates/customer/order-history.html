@@ -17,6 +17,7 @@
         <th>배달 시간</th>
         <th>가격</th>
         <th>결제카드번호</th>
+        <th>상세</th>
         <th>Status</th>
         <th>재주문</th>
     </tr>
@@ -29,6 +30,7 @@
         <td th:text="${order.deliveryTime} ?: '-'"></td>
         <td th:text="${order.totalPrice} ?: '-'"></td>
         <td th:text="${order.cardNumber} ?: '-'"></td>
+        <td><a>상세</a></td>
         <td th:text="${order.status} ?: '-'"></td>
         <td><a th:href="@{|/customer/order/reorder/${order.id}|}">재주문</a></td>
     </tr>
