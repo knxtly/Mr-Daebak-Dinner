@@ -32,7 +32,7 @@ public class OrderController {
     public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult,
                             RedirectAttributes redirectAttributes,
-                            @SessionAttribute CustomerLoginDTO customerLoginDTO) {
+                            @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
 
         if (bindingResult.hasErrors()) {
             // 오류 메시지 이어붙이기
@@ -73,7 +73,7 @@ public class OrderController {
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId,
-                              @SessionAttribute CustomerLoginDTO customerLoginDTO) {
+                              @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
 
         orderService.placeOrder(
                 orderService.buildReorderDTO(orderId),
