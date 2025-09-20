@@ -15,6 +15,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(loginCheckInterceptor)
-                .addPathPatterns("/customer/orders/**"); // 로그인 체크 필요 경로
+                .addPathPatterns("/customer/orders/**", "/customer/main"); // 로그인 체크 필요 경로
     }
 }

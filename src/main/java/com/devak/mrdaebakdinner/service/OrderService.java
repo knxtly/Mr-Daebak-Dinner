@@ -1,6 +1,6 @@
 package com.devak.mrdaebakdinner.service;
 
-import com.devak.mrdaebakdinner.dto.CustomerDTO;
+import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
 import com.devak.mrdaebakdinner.dto.OrderDTO;
 import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
 import com.devak.mrdaebakdinner.entity.CustomerEntity;
@@ -33,7 +33,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void placeOrder(@Valid OrderDTO orderDTO, CustomerDTO customerDTO) {
+    public void placeOrder(@Valid OrderDTO orderDTO, CustomerLoginDTO customerDTO) {
         // TODO: 재고가 불충분 = 주문불가
         CustomerEntity customer = customerRepository.findById(customerDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));

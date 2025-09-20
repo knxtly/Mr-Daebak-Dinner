@@ -1,6 +1,6 @@
 package com.devak.mrdaebakdinner.interceptor;
 
-import com.devak.mrdaebakdinner.dto.CustomerDTO;
+import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -15,8 +15,8 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
         HttpSession session = request.getSession(false);
-        CustomerDTO customerDTO = (session != null) ?
-                (CustomerDTO) session.getAttribute("loggedInCustomer") : null;
+        CustomerLoginDTO customerDTO = (session != null) ?
+                (CustomerLoginDTO) session.getAttribute("loggedInCustomer") : null;
         if (customerDTO == null){
             // 로그인 페이지로 redirect
             response.sendRedirect("/customer");
