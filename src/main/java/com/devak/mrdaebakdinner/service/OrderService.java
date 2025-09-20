@@ -38,9 +38,13 @@ public class OrderService {
         CustomerEntity customer = customerRepository.findById(customerDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
 
+        customer.setOrderCount(customer.getOrderCount() + 1);
+
         orderRepository.save(
                 OrderEntity.toOrderEntity(orderDTO, customer)
         );
+
+        customerRepository.save(customer);
     }
 
     public @Valid OrderDTO buildReorderDTO(Long orderId) {
