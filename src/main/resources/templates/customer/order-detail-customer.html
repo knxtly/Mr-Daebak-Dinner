@@ -28,8 +28,19 @@
         <td th:text="${order.deliveryAddress} ?: '-'"></td>
         <td th:text="${order.cardNumber} ?: '-'"></td>
         <td th:text="${order.status} ?: '-'"></td>
-<!--        TODO: orderItem도 넣어야 함-->
         <td><a th:href="@{|/customer/order/reorder/${order.id}|}">재주문</a></td>
+    </tr>
+
+    <!-- 주문한 아이템 표시 -->
+    <tr>
+        <th>아이템 이름</th>
+        <th>수량</th>
+        <th colspan="7"></th>
+    </tr>
+    <tr th:each="entry : ${orderItem.orderItems}">
+        <td th:text="${entry.key}">Item Name</td>
+        <td th:text="${entry.value}">Quantity</td>
+        <td colspan="7"></td>
     </tr>
 </table>
 <a href="/customer/main">메인으로</a>

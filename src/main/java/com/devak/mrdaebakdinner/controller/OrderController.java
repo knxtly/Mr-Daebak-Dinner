@@ -1,6 +1,7 @@
 package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.*;
+import com.devak.mrdaebakdinner.entity.OrderItemId;
 import com.devak.mrdaebakdinner.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -84,7 +85,7 @@ public class OrderController {
                                   Model model) {
         // orderId로부터 OrderHistoryDTO 불러오기
         OrderHistoryDTO order = orderService.findOrderHistoryByOrderId(orderId);
-        // TODO: OrderHistoryDTO뿐만 아니라 OrderItemDTO도 불러와야 함
+        OrderItemDTO orderItem = orderService.findOrderItemByOrderId(orderId);
 
         // 세션에서 사용자 확인
         CustomerLoginDTO customer = (CustomerLoginDTO) session.getAttribute("loggedInCustomer");
@@ -97,12 +98,14 @@ public class OrderController {
                 throw new IllegalArgumentException("다른 고객의 주문은 조회할 수 없습니다.");
             }
             model.addAttribute("order", order);
+            model.addAttribute("orderItem", orderItem);
             return "customer/order-detail-customer"; // 고객용 뷰
         }
 
         // 직원인 경우
         if (chef != null || delivery != null) {
             model.addAttribute("order", order);
+            model.addAttribute("orderItem", orderItem);
             return "staff/order-detail-staff"; // staff용 뷰
         }
 
@@ -111,5 +114,4 @@ public class OrderController {
     }
 
     // TODO: 배달완료 시 deliveryTime set
-    // TODO: detail 디렉토리 삭제
 }
