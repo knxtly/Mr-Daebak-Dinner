@@ -13,11 +13,11 @@
         <th>주문시각</th>
         <th>Dinner 종류</th>
         <th>Dinner 스타일</th>
-        <th>배달 주소</th>
-        <th>배달 시간</th>
         <th>가격</th>
-        <th>결제카드번호</th>
+        <th>배달 시간</th>
+        <th>배달 주소</th>
         <th>상세</th>
+        <th>결제카드번호</th>
         <th>Status</th>
         <th>재주문</th>
     </tr>
@@ -26,13 +26,12 @@
         <td th:text="${order.orderTime} ?: '-'"></td>
         <td th:text="${order.dinnerKind} ?: '-'"></td>
         <td th:text="${order.dinnerStyle} ?: '-'"></td>
-        <td th:text="${order.deliveryAddress} ?: '-'"></td>
-        <td th:text="${order.deliveryTime} ?: '-'"></td>
         <td th:text="${order.totalPrice} ?: '-'"></td>
-        <td th:text="${order.cardNumber} ?: '-'"></td>
+        <td th:text="${order.deliveryTime} ?: '-'"></td>
+        <td th:text="${order.deliveryAddress} ?: '-'"></td>
         <td><a>상세</a></td>
+        <td th:text="${order.cardNumber} ?: '-'"></td>
         <td th:text="${order.status} ?: '-'"></td>
-<!--        이게 곧 상세지만, 일부 필드만 노출하고 상세 필드 추가-->
         <td><a th:href="@{|/customer/order/reorder/${order.id}|}">재주문</a></td>
     </tr>
 </table>
