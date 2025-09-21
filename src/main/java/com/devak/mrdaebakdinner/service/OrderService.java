@@ -48,6 +48,23 @@ public class OrderService {
         return OrderMapper.toOrderHistoryDTO(order);
     }
 
+    public OrderItemDTO findOrderItemByOrderId(Long orderId) {
+        // orderId에 해당하는 item
+        List<OrderItemEntity> orderItems = orderItemRepository.findAllByOrderId(orderId);
+
+        // Map<String, Integer>로 변환 (key: item name, value: quantity)
+        Map<String, Integer> itemMap = orderItems.stream()
+                .collect(Collectors.toMap(
+                        oi -> oi.getItem().getName(),
+                        OrderItemEntity::getQuantity
+                ));
+
+        // DTO에 담아 반환
+        OrderItemDTO dto = new OrderItemDTO();
+        dto.setOrderItems(itemMap);
+        return dto;
+    }
+
     @Transactional
     public void placeOrder(OrderDTO orderDTO,
                            OrderItemDTO orderItemDTO,
