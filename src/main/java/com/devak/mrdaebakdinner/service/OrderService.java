@@ -28,7 +28,7 @@ public class OrderService {
     private final CustomerRepository customerRepository;
     private final ItemRepository itemRepository;
 
-    public List<OrderHistoryDTO> findAllByLoginId(String loginId) {
+    public List<OrderHistoryDTO> findOrderHistoryByLoginId(String loginId) {
         // loginId로 id 찾아서 반환
         CustomerEntity customerEntity = customerRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
@@ -39,6 +39,13 @@ public class OrderService {
         return orderEntityList.stream()
                 .map(OrderMapper::toOrderHistoryDTO)
                 .collect(Collectors.toList());
+    }
+
+    public OrderHistoryDTO findOrderHistoryByOrderId(Long orderId) {
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+
+        return OrderMapper.toOrderHistoryDTO(order);
     }
 
     @Transactional

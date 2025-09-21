@@ -20,6 +20,7 @@ public class OrderMapper {
     public static OrderHistoryDTO toOrderHistoryDTO(OrderEntity orderEntity) {
         OrderHistoryDTO orderHistoryDTO = new OrderHistoryDTO();
         orderHistoryDTO.setId(orderEntity.getId());
+        orderHistoryDTO.setCustomerLoginId(orderEntity.getCustomer().getLoginId());
         orderHistoryDTO.setOrderTime(orderEntity.getOrderTime());
         orderHistoryDTO.setDinnerKind(orderEntity.getDinnerKind());
         orderHistoryDTO.setDinnerStyle(orderEntity.getDinnerStyle());

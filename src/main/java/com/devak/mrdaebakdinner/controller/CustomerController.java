@@ -2,10 +2,12 @@ package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
 import com.devak.mrdaebakdinner.dto.CustomerSignUpDTO;
+import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
 import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
 import com.devak.mrdaebakdinner.exception.DuplicateLoginIdException;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
 import com.devak.mrdaebakdinner.service.CustomerService;
+import com.devak.mrdaebakdinner.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +21,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final OrderService orderService;
 
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
@@ -107,6 +112,12 @@ public class CustomerController {
     public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerLoginDTO customer,
                                    Model model) {
         model.addAttribute("loggedInCustomer", customer);
+
+        // 고객의 loginId로 order목록을 찾아서 보여주는 로직
+        List<OrderHistoryDTO> orderList =
+                orderService.findOrderHistoryByLoginId(customer.getLoginId());
+        // "orderList"라는 속성으로 전달
+        model.addAttribute("orderList", orderList);
         return "customer/main";
     }
 

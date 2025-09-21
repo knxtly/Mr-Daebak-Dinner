@@ -1,10 +1,8 @@
 package com.devak.mrdaebakdinner.controller;
 
-import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
-import com.devak.mrdaebakdinner.dto.OrderDTO;
-import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
-import com.devak.mrdaebakdinner.dto.OrderItemDTO;
+import com.devak.mrdaebakdinner.dto.*;
 import com.devak.mrdaebakdinner.service.OrderService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -59,11 +57,10 @@ public class OrderController {
     @GetMapping("/customer/orders/history")
     public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerLoginDTO customer,
                                            Model model) {
-
         // 고객의 loginId로 order목록을 찾아서 보여주는 로직
         List<OrderHistoryDTO> orderList =
-                orderService.findAllByLoginId(customer.getLoginId());
-        // order-history.html에 "orderList"라는 속성으로 전달
+                orderService.findOrderHistoryByLoginId(customer.getLoginId());
+        // "orderList"라는 속성으로 전달
         model.addAttribute("orderList", orderList);
         return "customer/order-history";
     }
@@ -72,16 +69,47 @@ public class OrderController {
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId,
                               @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
-
         orderService.placeOrder(
                 orderService.buildOrderDTO(orderId),
                 orderService.buildOrderItemDTO(orderId),
                 customerLoginDTO
         );
-
         return "redirect:/customer/orders/success";
     }
 
+    // 주문 상세 요청
+    @GetMapping("/orders/detail")
+    public String showOrderDetail(@RequestParam Long orderId,
+                                  HttpSession session,
+                                  Model model) {
+        // orderId로부터 OrderHistoryDTO 불러오기
+        OrderHistoryDTO order = orderService.findOrderHistoryByOrderId(orderId);
+        // TODO: OrderHistoryDTO뿐만 아니라 OrderItemDTO도 불러와야 함
+
+        // 세션에서 사용자 확인
+        CustomerLoginDTO customer = (CustomerLoginDTO) session.getAttribute("loggedInCustomer");
+        ChefStaffDTO chef = (ChefStaffDTO) session.getAttribute("loggedInChef");
+        DeliveryStaffDTO delivery = (DeliveryStaffDTO) session.getAttribute("loggedInDelivery");
+
+        // 고객인 경우, 자기 주문인지 체크
+        if (customer != null) {
+            if (!order.getCustomerLoginId().equals(customer.getLoginId())) {
+                throw new IllegalArgumentException("다른 고객의 주문은 조회할 수 없습니다.");
+            }
+            model.addAttribute("order", order);
+            return "customer/order-detail-customer"; // 고객용 뷰
+        }
+
+        // 직원인 경우
+        if (chef != null || delivery != null) {
+            model.addAttribute("order", order);
+            return "staff/order-detail-staff"; // staff용 뷰
+        }
+
+        // 로그인 안 됨
+        return "redirect:/";
+    }
 
     // TODO: 배달완료 시 deliveryTime set
+    // TODO: detail 디렉토리 삭제
 }
