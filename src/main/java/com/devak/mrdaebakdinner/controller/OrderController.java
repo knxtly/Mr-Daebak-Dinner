@@ -3,8 +3,8 @@ package com.devak.mrdaebakdinner.controller;
 import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
 import com.devak.mrdaebakdinner.dto.OrderDTO;
 import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
+import com.devak.mrdaebakdinner.dto.OrderItemDTO;
 import com.devak.mrdaebakdinner.service.OrderService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -31,23 +31,21 @@ public class OrderController {
     @PostMapping("/customer/orders/new")
     public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult,
+                            @ModelAttribute OrderItemDTO orderItemDTO,
                             RedirectAttributes redirectAttributes,
                             @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
 
-        if (bindingResult.hasErrors()) {
-            // 오류 메시지 이어붙이기
+        if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시, 에러메시지 전달
             StringBuilder errorMessage = new StringBuilder();
             bindingResult.getFieldErrors().forEach(fieldError -> {
                 errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
             });
-
-            // redirectAttributes에 errorMessage 전달
             redirectAttributes.addFlashAttribute("errorMessage",
                     errorMessage.toString().trim());
             return "redirect:/customer/orders/new";
         }
 
-        orderService.placeOrder(orderDTO, customerLoginDTO);
+        orderService.placeOrder(orderDTO, orderItemDTO, customerLoginDTO);
 
         return "redirect:/customer/orders/success";
     }
@@ -76,7 +74,8 @@ public class OrderController {
                               @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
 
         orderService.placeOrder(
-                orderService.buildReorderDTO(orderId),
+                orderService.buildOrderDTO(orderId),
+                orderService.buildOrderItemDTO(orderId),
                 customerLoginDTO
         );
 

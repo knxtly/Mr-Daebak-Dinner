@@ -35,6 +35,52 @@
             </select>
         </div>
 
+        <!-- 주문 아이템 -->
+        <fieldset>
+            <legend>주문 구성</legend>
+
+            <div>
+                <label for="wine">와인 ($35)</label>
+                <input type="number" id="wine" name="orderItems[wine]" min="0" value="0">
+            </div>
+            <div>
+                <label for="steak">스테이크 ($55)</label>
+                <input type="number" id="steak" name="orderItems[steak]" min="0" value="0">
+            </div>
+            <div>
+                <label for="coffee_cup">커피 (컵) ($4.5)</label>
+                <input type="number" id="coffee_cup" name="orderItems[coffee_cup]" min="0" value="0">
+            </div>
+            <div>
+                <label for="coffee_pot">커피 (포트) ($28)</label>
+                <input type="number" id="coffee_pot" name="orderItems[coffee_pot]" min="0" value="0">
+            </div>
+            <div>
+                <label for="salad">샐러드 ($18)</label>
+                <input type="number" id="salad" name="orderItems[salad]" min="0" value="0">
+            </div>
+            <div>
+                <label for="eggscramble">스크램블 에그 ($12)</label>
+                <input type="number" id="eggscramble" name="orderItems[eggscramble]" min="0" value="0">
+            </div>
+            <div>
+                <label for="bacon">베이컨 ($8)</label>
+                <input type="number" id="bacon" name="orderItems[bacon]" min="0" value="0">
+            </div>
+            <div>
+                <label for="bread">빵 ($5)</label>
+                <input type="number" id="bread" name="orderItems[bread]" min="0" value="0">
+            </div>
+            <div>
+                <label for="baguette">바게트 ($6.5)</label>
+                <input type="number" id="baguette" name="orderItems[baguette]" min="0" value="0">
+            </div>
+            <div>
+                <label for="champagne">샴페인 ($75)</label>
+                <input type="number" id="champagne" name="orderItems[champagne]" min="0" value="0">
+            </div>
+        </fieldset>
+
         <!-- 배달 주소 -->
         <div>
             <label for="deliveryAddress">배달 주소</label>
@@ -64,26 +110,78 @@
         const styleSelect = document.getElementById('styleSelect');
         const resetBtn = document.getElementById('resetBtn');
 
-        // Champagne Feast 선택 시 스타일 제한
-        menuSelect.addEventListener('change', () => {
-            if(menuSelect.value === 'champagne'){
-                Array.from(styleSelect.options).forEach(opt => {
-                    if(opt.value === 'simple'){
-                        opt.disabled = true;
-                    } else {
-                        opt.disabled = false;
-                    }
-                });
-            } else {
-                Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
-                styleSelect.value = '';
-            }
-        });
+        // 아이템 input들을 객체로 캐싱
+        const items = {
+            wine: document.getElementById('wine'),
+            steak: document.getElementById('steak'),
+            coffee_cup: document.getElementById('coffee_cup'),
+            coffee_pot: document.getElementById('coffee_pot'),
+            salad: document.getElementById('salad'),
+            eggscramble: document.getElementById('eggscramble'),
+            bacon: document.getElementById('bacon'),
+            bread: document.getElementById('bread'),
+            baguette: document.getElementById('baguette'),
+            champagne: document.getElementById('champagne')
+        };
 
-        // reset 시 옵션 재설정
-        resetBtn.addEventListener('click', () => {
+        // 모든 아이템 0으로 초기화
+        function resetItems() {
+            Object.values(items).forEach(input => input.value = 0);
+        }
+
+        // 메뉴 선택 시 기본값 반영
+        menuSelect.addEventListener('change', () => {
+            resetItems(); // 먼저 0으로 초기화
+
+            switch(menuSelect.value){
+                case 'valentine':
+                    items.wine.value = 1;
+                    items.steak.value = 1;
+                    break;
+                case 'french':
+                    items.coffee_cup.value = 1;
+                    items.wine.value = 1;
+                    items.salad.value = 1;
+                    items.steak.value = 1;
+                    break;
+                case 'english':
+                    items.eggscramble.value = 1;
+                    items.bacon.value = 1;
+                    items.bread.value = 1;
+                    items.steak.value = 1;
+                    break;
+                case 'champagne':
+                    items.champagne.value = 1;   // 샴페인 1병
+                    items.baguette.value = 4;    // 바게트 4개
+                    items.coffee_pot.value = 1;  // 커피 포트 1개
+                    items.wine.value = 1;
+                    items.steak.value = 1;
+
+                    // simple 비활성화 + 값 초기화
+                    Array.from(styleSelect.options).forEach(opt => {
+                        if(opt.value === 'simple'){
+                            opt.disabled = true;
+                            if(styleSelect.value === 'simple'){
+                                styleSelect.value = '';
+                            }
+                        } else {
+                            opt.disabled = false;
+                        }
+                    });
+                    return; // 여기서 끝내기
+            }
+
+            // champagne 외에는 모든 스타일 다시 활성화
             Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
             styleSelect.value = '';
+        });
+
+        // reset 시 옵션과 아이템 재설정
+        resetBtn.addEventListener('click', () => {
+            resetItems();
+            Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
+            styleSelect.value = '';
+            menuSelect.value = '';
         });
     })();
 </script>
