@@ -20,8 +20,6 @@ public class OrderDTO {
     private String dinnerStyle;
     @NotBlank(message = "배달 주소를 입력해주세요.")
     private String deliveryAddress;
-//    @NotNull
-    private Integer totalPrice;
     @NotBlank(message = "카드번호를 입력해주세요.")
     private String cardNumber;
 }

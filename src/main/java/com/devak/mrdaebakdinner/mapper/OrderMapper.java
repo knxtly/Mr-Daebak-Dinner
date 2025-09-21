@@ -12,7 +12,6 @@ public class OrderMapper {
         orderDTO.setDinnerKind(orderEntity.getDinnerKind());
         orderDTO.setDinnerStyle(orderEntity.getDinnerStyle());
         orderDTO.setDeliveryAddress(orderEntity.getDeliveryAddress());
-        orderDTO.setTotalPrice(orderEntity.getTotalPrice());
         orderDTO.setCardNumber(orderEntity.getCardNumber());
         return orderDTO;
     }
@@ -39,7 +38,6 @@ public class OrderMapper {
         orderEntity.setDinnerKind(orderDTO.getDinnerKind());
         orderEntity.setDinnerStyle(orderDTO.getDinnerStyle());
         orderEntity.setDeliveryAddress(orderDTO.getDeliveryAddress());
-        orderEntity.setTotalPrice(orderDTO.getTotalPrice());
         orderEntity.setCardNumber(orderDTO.getCardNumber());
         // id, orderTime, status은 기본값 사용
         return orderEntity;
