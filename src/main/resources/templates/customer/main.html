@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Main | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/customer-main.css}">
 </head>
 <body>
 <h1>Main Page</h1>
@@ -13,6 +13,28 @@
 </div>
 <a href="/customer/orders/new">주문하기</a><br>
 <a href="/customer/orders/history">이전주문조회</a><br>
+<table>
+    <tr>
+        <th>순번</th>
+        <th>주문시각</th>
+        <th>Dinner 종류</th>
+        <th>Dinner 스타일</th>
+        <th>가격</th>
+        <th>배달 시간</th>
+        <th>배달 주소</th>
+        <th>상세</th>
+    </tr>
+    <tr th:each="order, stat : ${orderList}">
+        <td th:text="${stat.index + 1}"></td>
+        <td th:text="${order.orderTime} ?: '-'"></td>
+        <td th:text="${order.dinnerKind} ?: '-'"></td>
+        <td th:text="${order.dinnerStyle} ?: '-'"></td>
+        <td th:text="${order.totalPrice} ?: '-'"></td>
+        <td th:text="${order.deliveryTime} ?: '-'"></td>
+        <td th:text="${order.deliveryAddress} ?: '-'"></td>
+        <td><a th:href="@{/orders/detail(orderId=${order.id})}">상세</a></td>
+    </tr>
+</table>
 <a href="/customer/logout">로그아웃</a>
 </body>
 </html>

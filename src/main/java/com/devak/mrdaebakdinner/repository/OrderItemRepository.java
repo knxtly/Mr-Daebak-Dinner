@@ -11,6 +11,6 @@ import java.util.List;
 public interface OrderItemRepository extends JpaRepository<OrderItemEntity, OrderItemId> {
     // 특정 order의 모든 item 조회
     List<OrderItemEntity> findAllByOrderId(Long orderId);
-    // 특정 item이 들어간 모든 order 조회
+    // 특정 item이 들어간 모든 detail 조회
 //    List<OrderItemEntity> findAllByItemId(Long itemId);
 }

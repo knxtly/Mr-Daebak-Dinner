@@ -9,4 +9,11 @@ public class StaffController {
     public String showStaffInterface() {
         return "staff/staff";
     }
+
+    @GetMapping("/staff/chef")
+    public String showChefInterface() {
+        // TODO: session 확인
+        return "staff/chef";
+    }
+    // chef, delivery
 }
