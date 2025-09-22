@@ -1,7 +1,7 @@
 package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.*;
-import com.devak.mrdaebakdinner.entity.OrderItemId;
+import com.devak.mrdaebakdinner.exception.InsufficientInventoryException;
 import com.devak.mrdaebakdinner.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -35,17 +35,22 @@ public class OrderController {
                             @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
 
         if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시, 에러메시지 전달
-            StringBuilder errorMessage = new StringBuilder();
+            StringBuilder orderErrorMsg = new StringBuilder();
             bindingResult.getFieldErrors().forEach(fieldError -> {
-                errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
+                orderErrorMsg.append(fieldError.getDefaultMessage()).append("<br>");
             });
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    errorMessage.toString().trim());
+            redirectAttributes.addFlashAttribute("orderErrorMessage",
+                    orderErrorMsg.toString().trim());
             return "redirect:/customer/orders/new";
         }
 
-        orderService.placeOrder(orderDTO, orderItemDTO, customerLoginDTO);
-
+        try {
+            orderService.placeOrder(orderDTO, orderItemDTO, customerLoginDTO);
+        } catch (InsufficientInventoryException e) {
+            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
+            return "redirect:/customer/orders/new";
+        }
         return "redirect:/customer/orders/success";
     }
 
@@ -69,12 +74,19 @@ public class OrderController {
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId,
+                              RedirectAttributes redirectAttributes,
                               @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
-        orderService.placeOrder(
-                orderService.buildOrderDTO(orderId),
-                orderService.buildOrderItemDTO(orderId),
-                customerLoginDTO
-        );
+        try {
+            orderService.placeOrder(
+                    orderService.buildOrderDTO(orderId),
+                    orderService.buildOrderItemDTO(orderId),
+                    customerLoginDTO
+            );
+        } catch (InsufficientInventoryException e) {
+            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
+            return "redirect:/customer/orders/new";
+        }
         return "redirect:/customer/orders/success";
     }
 

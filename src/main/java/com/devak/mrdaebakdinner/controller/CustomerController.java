@@ -55,7 +55,7 @@ public class CustomerController {
                 errorMessage.append("PW");
             }
             errorMessage.append("는 필수 요소입니다.");
-            redirectAttributes.addFlashAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("loginErrorMessage",
                     errorMessage.toString());
             return "redirect:/customer";
         }
@@ -67,7 +67,7 @@ public class CustomerController {
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) {
             // 로그인 실패: 에러메시지 전달
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
             return "redirect:/customer";
         }
     }
@@ -91,7 +91,7 @@ public class CustomerController {
             });
 
             // redirectAttributes에 errorMessage 전달
-            redirectAttributes.addFlashAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("signUpErrorMessage",
                     errorMessage.toString().trim());
             return "redirect:/customer/signup";
         }
@@ -102,7 +102,7 @@ public class CustomerController {
             return "redirect:/customer";
         } catch (DuplicateLoginIdException | DataAccessException e) {
             // 회원가입 실패하면 errorMessage 출력
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("signUpErrorMessage", e.getMessage());
             return "redirect:/customer/signup";
         }
     }

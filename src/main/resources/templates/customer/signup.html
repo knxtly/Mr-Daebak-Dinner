@@ -15,8 +15,8 @@
     Tel: <input type="tel" name="contact"><br>
     <input type="submit" value="Sign up!">
 </form>
-<div th:if="${errorMessage}">
-    <p th:utext="${errorMessage}" style="color: red;"></p>
+<div th:if="${signUpErrorMessage}">
+    <p th:utext="${signUpErrorMessage}" style="color: red;"></p>
 </div>
 <a href="/customer">이전</a><br>
 <a href="/">Go to Index Page</a>

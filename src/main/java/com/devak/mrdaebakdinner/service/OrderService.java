@@ -5,11 +5,9 @@ import com.devak.mrdaebakdinner.dto.OrderDTO;
 import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
 import com.devak.mrdaebakdinner.dto.OrderItemDTO;
 import com.devak.mrdaebakdinner.entity.*;
+import com.devak.mrdaebakdinner.exception.InsufficientInventoryException;
 import com.devak.mrdaebakdinner.mapper.OrderMapper;
-import com.devak.mrdaebakdinner.repository.CustomerRepository;
-import com.devak.mrdaebakdinner.repository.ItemRepository;
-import com.devak.mrdaebakdinner.repository.OrderItemRepository;
-import com.devak.mrdaebakdinner.repository.OrderRepository;
+import com.devak.mrdaebakdinner.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,7 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final CustomerRepository customerRepository;
     private final ItemRepository itemRepository;
+    private final InventoryRepository inventoryRepository;
 
     public List<OrderHistoryDTO> findOrderHistoryByLoginId(String loginId) {
         // loginId로 id 찾아서 반환
@@ -69,8 +68,6 @@ public class OrderService {
     public void placeOrder(OrderDTO orderDTO,
                            OrderItemDTO orderItemDTO,
                            CustomerLoginDTO customerLoginDTO) {
-        // TODO: 재고가 불충분 = 주문불가
-
         // 고객의 id찾고 orderCount 1증가. membership update
         CustomerEntity customerEntity = customerRepository.findByLoginId(customerLoginDTO.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
@@ -84,29 +81,57 @@ public class OrderService {
 
         // save OrderItem
         List<OrderItemEntity> orderItemEntityList = new ArrayList<>();
+        // 부족한 재고의 이름을 모은 리스트
+        List<String> insufficientItems = new ArrayList<>();
+
+        // OrderItemDTO 내부 반복
         for (Map.Entry<String, Integer> entry : orderItemDTO.getOrderItems().entrySet()) {
-            String itemName = entry.getKey();
+            String orderItemName = entry.getKey();
             int quantity = entry.getValue();
 
-            ItemEntity item = itemRepository.findByName(itemName)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 아이템이 없습니다." + itemName));
+            ItemEntity item = itemRepository.findByName(orderItemName)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "없는 item입니다." + orderItemName
+                    ));
 
+            InventoryEntity inventoryEntity = inventoryRepository.findByItemId(item.getId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "재고에 등록되지 않은 item입니다." + orderItemName
+                    ));
+
+            // 재고가 불충분하면 주문불가
+            if (inventoryEntity.getStockQuantity() < quantity) {
+                insufficientItems.add(orderItemName + " (요청: " + quantity +
+                        ", 보유: " + inventoryEntity.getStockQuantity() + ")\n");
+                continue;
+            }
+
+            // 재고가 충분하면 quantity만큼 decrease
+            inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - quantity);
+
+            // OrderItemEntity 구성 후 저장
             OrderItemEntity orderItemEntity = new OrderItemEntity();
-            // OrderItemId를 직접 생성해서 넣어야 한다: JPA가 @MapsId 때문에 id를 Long으로 채우려고 하기 때문
             OrderItemId orderItemId = new OrderItemId(savedOrder.getId(), item.getId());
-            orderItemEntity.setId(orderItemId);
-
-            // 나머지는 그냥 넣어도 됨
-            orderItemEntity.setOrder(savedOrder);
+            orderItemEntity.setId(orderItemId); // OrderItemId(PK)를 직접 생성해 넣음
+            // -> JPA가 @MapsId 때문에 id를 Long으로 채우려고 하기 때문
+            orderItemEntity.setOrder(savedOrder); // 나머지는 그냥 넣어도 됨
             orderItemEntity.setItem(item);
             orderItemEntity.setQuantity(quantity);
 
             orderItemEntityList.add(orderItemEntity);
         }
+
+        // 재고가 부족한 게 있었다면 예외 호출
+        if (!insufficientItems.isEmpty()) {
+            throw new InsufficientInventoryException("재고가 부족합니다", insufficientItems);
+        }
+
+        // orderItemEntity 저장
         orderItemRepository.saveAll(orderItemEntityList);
 
-        // orderCount 1 증가 반영하기 (영속 상태이기 때문에 자동 반영되지만, 명시적 호출)
-        customerRepository.save(customerEntity);
+        // 영속 상태이기 때문에 자동 반영됨
+        // customerEntity변경사항: orderCount 1
+        // inventoryEntity변경사항: stockQuantity 감소
     }
 
     public OrderDTO buildOrderDTO(Long orderId) {
