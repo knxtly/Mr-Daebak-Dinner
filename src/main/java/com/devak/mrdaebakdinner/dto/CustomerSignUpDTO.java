@@ -1,6 +1,5 @@
 package com.devak.mrdaebakdinner.dto;
 
-import com.devak.mrdaebakdinner.entity.CustomerEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -12,9 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class CustomerDTO {
-    private Long id; // 내부 관리용 ID
-
+public class CustomerSignUpDTO {
     @NotBlank(message = "로그인 ID는 필수 입력값입니다.")
     @Size(min = 4, max = 30, message = "로그인 ID는 4~30자여야 합니다.")
     private String loginId; // 외부 비즈니스용 ID
@@ -29,20 +26,4 @@ public class CustomerDTO {
 
     private String address;
     private String contact;
-    private int orderCount;
-    private String membershipLevel;
-
-    // CustomerEntity => CustomerDTO
-    public static CustomerDTO toCustomerDTO(CustomerEntity customerEntity) {
-        CustomerDTO dto = new CustomerDTO();
-        dto.setId(customerEntity.getId());
-        dto.setLoginId(customerEntity.getLoginId());
-        dto.setPassword(customerEntity.getPassword());
-        dto.setName(customerEntity.getName());
-        dto.setAddress(customerEntity.getAddress());
-        dto.setContact(customerEntity.getContact());
-        dto.setOrderCount(customerEntity.getOrderCount());
-        dto.setMembershipLevel(customerEntity.getMembershipLevel());
-        return dto;
-    }
 }

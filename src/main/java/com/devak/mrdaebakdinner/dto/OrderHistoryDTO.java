@@ -13,13 +13,20 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class OrderDTO {
-    @NotBlank(message = "디너 종류를 선택해주세요.")
+public class OrderHistoryDTO { // 고객이 이전주문조회 시 정보를 담아올 객체
+    private Long id;
+    private String customerLoginId;
+    @NotNull
+    private LocalDateTime orderTime;
+    @NotBlank
     private String dinnerKind;
-    @NotBlank(message = "디너 스타일을 선택해주세요.")
+    @NotBlank
     private String dinnerStyle;
-    @NotBlank(message = "배달 주소를 입력해주세요.")
+    @NotBlank
     private String deliveryAddress;
-    @NotBlank(message = "카드번호를 입력해주세요.")
+    private LocalDateTime deliveryTime;
+    private Integer totalPrice;
+    @NotBlank
     private String cardNumber;
+    private String status;
 }
