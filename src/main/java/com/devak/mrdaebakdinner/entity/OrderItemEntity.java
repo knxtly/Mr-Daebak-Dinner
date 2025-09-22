@@ -6,7 +6,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "order_item")
-@Getter @Setter
+@Getter
+@Setter
 public class OrderItemEntity {
     @EmbeddedId
     private OrderItemId id;
