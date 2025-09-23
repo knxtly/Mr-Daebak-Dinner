@@ -65,18 +65,7 @@ public class OrderService {
     public void placeOrder(OrderDTO orderDTO,
                            OrderItemDTO orderItemDTO,
                            CustomerSessionDTO customerSessionDTO) {
-        // 고객의 id찾고 orderCount 1증가. membership update
-        CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
-        customerEntity.setOrderCount(customerEntity.getOrderCount() + 1);
-        if (customerEntity.getOrderCount() >= 5)
-            customerEntity.setMembershipLevel("VIP");
-
-        // save Order
-        OrderEntity savedOrder =
-                orderRepository.save(OrderMapper.toOrderEntity(orderDTO, customerEntity));
-
-        // save OrderItem
+        // OrderItem 조사
         List<OrderItemEntity> orderItemEntityList = new ArrayList<>();
         // 부족한 재고의 이름을 모은 리스트
         List<String> insufficientItems = new ArrayList<>();
@@ -102,6 +91,17 @@ public class OrderService {
                         ", 보유: " + inventoryEntity.getStockQuantity() + ")\n");
                 continue;
             }
+
+            // 고객의 id찾고 orderCount 1증가. membership update
+            CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+            customerEntity.setOrderCount(customerEntity.getOrderCount() + 1);
+            if (customerEntity.getOrderCount() >= 5)
+                customerEntity.setMembershipLevel("VIP");
+
+            // save Order
+            OrderEntity savedOrder =
+                    orderRepository.save(OrderMapper.toOrderEntity(orderDTO, customerEntity));
 
             // 재고가 충분하면 quantity만큼 decrease
             inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - quantity);
