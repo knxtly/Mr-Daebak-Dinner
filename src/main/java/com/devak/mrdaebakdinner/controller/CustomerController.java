@@ -38,11 +38,11 @@ public class CustomerController {
 
     // 로그인 요청
     @PostMapping("/customer/login")
-    public String login(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
-                        BindingResult bindingResult,
-                        RedirectAttributes redirectAttributes,
-                        HttpSession session) {
-        // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 errorMessage
+    public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes,
+                                HttpSession session) {
+        // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             if (bindingResult.getFieldError("loginId") != null) {
