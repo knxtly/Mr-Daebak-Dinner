@@ -39,13 +39,11 @@ public class StaffController {
                              RedirectAttributes redirectAttributes,
                              HttpSession session,
                              HttpServletRequest request) {
-        // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
+        // 유효성 검사(@Valid + BindingResult): PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
-            if (bindingResult.getFieldError("password") != null) {
-                redirectAttributes.addFlashAttribute(
-                        "loginErrorMessage",
-                        "PW는 필수 요소입니다.");
-            }
+            redirectAttributes.addFlashAttribute("loginErrorMessage",
+                    bindingResult.getFieldError("password").getDefaultMessage()
+            );
             return "redirect:/staff";
         }
 

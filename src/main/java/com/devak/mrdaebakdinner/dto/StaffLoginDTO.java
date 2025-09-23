@@ -11,6 +11,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class StaffLoginDTO {
-    @NotBlank(message = "PW")
+    @NotBlank(message = "PW는 필수 요소입니다.")
     private String password;
 }

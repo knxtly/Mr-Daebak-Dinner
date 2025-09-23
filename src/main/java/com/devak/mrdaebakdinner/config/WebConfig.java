@@ -23,6 +23,6 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(staffLoginCheckInterceptor)
                 .addPathPatterns("/staff/**")
-                .excludePathPatterns("/staff");
+                .excludePathPatterns("/staff", "/staff/login");
     }
 }
