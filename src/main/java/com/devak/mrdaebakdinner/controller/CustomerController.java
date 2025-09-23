@@ -120,6 +120,7 @@ public class CustomerController {
     @GetMapping("/customer/main")
     public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
                                    Model model) {
+        // TODO: 주문하고나서 바로바로 VIP반영이 안 되는듯: model문제?
         model.addAttribute("loggedInCustomer", customerSessionDTO);
 
         // 고객의 loginId로 order목록을 찾아서 보여주는 로직

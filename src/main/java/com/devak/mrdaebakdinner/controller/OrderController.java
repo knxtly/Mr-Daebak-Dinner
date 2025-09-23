@@ -115,10 +115,12 @@ public class OrderController {
         }
 
         // 직원인 경우
-        if (staffType.equals("chef") || staffType.equals("delivery")) {
-            model.addAttribute("order", order);
-            model.addAttribute("orderItem", orderItem);
-            return "staff/order-detail-staff"; // 직원용 뷰
+        if (staffType != null) {
+            if (staffType.equals("chef") || staffType.equals("delivery")) {
+                model.addAttribute("order", order);
+                model.addAttribute("orderItem", orderItem);
+                return "staff/order-detail-staff"; // 직원용 뷰
+            }
         }
 
         // 세션없음

@@ -65,6 +65,13 @@ public class OrderService {
     public void placeOrder(OrderDTO orderDTO,
                            OrderItemDTO orderItemDTO,
                            CustomerSessionDTO customerSessionDTO) {
+        // 주문한 고객의 customerEntity찾기
+        CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+
+        // 주문될 order
+        OrderEntity order = OrderMapper.toOrderEntity(orderDTO, customerEntity);
+
         // OrderItem 조사
         List<OrderItemEntity> orderItemEntityList = new ArrayList<>();
         // 부족한 재고의 이름을 모은 리스트
@@ -75,43 +82,33 @@ public class OrderService {
             String orderItemName = entry.getKey();
             int quantity = entry.getValue();
 
+            // 없는 item인지 검사
             ItemEntity item = itemRepository.findByName(orderItemName)
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "없는 item입니다." + orderItemName
-                    ));
+                            "없는 item입니다." + orderItemName));
 
+            // item이 재고에 등록됐는지 검사
             InventoryEntity inventoryEntity = inventoryRepository.findByItemId(item.getId())
                     .orElseThrow(() -> new IllegalArgumentException(
                             "재고에 등록되지 않은 item입니다." + orderItemName
                     ));
 
-            // 재고가 불충분하면 주문불가
+            // 부족한 재고 이름은 리스트에 추가
             if (inventoryEntity.getStockQuantity() < quantity) {
                 insufficientItems.add(orderItemName + " (요청: " + quantity +
                         ", 보유: " + inventoryEntity.getStockQuantity() + ")\n");
                 continue;
             }
 
-            // 고객의 id찾고 orderCount 1증가. membership update
-            CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
-            customerEntity.setOrderCount(customerEntity.getOrderCount() + 1);
-            if (customerEntity.getOrderCount() >= 5)
-                customerEntity.setMembershipLevel("VIP");
-
-            // save Order
-            OrderEntity savedOrder =
-                    orderRepository.save(OrderMapper.toOrderEntity(orderDTO, customerEntity));
-
             // 재고가 충분하면 quantity만큼 decrease
             inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - quantity);
 
             // OrderItemEntity 구성 후 저장
             OrderItemEntity orderItemEntity = new OrderItemEntity();
-            OrderItemId orderItemId = new OrderItemId(savedOrder.getId(), item.getId());
+            OrderItemId orderItemId = new OrderItemId(order.getId(), item.getId());
             orderItemEntity.setId(orderItemId); // OrderItemId(PK)를 직접 생성해 넣음
             // -> JPA가 @MapsId 때문에 id를 Long으로 채우려고 하기 때문
-            orderItemEntity.setOrder(savedOrder); // 나머지는 그냥 넣어도 됨
+            orderItemEntity.setOrder(order); // 나머지는 그냥 넣어도 됨
             orderItemEntity.setItem(item);
             orderItemEntity.setQuantity(quantity);
 
@@ -123,11 +120,18 @@ public class OrderService {
             throw new InsufficientInventoryException("재고가 부족합니다", insufficientItems);
         }
 
-        // orderItemEntity 저장
+        // 주문될 order 테이블에 반영
+        orderRepository.save(order);
+        // orderItemEntity 저장 (bulk save)
         orderItemRepository.saveAll(orderItemEntityList);
+        // customerEntity의 orderCount 1 증가
+        customerEntity.setOrderCount(customerEntity.getOrderCount() + 1);
+        // orderCount 5 이상이면 VIP로 승격
+        if (customerEntity.getOrderCount() >= 5)
+            customerEntity.setMembershipLevel("VIP");
 
         // 영속 상태이기 때문에 아래 변경사항은 자동 반영됨
-        // customerEntity: orderCount 1
+        // customerEntity: orderCount 1증가 (+VIP승격)
         // inventoryEntity: stockQuantity 주문량만큼 감소
     }
 

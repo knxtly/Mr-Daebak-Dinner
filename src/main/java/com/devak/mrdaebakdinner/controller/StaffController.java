@@ -71,9 +71,15 @@ public class StaffController {
 
     // Staff - Delivery
     @GetMapping("/staff/delivery")
-    public String showStaffDeliveryInterface(HttpSession session) {
+    public String showStaffDeliveryInterface() {
         return "staff/delivery";
     }
-    // TODO: show Inventory
+
+    // Staff - Delivery
+    @GetMapping("/staff/inventory")
+    public String showInventory() {
+        // TODO: show Inventory
+        return "staff/inventory";
+    }
 
 }
