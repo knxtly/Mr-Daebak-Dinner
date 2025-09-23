@@ -1,6 +1,7 @@
 package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
+import com.devak.mrdaebakdinner.dto.CustomerSessionDTO;
 import com.devak.mrdaebakdinner.dto.CustomerSignUpDTO;
 import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
 import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
@@ -8,6 +9,7 @@ import com.devak.mrdaebakdinner.exception.DuplicateLoginIdException;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
 import com.devak.mrdaebakdinner.service.CustomerService;
 import com.devak.mrdaebakdinner.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +34,11 @@ public class CustomerController {
 
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
-    public String showCustomerInterface() {
+    public String showCustomerInterface(HttpSession session) {
+        // 이미 customer session이 있으면 바로 main화면으로
+        if (session.getAttribute("loggedInCustomer") != null) {
+            return "redirect:/customer/main";
+        }
         return "customer/customer";
     }
 
@@ -41,7 +47,8 @@ public class CustomerController {
     public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
                                 BindingResult bindingResult,
                                 RedirectAttributes redirectAttributes,
-                                HttpSession session) {
+                                HttpSession session,
+                                HttpServletRequest request) {
         // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
@@ -61,12 +68,14 @@ public class CustomerController {
         }
 
         try {
-            CustomerLoginDTO loginResult = customerService.login(customerLoginDTO);
-            // 로그인 성공: 세션에 사용자 정보 저장
-            session.setAttribute("loggedInCustomer", loginResult);
+            CustomerSessionDTO sessionDTO = customerService.login(customerLoginDTO);
+
+            session.invalidate(); // 기존 세션 초기화
+            HttpSession newSession = request.getSession(true); // 새 세션 발급
+
+            newSession.setAttribute("loggedInCustomer", sessionDTO);
             return "redirect:/customer/main";
-        } catch (IncorrectPasswordException | CustomerNotFoundException e) {
-            // 로그인 실패: 에러메시지 전달
+        } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
             redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
             return "redirect:/customer";
         }
@@ -109,13 +118,13 @@ public class CustomerController {
 
     // 메인 페이지 GET 요청
     @GetMapping("/customer/main")
-    public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerLoginDTO customer,
+    public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
                                    Model model) {
-        model.addAttribute("loggedInCustomer", customer);
+        model.addAttribute("loggedInCustomer", customerSessionDTO);
 
         // 고객의 loginId로 order목록을 찾아서 보여주는 로직
         List<OrderHistoryDTO> orderList =
-                orderService.findOrderHistoryByLoginId(customer.getLoginId());
+                orderService.findOrderHistoryByLoginId(customerSessionDTO.getLoginId());
         // "orderList"라는 속성으로 전달
         model.addAttribute("orderList", orderList);
         return "customer/main";

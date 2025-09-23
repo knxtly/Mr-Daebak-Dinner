@@ -1,9 +1,6 @@
 package com.devak.mrdaebakdinner.service;
 
-import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
-import com.devak.mrdaebakdinner.dto.OrderDTO;
-import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
-import com.devak.mrdaebakdinner.dto.OrderItemDTO;
+import com.devak.mrdaebakdinner.dto.*;
 import com.devak.mrdaebakdinner.entity.*;
 import com.devak.mrdaebakdinner.exception.InsufficientInventoryException;
 import com.devak.mrdaebakdinner.mapper.OrderMapper;
@@ -67,9 +64,9 @@ public class OrderService {
     @Transactional
     public void placeOrder(OrderDTO orderDTO,
                            OrderItemDTO orderItemDTO,
-                           CustomerLoginDTO customerLoginDTO) {
+                           CustomerSessionDTO customerSessionDTO) {
         // 고객의 id찾고 orderCount 1증가. membership update
-        CustomerEntity customerEntity = customerRepository.findByLoginId(customerLoginDTO.getLoginId())
+        CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
         customerEntity.setOrderCount(customerEntity.getOrderCount() + 1);
         if (customerEntity.getOrderCount() >= 5)
@@ -129,9 +126,9 @@ public class OrderService {
         // orderItemEntity 저장
         orderItemRepository.saveAll(orderItemEntityList);
 
-        // 영속 상태이기 때문에 자동 반영됨
-        // customerEntity변경사항: orderCount 1
-        // inventoryEntity변경사항: stockQuantity 감소
+        // 영속 상태이기 때문에 아래 변경사항은 자동 반영됨
+        // customerEntity: orderCount 1
+        // inventoryEntity: stockQuantity 주문량만큼 감소
     }
 
     public OrderDTO buildOrderDTO(Long orderId) {

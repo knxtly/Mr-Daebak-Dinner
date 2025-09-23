@@ -9,6 +9,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ChefStaffDTO {
-
+public class CustomerSessionDTO {
+    private String loginId;
+    private String name;
+    private String membership;
 }

@@ -9,6 +9,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class DeliveryStaffDTO {
-
+public class StaffSessionDTO {
+    private String position;
 }

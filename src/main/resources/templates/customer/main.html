@@ -9,6 +9,7 @@
 <h1>Main Page</h1>
 <div th:if="${loggedInCustomer}">
     Hi <span th:text="${loggedInCustomer.loginId}" style="color: blue;"></span>!<br>
+    Membership: <span th:text="${loggedInCustomer.membership}" style="color: blue;"></span><br>
     User Information: <p th:text="${loggedInCustomer}"></p>
 </div>
 <a href="/customer/orders/new">주문하기</a><br>
