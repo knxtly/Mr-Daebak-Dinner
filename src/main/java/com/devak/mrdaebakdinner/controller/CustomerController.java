@@ -119,8 +119,12 @@ public class CustomerController {
     // 메인 페이지 GET 요청
     @GetMapping("/customer/main")
     public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
+                                   HttpSession session,
                                    Model model) {
-        // TODO: 주문하고나서 바로바로 VIP반영이 안 되는듯: model문제?
+        // 최신 고객정보 조회
+        CustomerSessionDTO freshCustomer = orderService.getFreshCustomerSessionDTO(customerSessionDTO.getLoginId());
+        session.setAttribute("loggedInCustomer", freshCustomer); // 세션 갱신: 주문 후 VIP 반영
+
         model.addAttribute("loggedInCustomer", customerSessionDTO);
 
         // 고객의 loginId로 order목록을 찾아서 보여주는 로직

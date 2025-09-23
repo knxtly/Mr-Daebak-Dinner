@@ -3,6 +3,7 @@ package com.devak.mrdaebakdinner.service;
 import com.devak.mrdaebakdinner.dto.*;
 import com.devak.mrdaebakdinner.entity.*;
 import com.devak.mrdaebakdinner.exception.InsufficientInventoryException;
+import com.devak.mrdaebakdinner.mapper.CustomerMapper;
 import com.devak.mrdaebakdinner.mapper.OrderMapper;
 import com.devak.mrdaebakdinner.repository.*;
 import jakarta.transaction.Transactional;
@@ -156,4 +157,9 @@ public class OrderService {
         return dto;
     }
 
+    public CustomerSessionDTO getFreshCustomerSessionDTO(String loginId) {
+        CustomerEntity customerEntity = customerRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+        return CustomerMapper.toCustomerSessionDTO(customerEntity);
+    }
 }

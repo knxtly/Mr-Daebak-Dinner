@@ -34,7 +34,7 @@ public class OrderController {
                             RedirectAttributes redirectAttributes,
                             @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
 
-        if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시, 에러메시지 전달
+        if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시
             StringBuilder orderErrorMsg = new StringBuilder();
             bindingResult.getFieldErrors().forEach(fieldError -> {
                 orderErrorMsg.append(fieldError.getDefaultMessage()).append("<br>");
@@ -45,6 +45,7 @@ public class OrderController {
         }
 
         try {
+            // 주문처리
             orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
         } catch (InsufficientInventoryException e) {
             redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
