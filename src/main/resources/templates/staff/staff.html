@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Staff</title>
-    <link rel="stylesheet" th:href="@{style.css}">
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
 <h1>Staff Interface</h1>
-<a href="/staff/chef">요리직원</a><br>
-<a href="/staff/delivery">배달직원</a><br>
-<a href="/staff/inventory">재고조회</a>
+<form action="/staff/login" method="post">
+    PW: <input type="password" name="password"><br>
+    <input type="submit" value="로그인">
+</form>
+<div th:if="${loginErrorMessage}">
+    <p th:text="${loginErrorMessage}" style="color: red;"></p>
+</div>
 <a href="/">Go to Index Page</a>
 </body>
 </html>

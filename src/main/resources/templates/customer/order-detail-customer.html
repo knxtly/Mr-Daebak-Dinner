@@ -2,40 +2,47 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Main | Mr. Daebak Dinner</title>
+    <title>Order Detail | Mr. Daebak Dinner</title>
     <link rel="stylesheet" th:href="@{/customer-main.css}">
 </head>
 <body>
-<h1>Main Page</h1>
-<div th:if="${loggedInCustomer}">
-    Hi <span th:text="${loggedInCustomer.loginId}" style="color: blue;"></span>!<br>
-    Membership: <span th:text="${loggedInCustomer.membership}" style="color: blue;"></span><br>
-    User Information: <p th:text="${loggedInCustomer}"></p>
-</div>
-<a href="/customer/orders/new">주문하기</a><br>
-<a href="/customer/orders/history">이전주문조회</a><br>
+<h1>Order Detail</h1>
 <table>
     <tr>
-        <th>순번</th>
         <th>주문시각</th>
         <th>Dinner 종류</th>
         <th>Dinner 스타일</th>
         <th>가격</th>
         <th>배달 시간</th>
         <th>배달 주소</th>
-        <th>상세</th>
+        <th>결제카드번호</th>
+        <th>Status</th>
+        <th>재주문</th>
     </tr>
-    <tr th:each="order, stat : ${orderList}">
-        <td th:text="${stat.index + 1}"></td>
+    <tr>
         <td th:text="${order.orderTime} ?: '-'"></td>
         <td th:text="${order.dinnerKind} ?: '-'"></td>
         <td th:text="${order.dinnerStyle} ?: '-'"></td>
         <td th:text="${order.totalPrice} ?: '-'"></td>
         <td th:text="${order.deliveryTime} ?: '-'"></td>
         <td th:text="${order.deliveryAddress} ?: '-'"></td>
-        <td><a th:href="@{/orders/detail(orderId=${order.id})}">상세</a></td>
+        <td th:text="${order.cardNumber} ?: '-'"></td>
+        <td th:text="${order.status} ?: '-'"></td>
+        <td><a th:href="@{|/customer/order/reorder/${order.id}|}">재주문</a></td>
+    </tr>
+
+    <!-- 주문한 아이템 표시 -->
+    <tr>
+        <th>아이템 이름</th>
+        <th>수량</th>
+        <th colspan="7"></th>
+    </tr>
+    <tr th:each="entry : ${orderItem.orderItems}">
+        <td th:text="${entry.key}">Item Name</td>
+        <td th:text="${entry.value}">Quantity</td>
+        <td colspan="7"></td>
     </tr>
 </table>
-<a href="/customer/logout">로그아웃</a>
+<a href="/customer/main">메인으로</a>
 </body>
 </html>

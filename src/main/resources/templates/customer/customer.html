@@ -12,8 +12,8 @@
     PW: <input type="password" name="password"><br>
     <input type="submit" value="로그인">
 </form>
-<div th:if="${errorMessage}">
-    <p th:text="${errorMessage}" style="color: red;"></p>
+<div th:if="${loginErrorMessage}">
+    <p th:text="${loginErrorMessage}" style="color: red;"></p>
 </div>
 <a href="/customer/signup">회원가입</a><br>
 <a href="/">Go to Index Page</a>

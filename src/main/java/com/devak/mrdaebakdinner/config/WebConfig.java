@@ -1,6 +1,7 @@
 package com.devak.mrdaebakdinner.config;
 
-import com.devak.mrdaebakdinner.interceptor.LoginCheckInterceptor;
+import com.devak.mrdaebakdinner.interceptor.CustomerLoginCheckInterceptor;
+import com.devak.mrdaebakdinner.interceptor.StaffLoginCheckInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -10,11 +11,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
-    private LoginCheckInterceptor loginCheckInterceptor;
+    private CustomerLoginCheckInterceptor customerLoginCheckInterceptor;
+
+    @Autowired
+    private StaffLoginCheckInterceptor staffLoginCheckInterceptor;
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry){
-        registry.addInterceptor(loginCheckInterceptor)
-                .addPathPatterns("/customer/orders/**"); // 로그인 체크 필요 경로
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(customerLoginCheckInterceptor)
+                .addPathPatterns("/customer/orders/**", "/customer/main"); // 로그인 체크 필요 경로
+
+        registry.addInterceptor(staffLoginCheckInterceptor)
+                .addPathPatterns("/staff/**")
+                .excludePathPatterns("/staff", "/staff/login");
     }
 }

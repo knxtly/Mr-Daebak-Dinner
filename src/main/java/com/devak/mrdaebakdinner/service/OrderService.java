@@ -1,19 +1,18 @@
 package com.devak.mrdaebakdinner.service;
 
-import com.devak.mrdaebakdinner.dto.CustomerDTO;
-import com.devak.mrdaebakdinner.dto.OrderDTO;
-import com.devak.mrdaebakdinner.dto.OrderResponseDTO;
-import com.devak.mrdaebakdinner.entity.CustomerEntity;
-import com.devak.mrdaebakdinner.entity.OrderEntity;
-import com.devak.mrdaebakdinner.repository.CustomerRepository;
-import com.devak.mrdaebakdinner.repository.OrderRepository;
+import com.devak.mrdaebakdinner.dto.*;
+import com.devak.mrdaebakdinner.entity.*;
+import com.devak.mrdaebakdinner.exception.InsufficientInventoryException;
+import com.devak.mrdaebakdinner.mapper.CustomerMapper;
+import com.devak.mrdaebakdinner.mapper.OrderMapper;
+import com.devak.mrdaebakdinner.repository.*;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,31 +20,146 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final CustomerRepository customerRepository;
+    private final ItemRepository itemRepository;
+    private final InventoryRepository inventoryRepository;
 
-    public List<OrderResponseDTO> findAllByCustomerId(Long loggedInCustomerId) {
-        // loggedInCustomer의 주문만을 담아 return
+    public List<OrderHistoryDTO> findOrderHistoryByLoginId(String loginId) {
+        // loginId로 id 찾아서 반환
+        CustomerEntity customerEntity = customerRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+
+        // id로 해당 고객의 주문만을 담아 return
         List<OrderEntity> orderEntityList =
-                orderRepository.findAllByCustomerId(loggedInCustomerId);
+                orderRepository.findAllByCustomerId(customerEntity.getId());
         return orderEntityList.stream()
-                .map(OrderResponseDTO::toOrderResponseDTO)
+                .map(OrderMapper::toOrderHistoryDTO)
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void placeOrder(@Valid OrderDTO orderDTO, CustomerDTO customerDTO) {
-        // TODO: 재고가 sufficient = 주문허가, insufficient = 주문불가
-        CustomerEntity customer = customerRepository.findById(customerDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+    public OrderHistoryDTO findOrderHistoryByOrderId(Long orderId) {
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
 
-        orderRepository.save(
-                OrderEntity.toOrderEntity(orderDTO, customer)
-        );
+        return OrderMapper.toOrderHistoryDTO(order);
     }
 
-    public @Valid OrderDTO buildReorderDTO(Long orderId) {
-        OrderEntity orderEntity = orderRepository.findById(orderId)
+    public OrderItemDTO findOrderItemByOrderId(Long orderId) {
+        // orderId에 해당하는 item
+        List<OrderItemEntity> orderItems = orderItemRepository.findAllByOrderId(orderId);
+
+        // Map<String, Integer>로 변환 (key: item name, value: quantity)
+        Map<String, Integer> itemMap = orderItems.stream()
+                .collect(Collectors.toMap(
+                        oi -> oi.getItem().getName(),
+                        OrderItemEntity::getQuantity
+                ));
+
+        // DTO에 담아 반환
+        OrderItemDTO dto = new OrderItemDTO();
+        dto.setOrderItems(itemMap);
+        return dto;
+    }
+
+    @Transactional
+    public void placeOrder(OrderDTO orderDTO,
+                           OrderItemDTO orderItemDTO,
+                           CustomerSessionDTO customerSessionDTO) {
+        // 주문한 고객의 customerEntity찾기
+        CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
-        return OrderDTO.toOrderDTO(orderEntity);
+
+        // 주문될 order
+        OrderEntity order = OrderMapper.toOrderEntity(orderDTO, customerEntity);
+
+        // OrderItem 조사
+        List<OrderItemEntity> orderItemEntityList = new ArrayList<>();
+        // 부족한 재고의 이름을 모은 리스트
+        List<String> insufficientItems = new ArrayList<>();
+
+        // OrderItemDTO 내부 반복
+        for (Map.Entry<String, Integer> entry : orderItemDTO.getOrderItems().entrySet()) {
+            String orderItemName = entry.getKey();
+            int quantity = entry.getValue();
+
+            // 없는 item인지 검사
+            ItemEntity item = itemRepository.findByName(orderItemName)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "없는 item입니다." + orderItemName));
+
+            // item이 재고에 등록됐는지 검사
+            InventoryEntity inventoryEntity = inventoryRepository.findByItemId(item.getId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "재고에 등록되지 않은 item입니다." + orderItemName
+                    ));
+
+            // 부족한 재고 이름은 리스트에 추가
+            if (inventoryEntity.getStockQuantity() < quantity) {
+                insufficientItems.add(orderItemName + " (요청: " + quantity +
+                        ", 보유: " + inventoryEntity.getStockQuantity() + ")\n");
+                continue;
+            }
+
+            // 재고가 충분하면 quantity만큼 decrease
+            inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - quantity);
+
+            // OrderItemEntity 구성 후 저장
+            OrderItemEntity orderItemEntity = new OrderItemEntity();
+            OrderItemId orderItemId = new OrderItemId(order.getId(), item.getId());
+            orderItemEntity.setId(orderItemId); // OrderItemId(PK)를 직접 생성해 넣음
+            // -> JPA가 @MapsId 때문에 id를 Long으로 채우려고 하기 때문
+            orderItemEntity.setOrder(order); // 나머지는 그냥 넣어도 됨
+            orderItemEntity.setItem(item);
+            orderItemEntity.setQuantity(quantity);
+
+            orderItemEntityList.add(orderItemEntity);
+        }
+
+        // 재고가 부족한 게 있었다면 예외 호출
+        if (!insufficientItems.isEmpty()) {
+            throw new InsufficientInventoryException("재고가 부족합니다", insufficientItems);
+        }
+
+        // 주문될 order 테이블에 반영
+        orderRepository.save(order);
+        // orderItemEntity 저장 (bulk save)
+        orderItemRepository.saveAll(orderItemEntityList);
+        // customerEntity의 orderCount 1 증가
+        customerEntity.setOrderCount(customerEntity.getOrderCount() + 1);
+        // orderCount 5 이상이면 VIP로 승격
+        if (customerEntity.getOrderCount() >= 5)
+            customerEntity.setMembershipLevel("VIP");
+
+        // 영속 상태이기 때문에 아래 변경사항은 자동 반영됨
+        // customerEntity: orderCount 1증가 (+VIP승격)
+        // inventoryEntity: stockQuantity 주문량만큼 감소
+    }
+
+    public OrderDTO buildOrderDTO(Long orderId) {
+        OrderEntity orderEntity = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 없습니다."));
+        return OrderMapper.toOrderDTO(orderEntity);
+    }
+
+    public OrderItemDTO buildOrderItemDTO(Long orderId) {
+        // order_item테이블에서 orderId가 일치하는 레코드 모두 가져옴
+        List<OrderItemEntity> orderItemList = orderItemRepository.findAllByOrderId(orderId);
+
+        Map<String, Integer> itemMap = orderItemList.stream()
+                .collect(Collectors.toMap(
+                        oi -> oi.getItem().getName(), // Key = Item Name
+                        OrderItemEntity::getQuantity // Value = quantity
+                ));
+
+        OrderItemDTO dto = new OrderItemDTO();
+        dto.setOrderItems(itemMap);
+        return dto;
+    }
+
+    public CustomerSessionDTO getFreshCustomerSessionDTO(String loginId) {
+        CustomerEntity customerEntity = customerRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+        return CustomerMapper.toCustomerSessionDTO(customerEntity);
     }
 }
