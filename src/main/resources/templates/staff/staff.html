@@ -7,9 +7,13 @@
 </head>
 <body>
 <h1>Staff Interface</h1>
-<a href="/staff/chef">Chef</a><br>
-<a href="/staff/delivery">Delivery</a><br>
-<a href="/staff/inventory">Inventory</a>
+<form action="/staff/login" method="post">
+    PW: <input type="password" name="password"><br>
+    <input type="submit" value="로그인">
+</form>
+<div th:if="${loginErrorMessage}">
+    <p th:text="${loginErrorMessage}" style="color: red;"></p>
+</div>
 <a href="/">Go to Index Page</a>
 </body>
 </html>

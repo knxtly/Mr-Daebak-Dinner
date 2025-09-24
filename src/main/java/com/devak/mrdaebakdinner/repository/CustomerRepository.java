@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
     // JpaRepository<T, ID>
-    // T: 어떤 Entity인지, ID: PK가 어떤 타입인지
+    // T: Entity 타입, ID: Entity의 PK타입
     /* JPA 기능들
     save(entity) => 저장/수정
     findById(id) => ID로 조회

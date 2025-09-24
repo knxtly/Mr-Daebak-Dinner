@@ -1,7 +1,7 @@
 package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.*;
-import com.devak.mrdaebakdinner.entity.OrderItemId;
+import com.devak.mrdaebakdinner.exception.InsufficientInventoryException;
 import com.devak.mrdaebakdinner.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -32,20 +32,26 @@ public class OrderController {
                             BindingResult bindingResult,
                             @ModelAttribute OrderItemDTO orderItemDTO,
                             RedirectAttributes redirectAttributes,
-                            @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
+                            @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
 
-        if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시, 에러메시지 전달
-            StringBuilder errorMessage = new StringBuilder();
+        if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시
+            StringBuilder orderErrorMsg = new StringBuilder();
             bindingResult.getFieldErrors().forEach(fieldError -> {
-                errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
+                orderErrorMsg.append(fieldError.getDefaultMessage()).append("<br>");
             });
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    errorMessage.toString().trim());
+            redirectAttributes.addFlashAttribute("orderErrorMessage",
+                    orderErrorMsg.toString().trim());
             return "redirect:/customer/orders/new";
         }
 
-        orderService.placeOrder(orderDTO, orderItemDTO, customerLoginDTO);
-
+        try {
+            // 주문처리
+            orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
+        } catch (InsufficientInventoryException e) {
+            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
+            return "redirect:/customer/orders/new";
+        }
         return "redirect:/customer/orders/success";
     }
 
@@ -56,11 +62,11 @@ public class OrderController {
 
     // 이전주문기록 조회 요청
     @GetMapping("/customer/orders/history")
-    public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerLoginDTO customer,
+    public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
                                            Model model) {
         // 고객의 loginId로 order목록을 찾아서 보여주는 로직
         List<OrderHistoryDTO> orderList =
-                orderService.findOrderHistoryByLoginId(customer.getLoginId());
+                orderService.findOrderHistoryByLoginId(customerSessionDTO.getLoginId());
         // "orderList"라는 속성으로 전달
         model.addAttribute("orderList", orderList);
         return "customer/order-history";
@@ -69,12 +75,19 @@ public class OrderController {
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId,
-                              @SessionAttribute("loggedInCustomer") CustomerLoginDTO customerLoginDTO) {
-        orderService.placeOrder(
-                orderService.buildOrderDTO(orderId),
-                orderService.buildOrderItemDTO(orderId),
-                customerLoginDTO
-        );
+                              RedirectAttributes redirectAttributes,
+                              @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
+        try {
+            orderService.placeOrder(
+                    orderService.buildOrderDTO(orderId),
+                    orderService.buildOrderItemDTO(orderId),
+                    customerSessionDTO
+            );
+        } catch (InsufficientInventoryException e) {
+            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
+            return "redirect:/customer/orders/new";
+        }
         return "redirect:/customer/orders/success";
     }
 
@@ -88,12 +101,12 @@ public class OrderController {
         OrderItemDTO orderItem = orderService.findOrderItemByOrderId(orderId);
 
         // 세션에서 사용자 확인
-        CustomerLoginDTO customer = (CustomerLoginDTO) session.getAttribute("loggedInCustomer");
-        ChefStaffDTO chef = (ChefStaffDTO) session.getAttribute("loggedInChef");
-        DeliveryStaffDTO delivery = (DeliveryStaffDTO) session.getAttribute("loggedInDelivery");
+        CustomerSessionDTO customer = (CustomerSessionDTO) session.getAttribute("loggedInCustomer");
+        String staffType = (String) session.getAttribute("loggedInStaff");
 
-        // 고객인 경우, 자기 주문인지 체크
+        // 고객인 경우
         if (customer != null) {
+            // 자기 주문인지 체크
             if (!order.getCustomerLoginId().equals(customer.getLoginId())) {
                 throw new IllegalArgumentException("다른 고객의 주문은 조회할 수 없습니다.");
             }
@@ -103,13 +116,15 @@ public class OrderController {
         }
 
         // 직원인 경우
-        if (chef != null || delivery != null) {
-            model.addAttribute("order", order);
-            model.addAttribute("orderItem", orderItem);
-            return "staff/order-detail-staff"; // staff용 뷰
+        if (staffType != null) {
+            if (staffType.equals("chef") || staffType.equals("delivery")) {
+                model.addAttribute("order", order);
+                model.addAttribute("orderItem", orderItem);
+                return "staff/order-detail-staff"; // 직원용 뷰
+            }
         }
 
-        // 로그인 안 됨
+        // 세션없음
         return "redirect:/";
     }
 

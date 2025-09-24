@@ -1,6 +1,7 @@
 package com.devak.mrdaebakdinner.controller;
 
 import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
+import com.devak.mrdaebakdinner.dto.CustomerSessionDTO;
 import com.devak.mrdaebakdinner.dto.CustomerSignUpDTO;
 import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
 import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
@@ -8,6 +9,7 @@ import com.devak.mrdaebakdinner.exception.DuplicateLoginIdException;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
 import com.devak.mrdaebakdinner.service.CustomerService;
 import com.devak.mrdaebakdinner.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,17 +34,22 @@ public class CustomerController {
 
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
-    public String showCustomerInterface() {
+    public String showCustomerInterface(HttpSession session) {
+        // 이미 customer session이 있으면 바로 main화면으로
+        if (session.getAttribute("loggedInCustomer") != null) {
+            return "redirect:/customer/main";
+        }
         return "customer/customer";
     }
 
     // 로그인 요청
     @PostMapping("/customer/login")
-    public String login(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
-                        BindingResult bindingResult,
-                        RedirectAttributes redirectAttributes,
-                        HttpSession session) {
-        // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 errorMessage
+    public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes,
+                                HttpSession session,
+                                HttpServletRequest request) {
+        // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
             if (bindingResult.getFieldError("loginId") != null) {
@@ -55,19 +62,21 @@ public class CustomerController {
                 errorMessage.append("PW");
             }
             errorMessage.append("는 필수 요소입니다.");
-            redirectAttributes.addFlashAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("loginErrorMessage",
                     errorMessage.toString());
             return "redirect:/customer";
         }
 
         try {
-            CustomerLoginDTO loginResult = customerService.login(customerLoginDTO);
-            // 로그인 성공: 세션에 사용자 정보 저장
-            session.setAttribute("loggedInCustomer", loginResult);
+            CustomerSessionDTO sessionDTO = customerService.login(customerLoginDTO);
+
+            session.invalidate(); // 기존 세션 초기화
+            HttpSession newSession = request.getSession(true); // 새 세션 발급
+
+            newSession.setAttribute("loggedInCustomer", sessionDTO);
             return "redirect:/customer/main";
-        } catch (IncorrectPasswordException | CustomerNotFoundException e) {
-            // 로그인 실패: 에러메시지 전달
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
+            redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
             return "redirect:/customer";
         }
     }
@@ -91,7 +100,7 @@ public class CustomerController {
             });
 
             // redirectAttributes에 errorMessage 전달
-            redirectAttributes.addFlashAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("signUpErrorMessage",
                     errorMessage.toString().trim());
             return "redirect:/customer/signup";
         }
@@ -102,20 +111,25 @@ public class CustomerController {
             return "redirect:/customer";
         } catch (DuplicateLoginIdException | DataAccessException e) {
             // 회원가입 실패하면 errorMessage 출력
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("signUpErrorMessage", e.getMessage());
             return "redirect:/customer/signup";
         }
     }
 
     // 메인 페이지 GET 요청
     @GetMapping("/customer/main")
-    public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerLoginDTO customer,
+    public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
+                                   HttpSession session,
                                    Model model) {
-        model.addAttribute("loggedInCustomer", customer);
+        // 최신 고객정보 조회
+        CustomerSessionDTO freshCustomer = orderService.getFreshCustomerSessionDTO(customerSessionDTO.getLoginId());
+        session.setAttribute("loggedInCustomer", freshCustomer); // 세션 갱신: 주문 후 VIP 반영
+
+        model.addAttribute("loggedInCustomer", customerSessionDTO);
 
         // 고객의 loginId로 order목록을 찾아서 보여주는 로직
         List<OrderHistoryDTO> orderList =
-                orderService.findOrderHistoryByLoginId(customer.getLoginId());
+                orderService.findOrderHistoryByLoginId(customerSessionDTO.getLoginId());
         // "orderList"라는 속성으로 전달
         model.addAttribute("orderList", orderList);
         return "customer/main";

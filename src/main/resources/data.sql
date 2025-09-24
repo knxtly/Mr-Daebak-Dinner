@@ -9,3 +9,15 @@ INSERT INTO item (name, unit_price) VALUES
 ('bread', 5.00),
 ('baguette', 6.50),
 ('champagne', 75.00);
+
+INSERT INTO inventory (item_id, stock_quantity) VALUES
+(1, 10),
+(2, 10),
+(3, 10),
+(4, 10),
+(5, 10),
+(6, 10),
+(7, 10),
+(8, 10),
+(9, 10),
+(10, 10);

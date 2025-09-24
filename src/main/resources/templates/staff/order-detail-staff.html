@@ -29,7 +29,17 @@
         <td th:text="${order.deliveryAddress} ?: '-'"></td>
         <td th:text="${order.cardNumber} ?: '-'"></td>
         <td th:text="${order.status} ?: '-'"></td>
-<!--        TODO: orderItem정보도 넣어야 함-->
+    </tr>
+    <!-- 주문한 아이템 표시 -->
+    <tr>
+        <th>아이템 이름</th>
+        <th>수량</th>
+        <th colspan="7"></th>
+    </tr>
+    <tr th:each="entry : ${orderItem.orderItems}">
+        <td th:text="${entry.key}">Item Name</td>
+        <td th:text="${entry.value}">Quantity</td>
+        <td colspan="7"></td>
     </tr>
 </table>
 <a href="/staff">메인으로</a>

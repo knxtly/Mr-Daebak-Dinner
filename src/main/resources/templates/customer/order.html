@@ -99,8 +99,15 @@
             <a href="/customer/main">이전</a>
         </div>
     </form>
-    <div th:if="${errorMessage}">
-        <p th:utext="${errorMessage}" style="color: red;"></p>
+    <div th:if="${orderErrorMessage}">
+        <p th:utext="${orderErrorMessage}" style="color: red;"></p>
+    </div>
+<!--    itemErrorMessage-->
+    <div th:if="${itemErrorMessage}">
+        <p th:utext="${itemErrorMessage}" style="color: red;"></p>
+        <ul>
+            <li th:each="item : ${insufficientItems}" th:text="${item}" style="color: darkred;"></li>
+        </ul>
     </div>
 </main>
 
