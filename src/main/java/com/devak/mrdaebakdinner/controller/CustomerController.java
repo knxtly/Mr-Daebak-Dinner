@@ -49,6 +49,7 @@ public class CustomerController {
                                 RedirectAttributes redirectAttributes,
                                 HttpSession session,
                                 HttpServletRequest request) {
+
         // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
@@ -68,12 +69,13 @@ public class CustomerController {
         }
 
         try {
-            CustomerSessionDTO sessionDTO = customerService.login(customerLoginDTO);
-
-            session.invalidate(); // 기존 세션 초기화
-            HttpSession newSession = request.getSession(true); // 새 세션 발급
-
-            newSession.setAttribute("loggedInCustomer", sessionDTO);
+            // Staff 세션 있으면 삭제
+            if (session.getAttribute("loggedInStaff") != null) {
+                session.removeAttribute("loggedInStaff");
+            }
+            // 로그인 시도
+            CustomerSessionDTO customerSessionDTO = customerService.login(customerLoginDTO);
+            session.setAttribute("loggedInCustomer", customerSessionDTO);
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
             redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
@@ -138,7 +140,7 @@ public class CustomerController {
     // 로그아웃 요청
     @GetMapping("/customer/logout")
     public String customerLogout(HttpSession session) {
-        session.invalidate();
+        session.removeAttribute("loggedInCustomer");
         return "redirect:/customer";
     }
 

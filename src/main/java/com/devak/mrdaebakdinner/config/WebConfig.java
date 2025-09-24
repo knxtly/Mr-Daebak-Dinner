@@ -27,9 +27,9 @@ public class WebConfig implements WebMvcConfigurer {
 
         registry.addInterceptor(staffLoginCheckInterceptor)
                 .addPathPatterns("/staff/**")
-                .excludePathPatterns("/staff", "/staff/login");
+                .excludePathPatterns("/staff", "/staff/login", "/staff/logout");
 
-        registry.addInterceptor(orderLoginCheckInterceptor) // 👈 새로 등록
+        registry.addInterceptor(orderLoginCheckInterceptor)
                 .addPathPatterns("/orders/**");
     }
 }

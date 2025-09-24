@@ -95,14 +95,14 @@ public class OrderController {
     @GetMapping("/orders/detail")
     public String showOrderDetail(@RequestParam Long orderId,
                                   HttpSession session,
-                                  Model model) { // TODO: 세션없이 /orders/로 오면 "/"로 안가고 오류페이지로감.
+                                  Model model) {
         // orderId로부터 OrderHistoryDTO 불러오기
         OrderHistoryDTO order = orderService.findOrderHistoryByOrderId(orderId);
         OrderItemDTO orderItem = orderService.findOrderItemByOrderId(orderId);
 
-        // 세션에서 사용자 확인
+        // 세션에서 사용자 확인  // TODO: 세션없이 /orders/로 오면 "/"로 안가고 오류페이지로감.
         CustomerSessionDTO customer = (CustomerSessionDTO) session.getAttribute("loggedInCustomer");
-        String staffType = (String) session.getAttribute("loggedInStaff");
+        StaffSessionDTO staff = (StaffSessionDTO) session.getAttribute("loggedInStaff");
 
         // 고객인 경우
         if (customer != null) {
@@ -116,8 +116,9 @@ public class OrderController {
         }
 
         // 직원인 경우
-        if (staffType != null) {
-            if (staffType.equals("chef") || staffType.equals("delivery")) {
+        if (staff != null) {
+            String staffPos = staff.getPosition();
+            if ("chef".equals(staffPos) || "delivery".equals(staffPos)) {
                 model.addAttribute("order", order);
                 model.addAttribute("orderItem", orderItem);
                 return "staff/order-detail-staff"; // 직원용 뷰

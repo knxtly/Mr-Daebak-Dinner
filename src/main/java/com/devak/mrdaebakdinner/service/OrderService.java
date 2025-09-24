@@ -11,9 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +34,7 @@ public class OrderService {
                 orderRepository.findAllByCustomerId(customerEntity.getId());
         return orderEntityList.stream()
                 .map(OrderMapper::toOrderHistoryDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public OrderHistoryDTO findOrderHistoryByOrderId(Long orderId) {
@@ -162,5 +160,31 @@ public class OrderService {
         CustomerEntity customerEntity = customerRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
         return CustomerMapper.toCustomerSessionDTO(customerEntity);
+    }
+
+    // Chef가 볼 주문 조회
+    public List<OrderHistoryDTO> getChefOrders() {
+        // 주문 상태가 "주문완료" 또는 "요리중"인 주문만 조회
+        return orderRepository.findByStatusIn(Arrays.asList("주문완료", "요리중"))
+                .stream()
+                .map(OrderMapper::toOrderHistoryDTO)
+                .toList();
+    }
+
+    // Delivery가 볼 주문 조회
+    public List<OrderHistoryDTO> getDeliveryOrders() {
+        // 주문 상태가 "배달대기" 또는 "배달중"인 주문만 조회
+        return orderRepository.findByStatusIn(Arrays.asList("배달대기", "배달중"))
+                .stream()
+                .map(OrderMapper::toOrderHistoryDTO)
+                .toList();
+    }
+
+    // 요리중인 주문만 조회 (배달직원에게도 보여줄 테이블용)
+    public List<OrderHistoryDTO> getCookingOrders() {
+        return orderRepository.findByStatusIn(Arrays.asList("요리중"))
+                .stream()
+                .map(OrderMapper::toOrderHistoryDTO)
+                .toList();
     }
 }
