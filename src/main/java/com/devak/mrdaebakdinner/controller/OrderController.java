@@ -95,7 +95,7 @@ public class OrderController {
     @GetMapping("/orders/detail")
     public String showOrderDetail(@RequestParam Long orderId,
                                   HttpSession session,
-                                  Model model) {
+                                  Model model) { // TODO: 세션없이 /orders/로 오면 "/"로 안가고 오류페이지로감.
         // orderId로부터 OrderHistoryDTO 불러오기
         OrderHistoryDTO order = orderService.findOrderHistoryByOrderId(orderId);
         OrderItemDTO orderItem = orderService.findOrderItemByOrderId(orderId);

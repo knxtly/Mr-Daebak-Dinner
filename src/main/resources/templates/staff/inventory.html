@@ -11,7 +11,24 @@
 <a href="/staff/delivery">Delivery</a><br>
 <a href="/staff/inventory">Inventory</a><br>
 <table>
-
+    <thead>
+    <tr>
+        <th>Item ID</th>
+        <th>이름</th>
+        <th>재고 수량</th>
+        <th>재고 증가</th>
+        <th>재고 감소</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="inv : ${inventoryList}">
+        <td th:text="${inv.itemId}"></td>
+        <td th:text="${inv.itemName}"></td>
+        <td th:text="${inv.quantity}"></td>
+        <td><button type="button">+</button></td>
+        <td><button type="button">-</button></td>
+    </tr>
+    </tbody>
 </table>
 <a href="/">Go to Index Page</a>
 </body>

@@ -2,6 +2,7 @@ package com.devak.mrdaebakdinner.service;
 
 import com.devak.mrdaebakdinner.dto.*;
 import com.devak.mrdaebakdinner.entity.*;
+import com.devak.mrdaebakdinner.entity.OrderEntity;
 import com.devak.mrdaebakdinner.exception.InsufficientInventoryException;
 import com.devak.mrdaebakdinner.mapper.CustomerMapper;
 import com.devak.mrdaebakdinner.mapper.OrderMapper;

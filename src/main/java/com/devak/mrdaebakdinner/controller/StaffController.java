@@ -1,32 +1,39 @@
 package com.devak.mrdaebakdinner.controller;
 
+import com.devak.mrdaebakdinner.dto.InventoryDTO;
 import com.devak.mrdaebakdinner.dto.StaffLoginDTO;
 import com.devak.mrdaebakdinner.dto.StaffSessionDTO;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
+import com.devak.mrdaebakdinner.service.InventoryService;
 import com.devak.mrdaebakdinner.service.StaffService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class StaffController {
 
     private final StaffService staffService;
+    private final InventoryService inventoryService;
 
     // Staff 기본화면 (로그인화면)
     @GetMapping("/staff")
     public String showStaffInterface(HttpSession session) {
         // 이미 staff session이 있으면 바로 chef화면으로
-        if (session.getAttribute("loggedInStaff") != null) {
+        Object staffRole = session.getAttribute("loggedInStaff");
+
+        if ("chef".equals(staffRole) || "delivery".equals(staffRole)) {
             return "redirect:/staff/chef";
         }
         return "staff/staff";
@@ -75,9 +82,9 @@ public class StaffController {
 
     // Staff - Delivery
     @GetMapping("/staff/inventory")
-    public String showInventory() {
-        // TODO: show Inventory
+    public String showInventory(Model model) {
+        List<InventoryDTO> inventoryDTOList = inventoryService.findAllInventory();
+        model.addAttribute("inventoryList", inventoryDTOList);
         return "staff/inventory";
     }
-
 }
