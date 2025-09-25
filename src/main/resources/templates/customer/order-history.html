@@ -16,6 +16,7 @@
         <th>가격</th>
         <th>배달 시간</th>
         <th>배달 주소</th>
+        <th>배달 상태</th>
         <th>상세</th>
     </tr>
     <tr th:each="order, stat : ${orderList}">
@@ -26,6 +27,7 @@
         <td th:text="${order.totalPrice} ?: '-'"></td>
         <td th:text="${order.deliveryTime} ?: '-'"></td>
         <td th:text="${order.deliveryAddress} ?: '-'"></td>
+        <td th:text="${order.status} ?: '-'"></td>
         <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}">상세</a></td>
     </tr>
 </table>
