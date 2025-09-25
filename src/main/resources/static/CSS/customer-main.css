@@ -20,6 +20,24 @@ a {
     padding: 15px 50px;
     background-color: #fff;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    width = 100%
+}
+.navbar-left,
+.navbar-right {
+    flex: 1; /* flex-grow: 1;과 동일, 남은 공간을 균등하게 차지 */
+    min-width: 0; /* flexbox의 요소 크기 설정 */
+}
+
+/* nav-center를 가운데 정렬 */
+.navbar-center {
+    flex: 2; /* 중앙 요소가 좌우보다 더 많은 공간을 차지하도록 설정 */
+    text-align: center; /* 내부 요소들을 가운데 정렬 */
+}
+
+/* 우측 요소 정렬 */
+.navbar-right {
+    display: flex;
+    justify-content: flex-end; /* 우측 끝으로 정렬 */
 }
 
 .navbar-left .logo {
