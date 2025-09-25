@@ -10,10 +10,10 @@
 
 <header class="navbar">
     <div class="navbar-left">
-        <a href="#" class="logo">MR.DAEBAKDINNER</a>
+        <a href="/customer/main" class="logo">MR.DAEBAKDINNER</a>
     </div>
     <nav class="navbar-center">
-        <a href="/staff">STAFF</a>
+        <a href="#">SIGNUP</a>
         <a href="#">ABOUT US</a>
         <a href="#">MENU</a>
         <a href="#">DELIVERY</a>
@@ -39,7 +39,7 @@
             <a href = "/customer/orders/history">PREVIOUS ORDERS →</a>
         </h2>
         <div class="orders-container">
-            <a th:each="order : ${orderList}">
+            <a th:each="order : ${orderList}" th:href="@{/orders/detail(orderId=${order.id})}" class="order-link">
                 <div class="order-item">
                     <p class="order-date" th:text="${order.orderTime} ?: '-'"></p>
                     <h3 class="order-name">
@@ -59,12 +59,7 @@
 
 </footer>
 
-<!--
-TODO: navcenter로그인 전후 상관없이 가운데에 있게
-가운데 사진 로그인 전후 상관없이 높이 똑같게
-order container 눌러서 order/detail로 연결되게
-(42번 라인 <a th:each="order : ${orderList}"> 에 th:href 추가하면 로그인이나 주문완료시 에러발생)
--->
+
 
 </body>
 </html>
