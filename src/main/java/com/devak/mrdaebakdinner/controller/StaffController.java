@@ -74,7 +74,7 @@ public class StaffController {
     @GetMapping("/staff/logout")
     public String staffLogout(HttpSession session) {
         session.removeAttribute("loggedInStaff");
-        return "redirect:/staff";
+        return "redirect:/";
     }
 
     /* ============ Chef ============ */
@@ -140,5 +140,19 @@ public class StaffController {
     public String showInventory(Model model) {
         model.addAttribute("inventoryList", inventoryService.findAllInventory());
         return "staff/inventory";
+    }
+    // TODO: 한 번 increase요청하면 "수량선택"이 다시 1로 세팅되는 문제 w. inventory.html
+    @PostMapping("/staff/inventory/increase")
+    public String increaseStock(@RequestParam Long itemId,
+                                @RequestParam int amount) {
+        inventoryService.increaseCount(itemId, amount);
+        return "redirect:/staff/inventory";
+    }
+
+    @PostMapping("/staff/inventory/decrease")
+    public String decreaseStock(@RequestParam Long itemId,
+                                @RequestParam int amount) {
+        inventoryService.decreaseCount(itemId, amount);
+        return "redirect:/staff/inventory";
     }
 }

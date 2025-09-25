@@ -22,14 +22,14 @@ public class InventoryService {
                 .toList();
     }
 
-    public void incrementCount(Long itemId, int amount) {
+    public void increaseCount(Long itemId, int amount) {
         InventoryEntity inventoryEntity = inventoryRepository.findByItemId(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 item입니다."));
         inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() + amount);
         inventoryRepository.save(inventoryEntity);
     }
 
-    public void decrementCount(Long itemId, int amount) {
+    public void decreaseCount(Long itemId, int amount) {
         InventoryEntity inventoryEntity = inventoryRepository.findByItemId(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 item입니다."));
         inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - amount);

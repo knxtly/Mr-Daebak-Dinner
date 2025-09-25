@@ -2,40 +2,69 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/customer-main.css}">
+    <link rel="stylesheet" th:href="@{/CSS/customer-main.css}">
 </head>
 <body>
-<h1>Main Page</h1>
-<div th:if="${loggedInCustomer}">
-    Hi <span th:text="${loggedInCustomer.loginId}" style="color: blue;"></span>!<br>
-    Membership: <span th:text="${loggedInCustomer.membership}" style="color: blue;"></span><br>
-    User Information: <p th:text="${loggedInCustomer}"></p>
-</div>
-<a href="/customer/orders/new">주문하기</a><br>
-<a href="/customer/orders/history">이전주문조회</a><br>
-<table>
-    <tr>
-        <th>순번</th>
-        <th>주문시각</th>
-        <th>Dinner 종류</th>
-        <th>Dinner 스타일</th>
-        <th>가격</th>
-        <th>배달 시간</th>
-        <th>배달 주소</th>
-        <th>상세</th>
-    </tr>
-    <tr th:each="order, stat : ${orderList}">
-        <td th:text="${stat.index + 1}"></td>
-        <td th:text="${order.orderTime} ?: '-'"></td>
-        <td th:text="${order.dinnerKind} ?: '-'"></td>
-        <td th:text="${order.dinnerStyle} ?: '-'"></td>
-        <td th:text="${order.totalPrice} ?: '-'"></td>
-        <td th:text="${order.deliveryTime} ?: '-'"></td>
-        <td th:text="${order.deliveryAddress} ?: '-'"></td>
-        <td><a th:href="@{/orders/detail(orderId=${order.id})}">상세</a></td>
-    </tr>
-</table>
-<a href="/customer/logout">로그아웃</a>
+
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="#" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="/staff">STAFF</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer/logout" class="logout-btn">로그아웃</a>
+        <a href="#" class="mypg-btn">마이페이지</a>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="main-image-container">
+        <img th:src="@{/images/mainimage.png}" alt="스테이크 사진" class="steak-image">
+        <div class="image-overlay">
+            <h1 class="main-text">IMPACT YOUR LOVED ONES BY SPENDING SPECIAL DAYS PEACEFULLY AT HOME</h1>
+            <a href = "/customer/orders/new">
+                <button class="order-button">주문하기</button>
+            </a>
+        </div>
+    </div>
+    <section class="previous-orders">
+        <h2 class="section-title">
+            <a href = "/customer/orders/history">PREVIOUS ORDERS →</a>
+        </h2>
+        <div class="orders-container">
+            <a th:each="order : ${orderList}">
+                <div class="order-item">
+                    <p class="order-date" th:text="${order.orderTime} ?: '-'"></p>
+                    <h3 class="order-name">
+                        <span th:text="${order.dinnerKind} ?: '-'"></span>
+                        <span class="order-detail" th:text="${order.dinnerStyle} ?: '-'"></span>
+                    </h3>
+                    <p class="order-price" th:text="${order.totalPrice} ?: '-'"></p>
+                    <p class="order-info" th:text="${order.deliveryTime} ?: '-'"></p>
+                    <p class="order-info" th:text="${order.deliveryAddress} ?: '-'"></p>
+                </div>
+            </a>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+
+</footer>
+
+<!--
+TODO: navcenter로그인 전후 상관없이 가운데에 있게
+가운데 사진 로그인 전후 상관없이 높이 똑같게
+order container 눌러서 order/detail로 연결되게
+(42번 라인 <a th:each="order : ${orderList}"> 에 th:href 추가하면 로그인이나 주문완료시 에러발생)
+-->
+
 </body>
 </html>

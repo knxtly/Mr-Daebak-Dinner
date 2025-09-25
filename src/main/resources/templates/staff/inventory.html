@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Inventory | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/customer-main.css}">
+    <link rel="stylesheet" th:href="@{/CSS/style.css}">
 </head>
 <body>
 <h1>Inventory</h1>
@@ -16,6 +16,7 @@
         <th>Item ID</th>
         <th>이름</th>
         <th>재고 수량</th>
+        <th>수량 입력</th>
         <th>재고 증가</th>
         <th>재고 감소</th>
     </tr>
@@ -25,8 +26,21 @@
         <td th:text="${inv.itemId}"></td>
         <td th:text="${inv.itemName}"></td>
         <td th:text="${inv.quantity}"></td>
-        <td><button type="button">+</button></td>
-        <td><button type="button">-</button></td>
+        <td>
+            <form method="post">
+                <!-- 사용자 입력 (숫자만) -->
+                <input type="number" name="amount" value="1" min="1" required />
+                <!-- 각 버튼에 대해 다른 POST URL 사용 -->
+                <button type="submit"
+                        th:attr="formaction=@{/staff/inventory/increase(itemId=${inv.itemId})}">
+                    +
+                </button>
+                <button type="submit"
+                        th:attr="formaction=@{/staff/inventory/decrease(itemId=${inv.itemId})}">
+                    -
+                </button>
+            </form>
+        </td>
     </tr>
     </tbody>
 </table>

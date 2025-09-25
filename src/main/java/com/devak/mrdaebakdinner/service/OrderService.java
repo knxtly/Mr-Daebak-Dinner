@@ -74,7 +74,7 @@ public class OrderService {
     /* ============ 주문 함수 ============ */
 
     @Transactional
-    public void placeOrder(OrderDTO orderDTO,
+    public OrderHistoryDTO placeOrder(OrderDTO orderDTO,
                            OrderItemDTO orderItemDTO,
                            CustomerSessionDTO customerSessionDTO) {
         // 주문한 customer 찾기
@@ -135,6 +135,8 @@ public class OrderService {
         customerEntity.setOrderCount(customerEntity.getOrderCount() + 1); // customerEntity의 orderCount 1 증가
         if (customerEntity.getOrderCount() >= 5)
             customerEntity.setMembershipLevel("VIP"); // orderCount 5 이상이면 VIP로 승격
+
+        return OrderMapper.toOrderHistoryDTO(order);
 
         // 영속 상태이기 때문에 아래 변경사항은 자동 반영됨
         // customerEntity: orderCount 1증가 + VIP승격

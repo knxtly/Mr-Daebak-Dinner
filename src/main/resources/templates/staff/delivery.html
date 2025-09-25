@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Staff - Delivery | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/customer-main.css}">
+    <link rel="stylesheet" th:href="@{/CSS/style.css}">
 </head>
 <body>
 <h1>Delivery</h1>
@@ -53,7 +53,7 @@
         <td th:text="${order.customerLoginId}"></td>
         <td th:text="${order.status}"></td>
         <td th:text="${order.orderTime}"></td>
-        <td><a th:href="@{/orders/detail(orderId=${order.id})}">상세</a></td>
+        <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}">상세</a></td>
     </tr>
 </table>
 

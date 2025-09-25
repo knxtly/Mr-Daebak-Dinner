@@ -32,6 +32,8 @@ public class CustomerController {
     private final CustomerService customerService;
     private final OrderService orderService;
 
+    /* ============ Login ============ */
+
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
     public String showCustomerInterface(HttpSession session) {
@@ -83,6 +85,8 @@ public class CustomerController {
         }
     }
 
+    /* ============ SignUp ============ */
+
     // 회원가입 페이지 GET 요청
     @GetMapping("/customer/signup")
     public String showSignUp() {
@@ -118,6 +122,8 @@ public class CustomerController {
         }
     }
 
+    /* ============ Main ============ */
+
     // 메인 페이지 GET 요청
     @GetMapping("/customer/main")
     public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
@@ -137,11 +143,13 @@ public class CustomerController {
         return "customer/main";
     }
 
+    /* ============ Logout ============ */
+
     // 로그아웃 요청
     @GetMapping("/customer/logout")
     public String customerLogout(HttpSession session) {
         session.removeAttribute("loggedInCustomer");
-        return "redirect:/customer";
+        return "redirect:/";
     }
 
 }
