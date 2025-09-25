@@ -98,9 +98,9 @@ public class OrderController {
                                   Model model) {
         // orderId로부터 OrderHistoryDTO 불러오기
         OrderHistoryDTO order = orderService.findOrderHistoryByOrderId(orderId);
-        OrderItemDTO orderItem = orderService.findOrderItemByOrderId(orderId);
+        OrderItemDTO orderItem = orderService.findOrderItem(orderId);
 
-        // 세션에서 사용자 확인  // TODO: 세션없이 /orders/로 오면 "/"로 안가고 오류페이지로감.
+        // 세션에서 사용자 확인
         CustomerSessionDTO customer = (CustomerSessionDTO) session.getAttribute("loggedInCustomer");
         StaffSessionDTO staff = (StaffSessionDTO) session.getAttribute("loggedInStaff");
 

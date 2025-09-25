@@ -24,52 +24,64 @@ public class OrderService {
     private final ItemRepository itemRepository;
     private final InventoryRepository inventoryRepository;
 
-    public List<OrderHistoryDTO> findOrderHistoryByLoginId(String loginId) {
-        // loginId로 id 찾아서 반환
-        CustomerEntity customerEntity = customerRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+    /* ============ 내부에서만 쓸 함수 ============ */
 
-        // id로 해당 고객의 주문만을 담아 return
+    private CustomerEntity findCustomer(String loginId) {
+        return customerRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+    }
+    private OrderEntity findOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+    }
+
+    /* ============ 주문조회를 위한 함수 ============ */
+
+    public List<OrderHistoryDTO> findOrderHistoryByLoginId(String loginId) {
+        // 고객의 id로 해당 고객의 주문만 찾기
         List<OrderEntity> orderEntityList =
-                orderRepository.findAllByCustomerId(customerEntity.getId());
+                orderRepository.findAllByCustomerId(findCustomer(loginId).getId());
+
         return orderEntityList.stream()
                 .map(OrderMapper::toOrderHistoryDTO)
                 .toList();
     }
 
     public OrderHistoryDTO findOrderHistoryByOrderId(Long orderId) {
-        OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
-
+        // orderId로 orderEntity 가져오기
+        OrderEntity order = findOrder(orderId);
+        // OrderHistoryDTO로 변경하여 반환
         return OrderMapper.toOrderHistoryDTO(order);
     }
 
-    public OrderItemDTO findOrderItemByOrderId(Long orderId) {
-        // orderId에 해당하는 item
+    public OrderItemDTO findOrderItem(Long orderId) {
+        // 한 orderId에 담긴 orderItems 가져오기
         List<OrderItemEntity> orderItems = orderItemRepository.findAllByOrderId(orderId);
 
-        // Map<String, Integer>로 변환 (key: item name, value: quantity)
+        // orderItems를 OrderItemDTO의 형(Map<String, Integer>)으로 변환
+        // (key: itemName, value: quantity)
         Map<String, Integer> itemMap = orderItems.stream()
                 .collect(Collectors.toMap(
                         oi -> oi.getItem().getName(),
                         OrderItemEntity::getQuantity
                 ));
 
-        // DTO에 담아 반환
         OrderItemDTO dto = new OrderItemDTO();
         dto.setOrderItems(itemMap);
         return dto;
     }
 
+    /* ============ 주문 함수 ============ */
+
     @Transactional
     public void placeOrder(OrderDTO orderDTO,
                            OrderItemDTO orderItemDTO,
                            CustomerSessionDTO customerSessionDTO) {
-        // 주문한 고객의 customerEntity찾기
+        // 주문한 customer 찾기
         CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
 
-        // 주문될 order
+        // 주문될 order 생성
         OrderEntity order = OrderMapper.toOrderEntity(orderDTO, customerEntity);
 
         // OrderItem 조사
@@ -84,14 +96,12 @@ public class OrderService {
 
             // 없는 item인지 검사
             ItemEntity item = itemRepository.findByName(orderItemName)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "없는 item입니다." + orderItemName));
+                    .orElseThrow(() -> new IllegalArgumentException("없는 item입니다." + orderItemName));
 
             // item이 재고에 등록됐는지 검사
             InventoryEntity inventoryEntity = inventoryRepository.findByItemId(item.getId())
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "재고에 등록되지 않은 item입니다." + orderItemName
-                    ));
+                            "재고에 등록되지 않은 item입니다." + orderItemName));
 
             // 부족한 재고 이름은 리스트에 추가
             if (inventoryEntity.getStockQuantity() < quantity) {
@@ -105,10 +115,10 @@ public class OrderService {
 
             // OrderItemEntity 구성 후 저장
             OrderItemEntity orderItemEntity = new OrderItemEntity();
+            // OrderItemId(PK)를 직접 생성해 넣음 -> JPA가 @MapsId 때문에 id를 Long으로 채우려고 하기 때문
             OrderItemId orderItemId = new OrderItemId(order.getId(), item.getId());
-            orderItemEntity.setId(orderItemId); // OrderItemId(PK)를 직접 생성해 넣음
-            // -> JPA가 @MapsId 때문에 id를 Long으로 채우려고 하기 때문
-            orderItemEntity.setOrder(order); // 나머지는 그냥 넣어도 됨
+            orderItemEntity.setId(orderItemId);
+            orderItemEntity.setOrder(order); // 나머지는 그냥 set해도 됨
             orderItemEntity.setItem(item);
             orderItemEntity.setQuantity(quantity);
 
@@ -120,32 +130,29 @@ public class OrderService {
             throw new InsufficientInventoryException("재고가 부족합니다", insufficientItems);
         }
 
-        // 주문될 order 테이블에 반영
-        orderRepository.save(order);
-        // orderItemEntity 저장 (bulk save)
-        orderItemRepository.saveAll(orderItemEntityList);
-        // customerEntity의 orderCount 1 증가
-        customerEntity.setOrderCount(customerEntity.getOrderCount() + 1);
-        // orderCount 5 이상이면 VIP로 승격
+        orderRepository.save(order); // 주문될 order 테이블에 반영
+        orderItemRepository.saveAll(orderItemEntityList); // orderItemEntity 한번에 저장 (bulk save)
+        customerEntity.setOrderCount(customerEntity.getOrderCount() + 1); // customerEntity의 orderCount 1 증가
         if (customerEntity.getOrderCount() >= 5)
-            customerEntity.setMembershipLevel("VIP");
+            customerEntity.setMembershipLevel("VIP"); // orderCount 5 이상이면 VIP로 승격
 
         // 영속 상태이기 때문에 아래 변경사항은 자동 반영됨
-        // customerEntity: orderCount 1증가 (+VIP승격)
+        // customerEntity: orderCount 1증가 + VIP승격
         // inventoryEntity: stockQuantity 주문량만큼 감소
     }
 
+    /* ============ 재주문을 위한 함수 ============ */
+
     public OrderDTO buildOrderDTO(Long orderId) {
-        OrderEntity orderEntity = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 없습니다."));
-        return OrderMapper.toOrderDTO(orderEntity);
+        return OrderMapper.toOrderDTO(findOrder(orderId));
     }
 
     public OrderItemDTO buildOrderItemDTO(Long orderId) {
-        // order_item테이블에서 orderId가 일치하는 레코드 모두 가져옴
-        List<OrderItemEntity> orderItemList = orderItemRepository.findAllByOrderId(orderId);
-
-        Map<String, Integer> itemMap = orderItemList.stream()
+        // order_item테이블에서 orderId가 일치하는 레코드 모두 가져와서
+        // OrderItemDTO의 형(Map<String, Integer>)으로 변환
+        Map<String, Integer> itemMap =
+                orderItemRepository.findAllByOrderId(orderId)
+                .stream()
                 .collect(Collectors.toMap(
                         oi -> oi.getItem().getName(), // Key = Item Name
                         OrderItemEntity::getQuantity // Value = quantity
@@ -162,10 +169,11 @@ public class OrderService {
         return CustomerMapper.toCustomerSessionDTO(customerEntity);
     }
 
+    /* ============ 직원이 조회할 주문 위한 함수 ============ */
     // Chef가 볼 주문 조회
     public List<OrderHistoryDTO> getChefOrders() {
-        // 주문 상태가 "주문완료" 또는 "요리중"인 주문만 조회
-        return orderRepository.findByStatusIn(Arrays.asList("주문완료", "요리중"))
+        // 주문 상태가 "ORDERED" 또는 "COOKING"인 주문만 조회
+        return orderRepository.findByStatusIn(Arrays.asList(OrderStatus.ORDERED, OrderStatus.COOKING))
                 .stream()
                 .map(OrderMapper::toOrderHistoryDTO)
                 .toList();
@@ -173,8 +181,8 @@ public class OrderService {
 
     // Delivery가 볼 주문 조회
     public List<OrderHistoryDTO> getDeliveryOrders() {
-        // 주문 상태가 "배달대기" 또는 "배달중"인 주문만 조회
-        return orderRepository.findByStatusIn(Arrays.asList("배달대기", "배달중"))
+        // 주문 상태가 "COOKED" 또는 "DELIVERING"인 주문만 조회
+        return orderRepository.findByStatusIn(Arrays.asList(OrderStatus.COOKED, OrderStatus.DELIVERING))
                 .stream()
                 .map(OrderMapper::toOrderHistoryDTO)
                 .toList();
@@ -182,9 +190,31 @@ public class OrderService {
 
     // 요리중인 주문만 조회 (배달직원에게도 보여줄 테이블용)
     public List<OrderHistoryDTO> getCookingOrders() {
-        return orderRepository.findByStatusIn(Arrays.asList("요리중"))
+        return orderRepository.findByStatusIn(Arrays.asList(OrderStatus.COOKING))
                 .stream()
                 .map(OrderMapper::toOrderHistoryDTO)
                 .toList();
+    }
+
+    /* ============ 주문시작/완료, 배달시작/완료 처리 ============ */
+
+    @Transactional
+    public void startCooking(Long orderId) {
+        findOrder(orderId).setStatus(OrderStatus.COOKING); // 상태를 "COOKING"으로 변경
+    }
+
+    @Transactional
+    public void completeCooking(Long orderId) {
+        findOrder(orderId).setStatus(OrderStatus.COOKED); // 상태를 "COOKED"으로 변경
+    }
+
+    @Transactional
+    public void startDelivery(Long orderId) {
+        findOrder(orderId).setStatus(OrderStatus.DELIVERING); // 상태를 "DELIVERING"으로 변경
+    }
+
+    @Transactional
+    public void completeDelivery(Long orderId) {
+        findOrder(orderId).setStatus(OrderStatus.DELIVERED); // 상태를 "DELIVERED"으로 변경
     }
 }

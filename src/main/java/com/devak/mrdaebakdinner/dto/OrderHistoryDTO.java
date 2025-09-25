@@ -1,5 +1,6 @@
 package com.devak.mrdaebakdinner.dto;
 
+import com.devak.mrdaebakdinner.entity.OrderStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -28,5 +29,5 @@ public class OrderHistoryDTO { // 고객이 이전주문조회 시 정보를 담
     private Integer totalPrice;
     @NotBlank
     private String cardNumber;
-    private String status;
+    private OrderStatus status;
 }

@@ -41,12 +41,13 @@ public class OrderEntity {
     private String cardNumber;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @PrePersist
     public void prePersist() {
         if (status == null) {
-            status = "주문완료";
+            status = OrderStatus.ORDERED;
         }
         if (orderTime == null) {
             orderTime = LocalDateTime.now();
