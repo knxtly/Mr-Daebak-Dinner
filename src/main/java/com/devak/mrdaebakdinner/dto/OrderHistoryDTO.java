@@ -1,5 +1,7 @@
 package com.devak.mrdaebakdinner.dto;
 
+import com.devak.mrdaebakdinner.entity.OrderDnrKind;
+import com.devak.mrdaebakdinner.entity.OrderDnrStyle;
 import com.devak.mrdaebakdinner.entity.OrderStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,10 +21,10 @@ public class OrderHistoryDTO { // 고객이 이전주문조회 시 정보를 담
     private String customerLoginId;
     @NotNull
     private LocalDateTime orderTime;
-    @NotBlank
-    private String dinnerKind;
-    @NotBlank
-    private String dinnerStyle;
+    @NotNull
+    private OrderDnrKind dinnerKind;
+    @NotNull
+    private OrderDnrStyle dinnerStyle;
     @NotBlank
     private String deliveryAddress;
     private LocalDateTime deliveryTime;

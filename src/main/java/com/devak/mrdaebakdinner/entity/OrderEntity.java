@@ -23,10 +23,12 @@ public class OrderEntity {
     private CustomerEntity customer;
 
     @Column(name = "dinner_kind", nullable = false)
-    private String dinnerKind;
+    @Enumerated(EnumType.STRING)
+    private OrderDnrKind dinnerKind;
 
     @Column(name = "dinner_style", nullable = false)
-    private String dinnerStyle;
+    @Enumerated(EnumType.STRING)
+    private OrderDnrStyle dinnerStyle;
 
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
@@ -34,7 +36,7 @@ public class OrderEntity {
     @Column(name = "delivery_time")
     private LocalDateTime deliveryTime;
 
-    @Column(name = "total_price") // TODO: nullable=false 추가할 것. 계산 후 값 결정
+    @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
 
     @Column(name = "card_number", nullable = false)
@@ -46,6 +48,9 @@ public class OrderEntity {
 
     @PrePersist
     public void prePersist() {
+        if (totalPrice == null) {
+            totalPrice = 0;
+        }
         if (status == null) {
             status = OrderStatus.ORDERED;
         }
