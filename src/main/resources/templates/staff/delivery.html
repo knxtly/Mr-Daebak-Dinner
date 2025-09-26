@@ -10,12 +10,54 @@
 <a href="/staff/chef">Chef</a><br>
 <a href="/staff/delivery">Delivery</a><br>
 <a href="/staff/inventory">Inventory</a><br>
+
+<h3>배달대기 / 배달중 주문</h3>
 <table>
-<!--    TODO: "배달대기", "배달중" 주문들을 보여준다-->
+    <tr>
+        <th>주문번호</th>
+        <th>고객명</th>
+        <th>상태</th>
+        <th>주문시간</th>
+        <th>배달시작</th>
+        <th>배달완료</th>
+    </tr>
+    <tr th:each="order : ${deliveryOrderList}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.customerLoginId}"></td>
+        <td th:text="${order.status}"></td>
+        <td th:text="${order.orderTime}"></td>
+        <td>
+            <form th:action="@{/staff/delivery/start(orderId=${order.id})}" method="post">
+                <button type="submit">시작</button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/staff/delivery/complete(orderId=${order.id})}" method="post">
+                <button type="submit">완료</button>
+            </form>
+        </td>
+    </tr>
 </table>
+
+<h3>요리중 주문</h3>
 <table>
-<!--    TODO: "요리중" 주문을 보여준다-->
+    <tr>
+        <th>주문번호</th>
+        <th>고객명</th>
+        <th>상태</th>
+        <th>주문시간</th>
+        <th>상세</th>
+    </tr>
+    <tr th:each="order : ${cookingOrderList}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.customerLoginId}"></td>
+        <td th:text="${order.status}"></td>
+        <td th:text="${order.orderTime}"></td>
+        <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}">상세</a></td>
+    </tr>
 </table>
+
+<a href="/staff/logout">로그아웃</a>
 <a href="/">Go to Index Page</a>
 </body>
 </html>

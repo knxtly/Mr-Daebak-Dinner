@@ -9,8 +9,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class InventoryDTO {
-    // Inventory 조회에 쓸 예정
+public class InventoryDTO { // inventory 조회에 사용
     private Long itemId;
-    private int string;
+    private String itemName;
+    private int quantity;
 }

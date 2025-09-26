@@ -14,6 +14,11 @@ public class CustomerLoginCheckInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
+        // 캐시 방지 헤더 추가
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+        response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+        response.setDateHeader("Expires", 0); // Proxy 서버
+
         HttpSession session = request.getSession(false);
         CustomerSessionDTO customerSessionDTO = (session != null) ?
                 (CustomerSessionDTO) session.getAttribute("loggedInCustomer") : null;

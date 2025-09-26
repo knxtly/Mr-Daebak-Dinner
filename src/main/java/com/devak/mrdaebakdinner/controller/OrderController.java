@@ -20,6 +20,8 @@ public class OrderController {
 
     private final OrderService orderService;
 
+    /* ============ Take order ============ */
+
     // Customer: 주문 페이지 GET 요청
     @GetMapping("/customer/orders/new")
     public String showOrderPage() {
@@ -46,7 +48,8 @@ public class OrderController {
 
         try {
             // 주문처리
-            orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
+            OrderHistoryDTO placedOrder = orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
+            redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
         } catch (InsufficientInventoryException e) {
             redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
@@ -60,6 +63,8 @@ public class OrderController {
         return "customer/order-success";
     }
 
+    /* ============ Order History ============ */
+
     // 이전주문기록 조회 요청
     @GetMapping("/customer/orders/history")
     public String showCustomerOrderHistory(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
@@ -72,17 +77,20 @@ public class OrderController {
         return "customer/order-history";
     }
 
+    /* ============ Reorder ============ */
+
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId,
                               RedirectAttributes redirectAttributes,
                               @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
         try {
-            orderService.placeOrder(
+            OrderHistoryDTO placedOrder = orderService.placeOrder(
                     orderService.buildOrderDTO(orderId),
                     orderService.buildOrderItemDTO(orderId),
                     customerSessionDTO
             );
+            redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
         } catch (InsufficientInventoryException e) {
             redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
@@ -91,18 +99,20 @@ public class OrderController {
         return "redirect:/customer/orders/success";
     }
 
+    /* ============ order Detail ============ */
+
     // 주문 상세 요청
-    @GetMapping("/orders/detail")
-    public String showOrderDetail(@RequestParam Long orderId,
+    @GetMapping("/orders/detail/{orderId}")
+    public String showOrderDetail(@PathVariable Long orderId,
                                   HttpSession session,
                                   Model model) {
         // orderId로부터 OrderHistoryDTO 불러오기
         OrderHistoryDTO order = orderService.findOrderHistoryByOrderId(orderId);
-        OrderItemDTO orderItem = orderService.findOrderItemByOrderId(orderId);
+        OrderItemDTO orderItem = orderService.findOrderItem(orderId);
 
         // 세션에서 사용자 확인
         CustomerSessionDTO customer = (CustomerSessionDTO) session.getAttribute("loggedInCustomer");
-        String staffType = (String) session.getAttribute("loggedInStaff");
+        StaffSessionDTO staff = (StaffSessionDTO) session.getAttribute("loggedInStaff");
 
         // 고객인 경우
         if (customer != null) {
@@ -116,8 +126,9 @@ public class OrderController {
         }
 
         // 직원인 경우
-        if (staffType != null) {
-            if (staffType.equals("chef") || staffType.equals("delivery")) {
+        if (staff != null) {
+            String staffPos = staff.getPosition();
+            if ("chef".equals(staffPos) || "delivery".equals(staffPos)) {
                 model.addAttribute("order", order);
                 model.addAttribute("orderItem", orderItem);
                 return "staff/order-detail-staff"; // 직원용 뷰
@@ -128,5 +139,4 @@ public class OrderController {
         return "redirect:/";
     }
 
-    // TODO: 배달완료 시 deliveryTime set
 }

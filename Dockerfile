@@ -3,8 +3,7 @@
 FROM gradle:jdk17-jammy AS build
 WORKDIR /app
 COPY --chown=gradle:gradle . /app
-RUN ./gradlew clean build -x test
-RUN ./gradlew build -x test --no-daemon
+RUN ./gradlew clean build -x test --no-daemon
 
 ## Run stage: compose.yaml에서 bootRun쓰는동안 잠금
 FROM eclipse-temurin:17-jre-jammy

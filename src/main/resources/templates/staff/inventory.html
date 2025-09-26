@@ -11,8 +11,38 @@
 <a href="/staff/delivery">Delivery</a><br>
 <a href="/staff/inventory">Inventory</a><br>
 <table>
-
+    <thead>
+    <tr>
+        <th>Item ID</th>
+        <th>이름</th>
+        <th>재고 수량</th>
+        <th>재고 관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="inv : ${inventoryList}">
+        <td th:text="${inv.itemId}"></td>
+        <td th:text="${inv.itemName}"></td>
+        <td th:text="${inv.quantity}"></td>
+        <td>
+            <form method="post">
+                <!-- 사용자 입력 (숫자만) -->
+                <input type="number" name="amount" value="1" min="1" required />
+                <!-- 각 버튼에 대해 다른 POST URL 사용 -->
+                <button type="submit"
+                        th:attr="formaction=@{/staff/inventory/increase(itemId=${inv.itemId})}">
+                    +
+                </button>
+                <button type="submit"
+                        th:attr="formaction=@{/staff/inventory/decrease(itemId=${inv.itemId})}">
+                    -
+                </button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
 </table>
+<a href="/staff/logout">로그아웃</a>
 <a href="/">Go to Index Page</a>
 </body>
 </html>
