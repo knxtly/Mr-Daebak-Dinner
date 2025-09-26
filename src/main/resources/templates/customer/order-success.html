@@ -7,6 +7,7 @@
 </head>
 <body>
 <h1>주문이 완료되었습니다!</h1>
-<a href="/customer/main">ORDER DETAIL</a>
+<a href="/customer/main">메인으로</a>
+<a th:href="@{/orders/detail/{orderId}(orderId=${placedOrder.id})}">주문상세보기</a>
 </body>
 </html>

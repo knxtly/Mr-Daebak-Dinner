@@ -32,6 +32,8 @@ public class CustomerController {
     private final CustomerService customerService;
     private final OrderService orderService;
 
+    /* ============ Login ============ */
+
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
     public String showCustomerInterface(HttpSession session) {
@@ -49,6 +51,7 @@ public class CustomerController {
                                 RedirectAttributes redirectAttributes,
                                 HttpSession session,
                                 HttpServletRequest request) {
+
         // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder();
@@ -68,18 +71,21 @@ public class CustomerController {
         }
 
         try {
-            CustomerSessionDTO sessionDTO = customerService.login(customerLoginDTO);
-
-            session.invalidate(); // 기존 세션 초기화
-            HttpSession newSession = request.getSession(true); // 새 세션 발급
-
-            newSession.setAttribute("loggedInCustomer", sessionDTO);
+            // Staff 세션 있으면 삭제
+            if (session.getAttribute("loggedInStaff") != null) {
+                session.removeAttribute("loggedInStaff");
+            }
+            // 로그인 시도
+            CustomerSessionDTO customerSessionDTO = customerService.login(customerLoginDTO);
+            session.setAttribute("loggedInCustomer", customerSessionDTO);
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
             redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
             return "redirect:/customer";
         }
     }
+
+    /* ============ SignUp ============ */
 
     // 회원가입 페이지 GET 요청
     @GetMapping("/customer/signup")
@@ -116,6 +122,8 @@ public class CustomerController {
         }
     }
 
+    /* ============ Main ============ */
+
     // 메인 페이지 GET 요청
     @GetMapping("/customer/main")
     public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
@@ -135,11 +143,13 @@ public class CustomerController {
         return "customer/main";
     }
 
+    /* ============ Logout ============ */
+
     // 로그아웃 요청
     @GetMapping("/customer/logout")
     public String customerLogout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/customer";
+        session.removeAttribute("loggedInCustomer");
+        return "redirect:/";
     }
 
 }

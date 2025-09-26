@@ -10,9 +10,36 @@
 <a href="/staff/chef">Chef</a><br>
 <a href="/staff/delivery">Delivery</a><br>
 <a href="/staff/inventory">Inventory</a><br>
+<h3>주문완료 / 요리중 주문</h3>
 <table>
-<!--    TODO: "주문완료"상태인 주문을 보여준다 -->
+    <tr>
+        <th>주문번호</th>
+        <th>고객명</th>
+        <th>상태</th>
+        <th>주문시간</th>
+        <th>상세</th>
+        <th>요리시작</th>
+        <th>요리완료</th>
+    </tr>
+    <tr th:each="order : ${chefOrderList}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.customerLoginId}"></td>
+        <td th:text="${order.status}"></td>
+        <td th:text="${order.orderTime}"></td>
+        <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}">상세</a></td>
+        <td>
+            <form th:action="@{/staff/chef/start(orderId=${order.id})}" method="post">
+                <button type="submit">시작</button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/staff/chef/complete(orderId=${order.id})}" method="post">
+                <button type="submit">완료</button>
+            </form>
+        </td>
+    </tr>
 </table>
+<a href="/staff/logout">로그아웃</a>
 <a href="/">Go to Index Page</a>
 </body>
 </html>

@@ -7,7 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
     @GetMapping("/")
-    public String showHome(HttpSession session) {
+    public String showIndex(HttpSession session) {
+        // 이미 고객 로그인 세션 있으면 /customer/main으로
+        if (session.getAttribute("loggedInCustomer") != null) {
+            return "redirect:/customer/main";
+        }
         return "index";
     }
 }
