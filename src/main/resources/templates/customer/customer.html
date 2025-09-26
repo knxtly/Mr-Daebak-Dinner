@@ -2,20 +2,59 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/CSS/style.css}">
+    <link rel="stylesheet" th:href="@{/CSS/customer.css}">
 </head>
+
 <body>
-<h1>Login</h1>
-<form action="/customer/login" method="post">
-    ID: <input type="text" name="loginId"><br>
-    PW: <input type="password" name="password"><br>
-    <input type="submit" value="로그인">
-</form>
-<div th:if="${loginErrorMessage}">
-    <p th:text="${loginErrorMessage}" style="color: red;"></p>
-</div>
-<a href="/customer/signup">회원가입</a><br>
-<a href="/">Go to Index Page</a>
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="/" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="#">SIGNUP</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer" class="login-btn">로그인</a>
+        <a href="/customer/signup" class="signup-btn">회원가입</a>
+    </div>
+</header>
+
+<main class="login-section">
+    <div class="login-container">
+        <h2 class="login-title">
+            LOGIN
+            <div class="title-line"></div>
+        </h2>
+
+        <form action="/customer/login" method="post" class="login-form">
+
+            <div class="input-group">
+                <input type="text" id="loginId" name="loginId" placeholder="ID">
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder="PASSWORD">
+            </div>
+
+            <div th:if="${loginErrorMessage}" class = "login-exception-container">
+                <p th:text="${loginErrorMessage}" class = "login-exception-msg"></p>
+            </div>
+
+            <button type="submit" class="login-btn-submit">LOG IN</button>
+        </form>
+
+        <div class="link-container">
+            <a href="/customer/signup" class="signup-link">Sign up</a>
+        </div>
+        <div class="index-link-container">
+            <a href="/" class="index-link">Go to Index Page</a>
+        </div>
+    </div>
+</main>
 </body>
 </html>
