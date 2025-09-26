@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -217,6 +218,8 @@ public class OrderService {
 
     @Transactional
     public void completeDelivery(Long orderId) {
-        findOrder(orderId).setStatus(OrderStatus.DELIVERED); // 상태를 "DELIVERED"으로 변경
+        OrderEntity o = findOrder(orderId);
+        o.setDeliveryTime(LocalDateTime.now());
+        o.setStatus(OrderStatus.DELIVERED); // 상태를 "DELIVERED"으로 변경
     }
 }
