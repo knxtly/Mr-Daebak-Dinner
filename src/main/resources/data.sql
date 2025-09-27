@@ -1,14 +1,14 @@
 INSERT INTO item (name, unit_price) VALUES
-('wine', 35.00),
-('steak', 55.00),
-('coffee_cup', 4.50),
-('coffee_pot', 28.00),
-('salad', 18.00),
-('eggscramble', 12.00),
-('bacon', 8.00),
-('bread', 5.00),
-('baguette', 6.50),
-('champagne', 75.00);
+('wine', 43000),
+('steak', 39000),
+('coffee_cup', 6000),
+('coffee_pot', 36000),
+('salad', 23000),
+('eggscramble', 16000),
+('bacon', 10000),
+('bread', 7000),
+('baguette', 8000),
+('champagne', 98000);
 
 INSERT INTO inventory (item_id, stock_quantity) VALUES
 (1, 10),

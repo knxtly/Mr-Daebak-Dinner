@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>New Order | Mr. Daebak Dinner</title>
     <link rel="stylesheet" th:href="@{/CSS/style.css}">
 </head>
@@ -17,10 +17,10 @@
             <label for="menuSelect">메뉴 선택</label>
             <select id="menuSelect" name="dinnerKind" required>
                 <option value="" selected hidden>메뉴를 선택하세요</option>
-                <option value="valentine">Valentine dinner</option>
-                <option value="french">French dinner</option>
-                <option value="english">English dinner</option>
-                <option value="champagne">Champagne Feast dinner</option>
+                <option value="VALENTINE">Valentine dinner</option>
+                <option value="FRENCH">French dinner</option>
+                <option value="ENGLISH">English dinner</option>
+                <option value="CHAMPAGNE">Champagne Feast dinner</option>
             </select>
         </div>
 
@@ -29,9 +29,9 @@
             <label for="styleSelect">서빙 스타일 선택</label>
             <select id="styleSelect" name="dinnerStyle" required>
                 <option value="" selected hidden>스타일을 선택하세요</option>
-                <option value="simple">simple</option>
-                <option value="grand">grand</option>
-                <option value="delux">delux</option>
+                <option value="SIMPLE">Simple</option>
+                <option value="GRAND">Grand</option>
+                <option value="DELUX">Delux</option>
             </select>
         </div>
 
@@ -40,43 +40,43 @@
             <legend>주문 구성</legend>
 
             <div>
-                <label for="wine">와인 ($35)</label>
+                <label for="wine">와인 (43,000)</label>
                 <input type="number" id="wine" name="orderItems[wine]" min="0" value="0">
             </div>
             <div>
-                <label for="steak">스테이크 ($55)</label>
+                <label for="steak">스테이크 (39,000)</label>
                 <input type="number" id="steak" name="orderItems[steak]" min="0" value="0">
             </div>
             <div>
-                <label for="coffee_cup">커피 (컵) ($4.5)</label>
+                <label for="coffee_cup">커피 (컵) (6,000)</label>
                 <input type="number" id="coffee_cup" name="orderItems[coffee_cup]" min="0" value="0">
             </div>
             <div>
-                <label for="coffee_pot">커피 (포트) ($28)</label>
+                <label for="coffee_pot">커피 (포트) (36,000)</label>
                 <input type="number" id="coffee_pot" name="orderItems[coffee_pot]" min="0" value="0">
             </div>
             <div>
-                <label for="salad">샐러드 ($18)</label>
+                <label for="salad">샐러드 (23,000)</label>
                 <input type="number" id="salad" name="orderItems[salad]" min="0" value="0">
             </div>
             <div>
-                <label for="eggscramble">스크램블 에그 ($12)</label>
+                <label for="eggscramble">스크램블 에그 (16,000)</label>
                 <input type="number" id="eggscramble" name="orderItems[eggscramble]" min="0" value="0">
             </div>
             <div>
-                <label for="bacon">베이컨 ($8)</label>
+                <label for="bacon">베이컨 (10,000)</label>
                 <input type="number" id="bacon" name="orderItems[bacon]" min="0" value="0">
             </div>
             <div>
-                <label for="bread">빵 ($5)</label>
+                <label for="bread">빵 (7,000)</label>
                 <input type="number" id="bread" name="orderItems[bread]" min="0" value="0">
             </div>
             <div>
-                <label for="baguette">바게트 ($6.5)</label>
+                <label for="baguette">바게트 (8,000)</label>
                 <input type="number" id="baguette" name="orderItems[baguette]" min="0" value="0">
             </div>
             <div>
-                <label for="champagne">샴페인 ($75)</label>
+                <label for="champagne">샴페인 (98,000)</label>
                 <input type="number" id="champagne" name="orderItems[champagne]" min="0" value="0">
             </div>
         </fieldset>
@@ -84,13 +84,13 @@
         <!-- 배달 주소 -->
         <div>
             <label for="deliveryAddress">배달 주소</label>
-            <input type="text" id="deliveryAddress" name="deliveryAddress" required />
+            <input type="text" id="deliveryAddress" name="deliveryAddress" required/>
         </div>
 
         <!-- 카드 번호 -->
         <div>
             <label for="cardNumber">카드 번호</label>
-            <input type="text" id="cardNumber" name="cardNumber" required />
+            <input type="text" id="cardNumber" name="cardNumber" required/>
         </div>
 
         <div>
@@ -102,7 +102,7 @@
     <div th:if="${orderErrorMessage}">
         <p th:utext="${orderErrorMessage}" style="color: red;"></p>
     </div>
-<!--    itemErrorMessage-->
+    <!--    itemErrorMessage-->
     <div th:if="${itemErrorMessage}">
         <p th:utext="${itemErrorMessage}" style="color: red;"></p>
         <ul>
@@ -138,44 +138,44 @@
 
         // 메뉴 선택 시 기본값 반영
         menuSelect.addEventListener('change', () => {
-            resetItems(); // 먼저 0으로 초기화
+                resetItems(); // 먼저 0으로 초기화
 
-            switch(menuSelect.value){
-                case 'valentine':
-                    items.wine.value = 1;
-                    items.steak.value = 1;
-                    break;
-                case 'french':
-                    items.coffee_cup.value = 1;
-                    items.wine.value = 1;
-                    items.salad.value = 1;
-                    items.steak.value = 1;
-                    break;
-                case 'english':
-                    items.eggscramble.value = 1;
-                    items.bacon.value = 1;
-                    items.bread.value = 1;
-                    items.steak.value = 1;
-                    break;
-                case 'champagne':
-                    items.champagne.value = 1;   // 샴페인 1병
-                    items.baguette.value = 4;    // 바게트 4개
-                    items.coffee_pot.value = 1;  // 커피 포트 1개
-                    items.wine.value = 1;
-                    items.steak.value = 1;
+                switch(menuSelect.value){
+                    case 'VALENTINE':
+                items.wine.value = 1;
+                items.steak.value = 1;
+                break;
+            case 'FRENCH':
+                items.coffee_cup.value = 1;
+                items.wine.value = 1;
+                items.salad.value = 1;
+                items.steak.value = 1;
+                break;
+            case 'ENGLISH':
+                items.eggscramble.value = 1;
+                items.bacon.value = 1;
+                items.bread.value = 1;
+                items.steak.value = 1;
+                break;
+            case 'CHAMPAGNE':
+                items.champagne.value = 1;
+                items.baguette.value = 4;
+                items.coffee_pot.value = 1;
+                items.wine.value = 1;
+                items.steak.value = 1;
 
-                    // simple 비활성화 + 값 초기화
-                    Array.from(styleSelect.options).forEach(opt => {
-                        if(opt.value === 'simple'){
-                            opt.disabled = true;
-                            if(styleSelect.value === 'simple'){
-                                styleSelect.value = '';
-                            }
-                        } else {
-                            opt.disabled = false;
+                // simple 비활성화 + 값 초기화
+                Array.from(styleSelect.options).forEach(opt => {
+                    if(opt.value === 'SIMPLE'){
+                        opt.disabled = true;
+                        if(styleSelect.value === 'SIMPLE'){
+                            styleSelect.value = '';
                         }
-                    });
-                    return; // 여기서 끝내기
+                    } else {
+                        opt.disabled = false;
+                    }
+                });
+                return; // 여기서 끝내기
             }
 
             // champagne 외에는 모든 스타일 다시 활성화

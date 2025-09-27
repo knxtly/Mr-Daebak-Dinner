@@ -31,6 +31,7 @@ public class OrderService {
         return customerRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
     }
+
     private OrderEntity findOrder(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
@@ -76,21 +77,23 @@ public class OrderService {
 
     @Transactional
     public OrderHistoryDTO placeOrder(OrderDTO orderDTO,
-                           OrderItemDTO orderItemDTO,
-                           CustomerSessionDTO customerSessionDTO) {
+                                      OrderItemDTO orderItemDTO,
+                                      CustomerSessionDTO customerSessionDTO) {
         // 주문한 customer 찾기
         CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
 
-        // 주문될 order 생성
+        // 주문될 orderEntity 생성
         OrderEntity order = OrderMapper.toOrderEntity(orderDTO, customerEntity);
 
-        // OrderItem 조사
+        // OrderItem 조사해서 담을 변수
         List<OrderItemEntity> orderItemEntityList = new ArrayList<>();
         // 부족한 재고의 이름을 모은 리스트
         List<String> insufficientItems = new ArrayList<>();
+        // 총 가격(totalPrice)을 담을 변수
+        int totalPrice = 0;
 
-        // OrderItemDTO 내부 반복
+        // OrderItemDTO 내부 (주문한 item) 반복
         for (Map.Entry<String, Integer> entry : orderItemDTO.getOrderItems().entrySet()) {
             String orderItemName = entry.getKey();
             int quantity = entry.getValue();
@@ -114,6 +117,9 @@ public class OrderService {
             // 재고가 충분하면 quantity만큼 decrease
             inventoryEntity.setStockQuantity(inventoryEntity.getStockQuantity() - quantity);
 
+            // totalPrice += 단가(unitPrice) * quantity
+            totalPrice = totalPrice + item.getUnitPrice() * quantity;
+
             // OrderItemEntity 구성 후 저장
             OrderItemEntity orderItemEntity = new OrderItemEntity();
             // OrderItemId(PK)를 직접 생성해 넣음 -> JPA가 @MapsId 때문에 id를 Long으로 채우려고 하기 때문
@@ -131,6 +137,12 @@ public class OrderService {
             throw new InsufficientInventoryException("재고가 부족합니다", insufficientItems);
         }
 
+        // VIP였다면 totalPrice 10퍼센트 할인
+        if (customerEntity.getMembershipLevel().equals("VIP")) {
+            totalPrice = ((int) (totalPrice * 0.9)) / 10 * 10;
+        }
+
+        order.setTotalPrice(totalPrice); // totalPrice 반영
         orderRepository.save(order); // 주문될 order 테이블에 반영
         orderItemRepository.saveAll(orderItemEntityList); // orderItemEntity 한번에 저장 (bulk save)
         customerEntity.setOrderCount(customerEntity.getOrderCount() + 1); // customerEntity의 orderCount 1 증가
@@ -155,11 +167,11 @@ public class OrderService {
         // OrderItemDTO의 형(Map<String, Integer>)으로 변환
         Map<String, Integer> itemMap =
                 orderItemRepository.findAllByOrderId(orderId)
-                .stream()
-                .collect(Collectors.toMap(
-                        oi -> oi.getItem().getName(), // Key = Item Name
-                        OrderItemEntity::getQuantity // Value = quantity
-                ));
+                        .stream()
+                        .collect(Collectors.toMap(
+                                oi -> oi.getItem().getName(), // Key = Item Name
+                                OrderItemEntity::getQuantity // Value = quantity
+                        ));
 
         OrderItemDTO dto = new OrderItemDTO();
         dto.setOrderItems(itemMap);
