@@ -15,5 +15,5 @@ public class ItemEntity {
     @Column(nullable = false, unique = true)
     private String name;
     @Column(nullable = false, name = "unit_price")
-    private Double unitPrice; // 단가
+    private Integer unitPrice; // 단가
 }

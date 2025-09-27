@@ -39,7 +39,7 @@
             <a href = "/customer/orders/history">PREVIOUS ORDERS →</a>
         </h2>
         <div class="orders-container">
-            <a th:each="order : ${orderList}" th:href="@{/orders/detail(orderId=${order.id})}" class="order-link">
+            <a th:each="order : ${orderList}" th:href="@{/orders/detail/{orderId}(orderId=${order.id})}" class="order-link">
                 <div class="order-item">
                     <p class="order-date" th:text="${order.orderTime} ?: '-'"></p>
                     <h3 class="order-name">
