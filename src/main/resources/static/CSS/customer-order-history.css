@@ -1,0 +1,198 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #FFF;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.navbar-left,
+.navbar-right {
+    flex: 1;
+    min-width: 0;
+}
+
+.navbar-center {
+    flex: 2;
+    text-align: center;
+}
+
+.navbar-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.navbar-left .logo {
+    font-size: 24px; /* 이미지에 맞게 크기 조정 */
+    font-weight: bold;
+}
+
+.navbar-center a, .navbar-right a {
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+.navbar-center a:hover, .navbar-right a:hover {
+    color: #ff6347;
+}
+
+.logout-btn, .mypg-btn {
+    padding: 8px 15px;
+    border-radius: 5px;
+}
+
+.logout-btn {
+    border: 1px solid #ddd;
+}
+
+.mypg-btn{
+    background-color: #ff6347;
+    color: #fff;
+    border: none;
+}
+
+/* 메인 컨텐츠 */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.content-wrapper {
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* 페이지 제목 */
+.page-main-title {
+    font-size: 1.8em; /* 이미지에 맞게 크기 조절 */
+    font-weight: bold;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-bottom: 10px; /* 구분선과의 간격 */
+    position: relative; /* 구분선을 위한 위치 설정 */
+}
+
+.title-line {
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+   height: 1px;
+   background-color: #ddd;
+}
+
+/* 주문 그리드 (카드 레이아웃) */
+.order-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);;
+    gap: 30px; /* 카드 사이 간격 */
+}
+
+/* 개별 주문 카드 스타일 */
+.order-card {
+    background-color: #fff;
+    padding: 25px;
+    border: 1px solid #e0e0e0; /* 연한 테두리 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03); /* 아주 약한 그림자 */
+    cursor: pointer; /* 클릭 가능 표시 */
+    transition: box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.order-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* 호버 시 그림자 강조 */
+    background-color: #fafafa;
+}
+
+/* 카드 내 텍스트 스타일 */
+.order-date-time {
+    font-size: 0.9em;
+    color: #6a6a6a;
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee; /* 날짜 아래 구분선 */
+}
+
+.dinner-info {
+    font-size: 1.4em; /* 이미지와 유사하게 약간 크게 */
+    font-weight: bold;
+    margin: 0 0 5px 0;
+    color: #333;
+    line-height: 1.3;
+}
+
+.dinner-kind {
+    text-transform: uppercase; /* 대문자로 표시 */
+}
+
+.dinner-style {
+    font-weight: normal;
+    font-size: 0.8em; /* Dinner 종류보다 작게 */
+    margin-left: 5px;
+    color: #555;
+}
+
+.order-price {
+    font-size: 1.15em;
+    font-weight: bold;
+    color: #000;
+    margin: 0 0 20px 0;
+}
+
+.delivery-label {
+    font-size: 0.75em; /* 레이블은 작게 */
+    color: #6a6a6a;
+    margin: 0;
+    margin-top: 15px; /* 항목 간 간격 */
+    line-height: 1.4;
+    font-weight: bold;
+}
+
+.delivery-value {
+    font-size: 0.9em;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 메인으로 돌아가는 링크 */
+
+.footer-link {
+    display: flex;
+    gap: 15px;
+}
+
+.main-link { /* 메인으로 돌아가기 */
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 700;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, opacity 0.3s;
+    text-align: center;
+    background-color: #FFF;
+    color: #333;
+}
+
+.main-link:hover {
+    background-color: #e0e0e0;
+}
