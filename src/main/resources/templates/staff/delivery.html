@@ -2,62 +2,98 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff - Delivery | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/CSS/style.css}">
+    <link rel="stylesheet" th:href="@{/CSS/chef&delivery.css}">
 </head>
 <body>
-<h1>Delivery</h1>
-<a href="/staff/chef">Chef</a><br>
-<a href="/staff/delivery">Delivery</a><br>
-<a href="/staff/inventory">Inventory</a><br>
 
-<h3>배달대기 / 배달중 주문</h3>
-<table>
-    <tr>
-        <th>주문번호</th>
-        <th>고객명</th>
-        <th>상태</th>
-        <th>주문시간</th>
-        <th>배달시작</th>
-        <th>배달완료</th>
-    </tr>
-    <tr th:each="order : ${deliveryOrderList}">
-        <td th:text="${order.id}"></td>
-        <td th:text="${order.customerLoginId}"></td>
-        <td th:text="${order.status}"></td>
-        <td th:text="${order.orderTime}"></td>
-        <td>
-            <form th:action="@{/staff/delivery/start(orderId=${order.id})}" method="post">
-                <button type="submit">시작</button>
-            </form>
-        </td>
-        <td>
-            <form th:action="@{/staff/delivery/complete(orderId=${order.id})}" method="post">
-                <button type="submit">완료</button>
-            </form>
-        </td>
-    </tr>
-</table>
+<nav class="navbar">
+    <a href="/staff" class="navbar-brand">MR.DAEBAKDINNER STAFF INTERFACE</a>
+</nav>
 
-<h3>요리중 주문</h3>
-<table>
-    <tr>
-        <th>주문번호</th>
-        <th>고객명</th>
-        <th>상태</th>
-        <th>주문시간</th>
-        <th>상세</th>
-    </tr>
-    <tr th:each="order : ${cookingOrderList}">
-        <td th:text="${order.id}"></td>
-        <td th:text="${order.customerLoginId}"></td>
-        <td th:text="${order.status}"></td>
-        <td th:text="${order.orderTime}"></td>
-        <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}">상세</a></td>
-    </tr>
-</table>
+<div class="layout-container">
 
-<a href="/staff/logout">로그아웃</a>
-<a href="/">Go to Index Page</a>
+    <aside class="sidebar">
+        <h2 class="sidebar-title">Staff Menu</h2>
+        <nav class="sidebar-nav">
+            <a th:href="@{/staff/chef}" class="nav-item">Chef</a>
+            <a th:href="@{/staff/delivery}" class="nav-item active">Delivery</a>
+            <a th:href="@{/staff/inventory}" class="nav-item">Inventory</a>
+            <hr>
+            <a th:href="@{/staff/logout}" class="nav-item logout-link">Logout</a>
+            <a th:href="@{/}" class="nav-item index-link">Go to Index Page</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>Delivery Interface</h1>
+
+        <h3>배달대기 / 배달중 주문</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                <tr>
+                    <th>주문번호</th>
+                    <th>고객명</th>
+                    <th>상태</th>
+                    <th>주소</th>
+                    <th>주문시간</th>
+                    <th>상세</th>
+                    <th>배달시작</th>
+                    <th>배달완료</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${deliveryOrderList}">
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.customerLoginId}"></td>
+                    <td th:text="${order.status}"></td>
+                    <td th:text="${order.deliveryAddress}"></td>
+                    <td th:text="${#temporals.format(order.orderTime, 'h:mm a')}"></td>
+                    <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}" class="detail-link">상세보기</a></td>
+                    <td>
+                        <form th:action="@{/staff/delivery/start(orderId=${order.id})}" method="post" class="action-form">
+                            <button type="submit" class="start-button">시작</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form th:action="@{/staff/delivery/complete(orderId=${order.id})}" method="post" class="action-form">
+                            <button type="submit" class="complete-button">완료</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>요리중 주문</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                <tr>
+                    <th>주문번호</th>
+                    <th>고객명</th>
+                    <th>상태</th>
+                    <th>주소</th>
+                    <th>주문시간</th>
+                    <th>상세</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${cookingOrderList}">
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.customerLoginId}"></td>
+                    <td th:text="${order.status}"></td>
+                    <td th:text="${order.deliveryAddress}"></td>
+                    <td th:text="${#temporals.format(order.orderTime, 'h:mm a')}"></td>
+                    <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}" class="detail-link">상세보기</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
 </body>
 </html>
