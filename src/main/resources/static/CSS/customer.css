@@ -114,7 +114,6 @@ a {
     font-size: 16px;
     border: 1px solid #ccc;
     box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
-    text-transform: uppercase; /* ID/PASSWORD 글씨가 대문자로 보이게 */
     color: #666;
 }
 

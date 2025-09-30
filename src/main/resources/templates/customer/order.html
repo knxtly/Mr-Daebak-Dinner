@@ -1,196 +1,168 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" >
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>New Order | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/CSS/style.css}">
+    <link rel="stylesheet" th:href="@{/CSS/customer-order.css}">
 </head>
 <body>
-<main>
-    <h1>New Order</h1>
-    <p>메뉴와 서빙 스타일을 선택하고 배달 정보를 입력한 뒤 제출하세요.</p>
 
-    <form id="orderForm" action="/customer/orders/new" method="post" autocomplete="off" novalidate>
-        <!-- 메뉴 선택 -->
-        <div>
-            <label for="menuSelect">메뉴 선택</label>
-            <select id="menuSelect" name="dinnerKind" required>
-                <option value="" selected hidden>메뉴를 선택하세요</option>
-                <option value="VALENTINE">Valentine dinner</option>
-                <option value="FRENCH">French dinner</option>
-                <option value="ENGLISH">English dinner</option>
-                <option value="CHAMPAGNE">Champagne Feast dinner</option>
-            </select>
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="/" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="#">SIGNUP</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer/logout" class="logout-btn">로그아웃</a>
+        <a href="#" class="mypg-btn">마이페이지</a>
+    </div>
+</header>
+
+<main class="order-main">
+    <h1 class="page-title">NEW ORDER</h1>
+    <p class="page-subtitle">메뉴와 서빙 스타일을 선택하고 배달 정보를 입력한 뒤 제출하세요.</p>
+
+    <form id="orderForm" th:action="@{/customer/orders/new}" method="post" autocomplete="off" novalidate class="order-form-container">
+
+        <select id="menuSelect" name="dinnerKind" required class="hidden-select">
+            <option value="" selected hidden>메뉴를 선택하세요</option>
+            <option value="VALENTINE">Valentine dinner</option>
+            <option value="FRENCH">French dinner</option>
+            <option value="ENGLISH">English dinner</option>
+            <option value="CHAMPAGNE">Champagne Feast dinner</option>
+        </select>
+
+        <div class="top-selection-row">
+            <div class="menu-area">
+                <h2 class="selection-heading">1. 디너 종류 선택</h2>
+                <div class="menu-card-container">
+                    <div class="menu-card" data-menu-value="VALENTINE">
+                        <img th:src="@{/images/Valentine_Dinner.png}" alt="Valentine dinner" class="menu-image">
+                        <div class="card-info">
+                            <h3>VALENTINE</h3>
+                            <p>로맨틱한 밤을 위한 스페셜 디너 세트</p>
+                        </div>
+                    </div>
+                    <div class="menu-card" data-menu-value="FRENCH">
+                        <img th:src="@{/images/French_Dinner.png}" alt="French dinner" class="menu-image">
+                        <div class="card-info">
+                            <h3>FRENCH</h3>
+                            <p>클래식하고 우아한 정통 프랑스 코스</p>
+                        </div>
+                    </div>
+                    <div class="menu-card" data-menu-value="ENGLISH">
+                        <img th:src="@{/images/English_Dinner.png}" alt="English dinner" class="menu-image">
+                        <div class="card-info">
+                            <h3>ENGLISH</h3>
+                            <p>따뜻하고 풍성한 브런치 스타일의 디너</p>
+                        </div>
+                    </div>
+                    <div class="menu-card" data-menu-value="CHAMPAGNE">
+                        <img th:src="@{/images/Champagne_Dinner.png}" alt="Champagne Feast dinner" class="menu-image">
+                        <div class="card-info">
+                            <h3>CHAMPAGNE</h3>
+                            <p>샴페인과 함께하는 화려한 파티 만찬</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="style-area">
+                <h2 class="selection-heading">2. 서빙 스타일 선택</h2>
+                <div class="style-select-wrapper">
+                    <select id="styleSelect" name="dinnerStyle" required>
+                        <option value="" selected hidden>스타일을 선택하세요</option>
+                        <option value="SIMPLE">Simple</option>
+                        <option value="GRAND">Grand</option>
+                        <option value="DELUX">Delux</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <!-- 서빙 스타일 선택 -->
-        <div>
-            <label for="styleSelect">서빙 스타일 선택</label>
-            <select id="styleSelect" name="dinnerStyle" required>
-                <option value="" selected hidden>스타일을 선택하세요</option>
-                <option value="SIMPLE">Simple</option>
-                <option value="GRAND">Grand</option>
-                <option value="DELUX">Delux</option>
-            </select>
-        </div>
-
-        <!-- 주문 아이템 -->
-        <fieldset>
-            <legend>주문 구성</legend>
-
-            <div>
-                <label for="wine">와인 (43,000)</label>
-                <input type="number" id="wine" name="orderItems[wine]" min="0" value="0">
-            </div>
-            <div>
-                <label for="steak">스테이크 (39,000)</label>
-                <input type="number" id="steak" name="orderItems[steak]" min="0" value="0">
-            </div>
-            <div>
-                <label for="coffee_cup">커피 (컵) (6,000)</label>
-                <input type="number" id="coffee_cup" name="orderItems[coffee_cup]" min="0" value="0">
-            </div>
-            <div>
-                <label for="coffee_pot">커피 (포트) (36,000)</label>
-                <input type="number" id="coffee_pot" name="orderItems[coffee_pot]" min="0" value="0">
-            </div>
-            <div>
-                <label for="salad">샐러드 (23,000)</label>
-                <input type="number" id="salad" name="orderItems[salad]" min="0" value="0">
-            </div>
-            <div>
-                <label for="eggscramble">스크램블 에그 (16,000)</label>
-                <input type="number" id="eggscramble" name="orderItems[eggscramble]" min="0" value="0">
-            </div>
-            <div>
-                <label for="bacon">베이컨 (10,000)</label>
-                <input type="number" id="bacon" name="orderItems[bacon]" min="0" value="0">
-            </div>
-            <div>
-                <label for="bread">빵 (7,000)</label>
-                <input type="number" id="bread" name="orderItems[bread]" min="0" value="0">
-            </div>
-            <div>
-                <label for="baguette">바게트 (8,000)</label>
-                <input type="number" id="baguette" name="orderItems[baguette]" min="0" value="0">
-            </div>
-            <div>
-                <label for="champagne">샴페인 (98,000)</label>
-                <input type="number" id="champagne" name="orderItems[champagne]" min="0" value="0">
+        <fieldset class="order-items-fieldset">
+            <legend class="fieldset-legend">3. 주문 구성 (옵션 설정)</legend>
+            <div class="item-list-grid">
+                <div class="item-group">
+                    <label for="wine">와인 (43,000)</label>
+                    <input type="number" id="wine" name="orderItems[wine]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="steak">스테이크 (39,000)</label>
+                    <input type="number" id="steak" name="orderItems[steak]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="coffee_cup">커피 (컵) (6,000)</label>
+                    <input type="number" id="coffee_cup" name="orderItems[coffee_cup]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="coffee_pot">커피 (포트) (36,000)</label>
+                    <input type="number" id="coffee_pot" name="orderItems[coffee_pot]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="salad">샐러드 (23,000)</label>
+                    <input type="number" id="salad" name="orderItems[salad]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="eggscramble">스크램블 에그 (16,000)</label>
+                    <input type="number" id="eggscramble" name="orderItems[eggscramble]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="bacon">베이컨 (10,000)</label>
+                    <input type="number" id="bacon" name="orderItems[bacon]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="bread">빵 (7,000)</label>
+                    <input type="number" id="bread" name="orderItems[bread]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="baguette">바게트 (8,000)</label>
+                    <input type="number" id="baguette" name="orderItems[baguette]" min="0" value="0">
+                </div>
+                <div class="item-group">
+                    <label for="champagne">샴페인 (98,000)</label>
+                    <input type="number" id="champagne" name="orderItems[champagne]" min="0" value="0">
+                </div>
             </div>
         </fieldset>
 
-        <!-- 배달 주소 -->
-        <div>
-            <label for="deliveryAddress">배달 주소</label>
-            <input type="text" id="deliveryAddress" name="deliveryAddress" required/>
+        <section class="delivery-payment-info">
+            <h2 class="selection-heading full-width-heading">4. 배달 및 결제 정보</h2>
+
+            <div class="form-group">
+                <label for="deliveryAddress">배달 주소</label>
+                <input type="text" id="deliveryAddress" name="deliveryAddress" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="cardNumber">카드 번호</label>
+                <input type="text" id="cardNumber" name="cardNumber" required/>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button type="reset" id="resetBtn" class="secondary-btn">초기화</button>
+            <button type="submit" class="primary-btn">주문 제출</button>
+            <a th:href="@{/customer/main}" class="tertiary-btn">이전</a>
         </div>
 
-        <!-- 카드 번호 -->
-        <div>
-            <label for="cardNumber">카드 번호</label>
-            <input type="text" id="cardNumber" name="cardNumber" required/>
+        <div th:if="${orderErrorMessage}" class="error-message">
+            <p th:utext="${orderErrorMessage}"></p>
         </div>
-
-        <div>
-            <button type="reset" id="resetBtn">초기화</button>
-            <button type="submit">주문 제출</button>
-            <a href="/customer/main">이전</a>
+        <div th:if="${itemErrorMessage}" class="error-message">
+            <p th:utext="${itemErrorMessage}"></p>
+            <ul>
+                <li th:each="item : ${insufficientItems}" th:text="${item}"></li>
+            </ul>
         </div>
     </form>
-    <div th:if="${orderErrorMessage}">
-        <p th:utext="${orderErrorMessage}" style="color: red;"></p>
-    </div>
-    <!--    itemErrorMessage-->
-    <div th:if="${itemErrorMessage}">
-        <p th:utext="${itemErrorMessage}" style="color: red;"></p>
-        <ul>
-            <li th:each="item : ${insufficientItems}" th:text="${item}" style="color: darkred;"></li>
-        </ul>
-    </div>
 </main>
-
-<script>
-    (function(){
-        const menuSelect = document.getElementById('menuSelect');
-        const styleSelect = document.getElementById('styleSelect');
-        const resetBtn = document.getElementById('resetBtn');
-
-        // 아이템 input들을 객체로 캐싱
-        const items = {
-            wine: document.getElementById('wine'),
-            steak: document.getElementById('steak'),
-            coffee_cup: document.getElementById('coffee_cup'),
-            coffee_pot: document.getElementById('coffee_pot'),
-            salad: document.getElementById('salad'),
-            eggscramble: document.getElementById('eggscramble'),
-            bacon: document.getElementById('bacon'),
-            bread: document.getElementById('bread'),
-            baguette: document.getElementById('baguette'),
-            champagne: document.getElementById('champagne')
-        };
-
-        // 모든 아이템 0으로 초기화
-        function resetItems() {
-            Object.values(items).forEach(input => input.value = 0);
-        }
-
-        // 메뉴 선택 시 기본값 반영
-        menuSelect.addEventListener('change', () => {
-                resetItems(); // 먼저 0으로 초기화
-
-                switch(menuSelect.value){
-                    case 'VALENTINE':
-                items.wine.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'FRENCH':
-                items.coffee_cup.value = 1;
-                items.wine.value = 1;
-                items.salad.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'ENGLISH':
-                items.eggscramble.value = 1;
-                items.bacon.value = 1;
-                items.bread.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'CHAMPAGNE':
-                items.champagne.value = 1;
-                items.baguette.value = 4;
-                items.coffee_pot.value = 1;
-                items.wine.value = 1;
-                items.steak.value = 1;
-
-                // simple 비활성화 + 값 초기화
-                Array.from(styleSelect.options).forEach(opt => {
-                    if(opt.value === 'SIMPLE'){
-                        opt.disabled = true;
-                        if(styleSelect.value === 'SIMPLE'){
-                            styleSelect.value = '';
-                        }
-                    } else {
-                        opt.disabled = false;
-                    }
-                });
-                return; // 여기서 끝내기
-            }
-
-            // champagne 외에는 모든 스타일 다시 활성화
-            Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
-            styleSelect.value = '';
-        });
-
-        // reset 시 옵션과 아이템 재설정
-        resetBtn.addEventListener('click', () => {
-            resetItems();
-            Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
-            styleSelect.value = '';
-            menuSelect.value = '';
-        });
-    })();
-</script>
+<script th:src="@{/js/orderForm.js}"></script>
 </body>
 </html>
