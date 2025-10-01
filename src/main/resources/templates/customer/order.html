@@ -162,6 +162,16 @@
             </ul>
         </div>
     </form>
+    <section>
+        <h2>음성 인식 주문</h2>
+        <form id="voiceForm" action="javascript:void(0);" class="voiceform">
+            <button type="button" id="voiceBtn" class="voiceBtn">음성인식</button>
+            <label for="voiceText">인식된 주문</label>
+            <textarea id="voiceText" placeholder="음성 인식 결과가 여기에 표시됩니다" rows="4" cols="50" class="voicetext"></textarea>
+            <button type="submit" id="applyVoiceBtn" class="applyVoiceBtn">적용</button>
+        </form>
+        <p id="voiceMessage" style="color:blue;" class="voiceMsg"></p>
+    </section>
 </main>
 <script th:src="@{/js/orderForm.js}"></script>
 </body>
