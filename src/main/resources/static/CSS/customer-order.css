@@ -330,3 +330,45 @@ a {
     margin-top: 5px;
     color: darkred;
 }
+
+
+.voiceform {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 요소 간 간격 */
+}
+
+label {
+    font-weight: bold;
+    color: #555;
+    margin-top: 5px;
+}
+
+.voicetext::placeholder {
+    font-family: Arial, sans-serif;
+    font-size: 15px; /* 필요하다면 크기도 변경 */
+    color: #999;
+}
+
+.voiceBtn, .applyVoiceBtn {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.voiceBtn:hover, .applyVoiceBtn:hover {
+    background-color: #e0e0e0;
+}
+
+.voiceMsg {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
