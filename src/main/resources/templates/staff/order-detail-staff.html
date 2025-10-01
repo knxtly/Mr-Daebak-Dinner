@@ -2,46 +2,64 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Detail | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/CSS/style.css}">
+    <link rel="stylesheet" th:href="@{/CSS/staff-order-detail.css}">
 </head>
 <body>
-<h1>Order Detail</h1>
-<table>
-    <tr>
-        <th>고객ID</th>
-        <th>주문시각</th>
-        <th>Dinner 종류</th>
-        <th>Dinner 스타일</th>
-        <th>가격</th>
-        <th>배달 시간</th>
-        <th>배달 주소</th>
-        <th>결제카드번호</th>
-        <th>Status</th>
-    </tr>
-    <tr>
-        <td th:text="${order.customerLoginId} ?: '-'"></td>
-        <td th:text="${order.orderTime} ?: '-'"></td>
-        <td th:text="${order.dinnerKind} ?: '-'"></td>
-        <td th:text="${order.dinnerStyle} ?: '-'"></td>
-        <td th:text="${order.totalPrice} ?: '-'"></td>
-        <td th:text="${order.deliveryTime} ?: '-'"></td>
-        <td th:text="${order.deliveryAddress} ?: '-'"></td>
-        <td th:text="${order.cardNumber} ?: '-'"></td>
-        <td th:text="${order.status} ?: '-'"></td>
-    </tr>
-    <!-- 주문한 아이템 표시 -->
-    <tr>
-        <th>아이템 이름</th>
-        <th>수량</th>
-        <th colspan="7"></th>
-    </tr>
-    <tr th:each="entry : ${orderItem.orderItems}">
-        <td th:text="${entry.key}">Item Name</td>
-        <td th:text="${entry.value}">Quantity</td>
-        <td colspan="7"></td>
-    </tr>
-</table>
-<a href="/staff">메인으로</a>
+
+<nav class="navbar">
+    <a href="/staff" class="navbar-brand">MR.DAEBAKDINNER STAFF INTERFACE</a>
+</nav>
+
+<div class="layout-container">
+
+    <aside class="sidebar">
+        <h2 class="sidebar-title">Staff Menu</h2>
+        <nav class="sidebar-nav">
+            <a th:href="@{/staff/chef}" class="nav-item">Chef</a>
+            <a th:href="@{/staff/delivery}" class="nav-item">Delivery</a>
+            <a th:href="@{/staff/inventory}" class="nav-item">Inventory</a>
+            <hr>
+            <a th:href="@{/staff/logout}" class="nav-item logout-link">Logout</a>
+            <a th:href="@{/}" class="nav-item index-link">Go to Index Page</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1 class="page-title">주문 상세</h1>
+        <hr class="title-divider">
+
+        <p class="order-date">ORDER DATE: <span th:text="${#temporals.format(order.orderTime, 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
+
+        <div class="order-detail-card">
+            <div class="dinner-header">
+                <h2 th:text="${order.dinnerKind} ?: '-'"></h2>
+                <p class="dinner-style" th:text="${order.dinnerStyle} ?: '-'"></p>
+            </div>
+
+            <div class="detail-list">
+                <p><strong>Order time:</strong> <span th:text="${#temporals.format(order.orderTime, 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
+                <p><strong>Customer id:</strong> <span th:text="${order.customerLoginId} ?: '-'"></span></p>
+                <p><strong>Dinner kind:</strong> <span th:text="${order.dinnerKind} ?: '-'"></span></p>
+                <p><strong>Dinner style:</strong> <span th:text="${order.dinnerStyle} ?: '-'"></span></p>
+                <p><strong>Delivery time:</strong> <span th:text="${order.deliveryTime} ?: '-'"></span></p>
+                <p><strong>Delivery address:</strong> <span th:text="${order.deliveryAddress} ?: '-'"></span></p>
+                <p><strong>Card number:</strong> <span th:text="${order.cardNumber} ?: '-'"></span></p>
+                <p><strong>Total price:</strong> <span th:text="'₩' + ${order.totalPrice} ?: '-'"></span></p>
+                <p><strong>Status:</strong> <span th:text="${order.status} ?: '-'"></span></p>
+            </div>
+
+            <div class="item-list">
+                <p><strong>--- Items Ordered ---</strong></p>
+                <div th:each="entry : ${orderItem.orderItems}" class="order-item-row">
+                    <span th:text="${entry.key}"></span>
+                    <span class="quantity" th:text="${entry.value}"></span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
 </body>
 </html>
