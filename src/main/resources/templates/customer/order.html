@@ -11,6 +11,7 @@
     <h1>New Order</h1>
     <p>메뉴와 서빙 스타일을 선택하고 배달 정보를 입력한 뒤 제출하세요.</p>
 
+    <!-- 주문 폼 -->
     <form id="orderForm" action="/customer/orders/new" method="post" autocomplete="off" novalidate>
         <!-- 메뉴 선택 -->
         <div>
@@ -39,46 +40,16 @@
         <fieldset>
             <legend>주문 구성</legend>
 
-            <div>
-                <label for="wine">와인 (43,000)</label>
-                <input type="number" id="wine" name="orderItems[wine]" min="0" value="0">
-            </div>
-            <div>
-                <label for="steak">스테이크 (39,000)</label>
-                <input type="number" id="steak" name="orderItems[steak]" min="0" value="0">
-            </div>
-            <div>
-                <label for="coffee_cup">커피 (컵) (6,000)</label>
-                <input type="number" id="coffee_cup" name="orderItems[coffee_cup]" min="0" value="0">
-            </div>
-            <div>
-                <label for="coffee_pot">커피 (포트) (36,000)</label>
-                <input type="number" id="coffee_pot" name="orderItems[coffee_pot]" min="0" value="0">
-            </div>
-            <div>
-                <label for="salad">샐러드 (23,000)</label>
-                <input type="number" id="salad" name="orderItems[salad]" min="0" value="0">
-            </div>
-            <div>
-                <label for="eggscramble">스크램블 에그 (16,000)</label>
-                <input type="number" id="eggscramble" name="orderItems[eggscramble]" min="0" value="0">
-            </div>
-            <div>
-                <label for="bacon">베이컨 (10,000)</label>
-                <input type="number" id="bacon" name="orderItems[bacon]" min="0" value="0">
-            </div>
-            <div>
-                <label for="bread">빵 (7,000)</label>
-                <input type="number" id="bread" name="orderItems[bread]" min="0" value="0">
-            </div>
-            <div>
-                <label for="baguette">바게트 (8,000)</label>
-                <input type="number" id="baguette" name="orderItems[baguette]" min="0" value="0">
-            </div>
-            <div>
-                <label for="champagne">샴페인 (98,000)</label>
-                <input type="number" id="champagne" name="orderItems[champagne]" min="0" value="0">
-            </div>
+            <div><label for="wine">와인 (&#8361;43,000)</label><input type="number" id="wine" name="orderItems[wine]" min="0" value="0"></div>
+            <div><label for="steak">스테이크 (&#8361;39,000)</label><input type="number" id="steak" name="orderItems[steak]" min="0" value="0"></div>
+            <div><label for="coffee_cup">커피 (컵) (&#8361;6,000)</label><input type="number" id="coffee_cup" name="orderItems[coffee_cup]" min="0" value="0"></div>
+            <div><label for="coffee_pot">커피 (포트) (&#8361;36,000)</label><input type="number" id="coffee_pot" name="orderItems[coffee_pot]" min="0" value="0"></div>
+            <div><label for="salad">샐러드 (&#8361;23,000)</label><input type="number" id="salad" name="orderItems[salad]" min="0" value="0"></div>
+            <div><label for="eggscramble">스크램블 에그 (&#8361;16,000)</label><input type="number" id="eggscramble" name="orderItems[eggscramble]" min="0" value="0"></div>
+            <div><label for="bacon">베이컨 (&#8361;10,000)</label><input type="number" id="bacon" name="orderItems[bacon]" min="0" value="0"></div>
+            <div><label for="bread">빵 (&#8361;7,000)</label><input type="number" id="bread" name="orderItems[bread]" min="0" value="0"></div>
+            <div><label for="baguette">바게트 (&#8361;8,000)</label><input type="number" id="baguette" name="orderItems[baguette]" min="0" value="0"></div>
+            <div><label for="champagne">샴페인 (&#8361;98,000)</label><input type="number" id="champagne" name="orderItems[champagne]" min="0" value="0"></div>
         </fieldset>
 
         <!-- 배달 주소 -->
@@ -99,98 +70,29 @@
             <a href="/customer/main">이전</a>
         </div>
     </form>
+
+    <!-- 에러 표시 -->
     <div th:if="${orderErrorMessage}">
         <p th:utext="${orderErrorMessage}" style="color: red;"></p>
     </div>
-    <!--    itemErrorMessage-->
     <div th:if="${itemErrorMessage}">
         <p th:utext="${itemErrorMessage}" style="color: red;"></p>
         <ul>
             <li th:each="item : ${insufficientItems}" th:text="${item}" style="color: darkred;"></li>
         </ul>
     </div>
+    <!-- 음성 인식 폼 -->
+    <section>
+        <h2>음성 인식 주문</h2>
+        <form id="voiceForm" action="javascript:void(0);">
+            <button type="button" id="voiceBtn">음성인식</button>
+            <label for="voiceText">인식된 주문</label>
+            <textarea id="voiceText" placeholder="음성 인식 결과가 여기에 표시됩니다" rows="4" cols="50"></textarea>
+            <button type="submit" id="applyVoiceBtn">적용</button>
+        </form>
+        <p id="voiceMessage" style="color:blue; white-space: pre-line;"></p>
+    </section>
 </main>
-
-<script>
-    (function(){
-        const menuSelect = document.getElementById('menuSelect');
-        const styleSelect = document.getElementById('styleSelect');
-        const resetBtn = document.getElementById('resetBtn');
-
-        // 아이템 input들을 객체로 캐싱
-        const items = {
-            wine: document.getElementById('wine'),
-            steak: document.getElementById('steak'),
-            coffee_cup: document.getElementById('coffee_cup'),
-            coffee_pot: document.getElementById('coffee_pot'),
-            salad: document.getElementById('salad'),
-            eggscramble: document.getElementById('eggscramble'),
-            bacon: document.getElementById('bacon'),
-            bread: document.getElementById('bread'),
-            baguette: document.getElementById('baguette'),
-            champagne: document.getElementById('champagne')
-        };
-
-        // 모든 아이템 0으로 초기화
-        function resetItems() {
-            Object.values(items).forEach(input => input.value = 0);
-        }
-
-        // 메뉴 선택 시 기본값 반영
-        menuSelect.addEventListener('change', () => {
-                resetItems(); // 먼저 0으로 초기화
-
-                switch(menuSelect.value){
-                    case 'VALENTINE':
-                items.wine.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'FRENCH':
-                items.coffee_cup.value = 1;
-                items.wine.value = 1;
-                items.salad.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'ENGLISH':
-                items.eggscramble.value = 1;
-                items.bacon.value = 1;
-                items.bread.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'CHAMPAGNE':
-                items.champagne.value = 1;
-                items.baguette.value = 4;
-                items.coffee_pot.value = 1;
-                items.wine.value = 1;
-                items.steak.value = 1;
-
-                // simple 비활성화 + 값 초기화
-                Array.from(styleSelect.options).forEach(opt => {
-                    if(opt.value === 'SIMPLE'){
-                        opt.disabled = true;
-                        if(styleSelect.value === 'SIMPLE'){
-                            styleSelect.value = '';
-                        }
-                    } else {
-                        opt.disabled = false;
-                    }
-                });
-                return; // 여기서 끝내기
-            }
-
-            // champagne 외에는 모든 스타일 다시 활성화
-            Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
-            styleSelect.value = '';
-        });
-
-        // reset 시 옵션과 아이템 재설정
-        resetBtn.addEventListener('click', () => {
-            resetItems();
-            Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
-            styleSelect.value = '';
-            menuSelect.value = '';
-        });
-    })();
-</script>
+<script th:src="@{/js/orderForm.js}"></script>
 </body>
 </html>
