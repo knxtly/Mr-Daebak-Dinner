@@ -1,13 +1,39 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>Order Success | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/CSS/style.css}">
+    <link rel="stylesheet" th:href="@{/CSS/customer-order-success.css}">
 </head>
 <body>
-<h1>주문이 완료되었습니다!</h1>
-<a href="/customer/main">메인으로</a>
-<a th:href="@{/orders/detail/{orderId}(orderId=${placedOrder.id})}">주문상세보기</a>
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="/" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="#">SIGNUP</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer/logout" class="logout-btn">로그아웃</a>
+        <a href="#" class="mypg-btn">마이페이지</a>
+    </div>
+</header>
+
+<main class="success-container">
+    <div class="success-box">
+        <img th:src="@{/images/check_icon.png}" alt="주문 완료 체크 아이콘" class="check-icon">
+        <h1 class="success-title">주문이 성공적으로 완료되었습니다!</h1>
+        <p class="success-message">Mr. Daebak Dinner가 곧 당신의 특별한 저녁을 준비합니다.</p>
+    </div>
+
+    <div class="action-buttons">
+        <a th:href="@{/customer/main}" class="secondary-btn">메인으로 돌아가기</a>
+        <a th:href="@{/orders/detail/{orderId}(orderId=${placedOrder.id})}" class="primary-btn">주문 상세 보기</a>
+    </div>
+</main>
 </body>
 </html>

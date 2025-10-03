@@ -55,7 +55,7 @@
             </div>
 
             <div th:if="${signUpErrorMessage}" class = "signup-exception-container">
-                <p th:text="${signUpErrorMessage}" class = "signup-exception-msg"></p>
+                <p th:utext="${signUpErrorMessage}" class = "signup-exception-msg"></p>
             </div>
 
             <button type="submit" class="signup-btn-submit">SIGN UP</button>
