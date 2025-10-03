@@ -151,10 +151,11 @@
             const data = await response.json();
             if (data.error) { voiceMessage.textContent = "Error: " + data.error; return; }
 
-            // Structured Output 안전 반영
-            if (data.menu) menuSelect.value = data.menu;
-            if (data.style) styleSelect.value = data.style;
+            // JSON => menu, style 반영
+            if (data.menu !== undefined && data.menu !== null) menuSelect.value = data.menu;
+            if (data.style !== undefined && data.style !== null) styleSelect.value = data.style;
 
+            // JSON => item 반영
             resetItems();
             if (data.items && typeof data.items === "object") {
                 Object.keys(items).forEach(key => {
@@ -163,6 +164,7 @@
                 });
             }
 
+            // JSON => deliveryAddress, cardNumber 반영
             document.getElementById("deliveryAddress").value = data.deliveryAddress || "";
             document.getElementById("cardNumber").value = data.cardNumber || "";
 
