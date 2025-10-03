@@ -114,7 +114,7 @@
         recognition.interimResults = true;
         recognizing = true;
         interimTranscript = "";
-        const originalText = voiceBtn.textContent;
+        const originalText = "음성 인식";
         voiceBtn.textContent = "말하는 중... (클릭 시 종료)";
         recognition.start();
 
