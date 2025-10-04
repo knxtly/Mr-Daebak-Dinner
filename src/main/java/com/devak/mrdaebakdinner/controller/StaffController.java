@@ -72,7 +72,7 @@ public class StaffController {
     @GetMapping("/staff/logout")
     public String staffLogout(HttpSession session) {
         session.removeAttribute("loggedInStaff");
-        return "redirect:/";
+        return "redirect:/staff";
     }
 
     /* ============ Chef ============ */
