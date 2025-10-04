@@ -11,7 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -215,23 +216,32 @@ public class OrderService {
 
     @Transactional
     public void startCooking(Long orderId) {
-        findOrder(orderId).setStatus(OrderStatus.COOKING); // 상태를 "COOKING"으로 변경
+        OrderEntity oe = findOrder(orderId);
+        // Status가 "ORDERED"일 때만 "COOKING"으로 변경
+        if (oe.getStatus() == OrderStatus.ORDERED) oe.setStatus(OrderStatus.COOKING);
     }
 
     @Transactional
     public void completeCooking(Long orderId) {
-        findOrder(orderId).setStatus(OrderStatus.COOKED); // 상태를 "COOKED"으로 변경
+        OrderEntity oe = findOrder(orderId);
+        // Status가 "COOKING"일 때만 "COOKED"으로 변경
+        if (oe.getStatus() == OrderStatus.COOKING) oe.setStatus(OrderStatus.COOKED);
     }
 
     @Transactional
     public void startDelivery(Long orderId) {
-        findOrder(orderId).setStatus(OrderStatus.DELIVERING); // 상태를 "DELIVERING"으로 변경
+        OrderEntity oe = findOrder(orderId);
+        // Status가 "COOKED"일 때만 "DELIVERING"으로 변경
+        if (oe.getStatus() == OrderStatus.COOKED) oe.setStatus(OrderStatus.DELIVERING);
     }
 
     @Transactional
     public void completeDelivery(Long orderId) {
-        OrderEntity o = findOrder(orderId);
-        o.setDeliveryTime(LocalDateTime.now());
-        o.setStatus(OrderStatus.DELIVERED); // 상태를 "DELIVERED"으로 변경
+        OrderEntity oe = findOrder(orderId);
+        // Status가 "DELIVERING"일 때만 "DELIVERED"으로 변경
+        if (oe.getStatus() == OrderStatus.DELIVERING) {
+            oe.setDeliveryTime(ZonedDateTime.now(ZoneId.of("Asia/Seoul")));
+            oe.setStatus(OrderStatus.DELIVERED);
+        }
     }
 }

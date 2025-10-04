@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @NoArgsConstructor
 @Getter
@@ -20,14 +20,14 @@ public class OrderHistoryDTO { // 고객이 이전주문조회 시 정보를 담
     private Long id;
     private String customerLoginId;
     @NotNull
-    private LocalDateTime orderTime;
+    private ZonedDateTime orderTime;
     @NotNull
     private OrderDnrKind dinnerKind;
     @NotNull
     private OrderDnrStyle dinnerStyle;
     @NotBlank
     private String deliveryAddress;
-    private LocalDateTime deliveryTime;
+    private ZonedDateTime deliveryTime;
     private Integer totalPrice;
     @NotBlank
     private String cardNumber;
