@@ -35,17 +35,17 @@
                  class="order-card"
                  th:onclick="|location.href='@{/orders/detail/{orderId}(orderId=${order.id})}'|">
 
-                <p class="order-date-time" th:text="${#temporals.format(order.orderTime, 'yyyy, MMM d @ h:mm a')} ?: '-'"></p>
+                <p class="order-date-time" th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: 'N/A'"></p>
 
                 <h2 class="dinner-info">
                     <span class="dinner-kind" th:text="${order.dinnerKind} ?: 'N/A'"></span>
-                    <span class="dinner-style" th:text="${order.dinnerStyle} ?: ''"></span>
+                    <span class="dinner-style" th:text="${order.dinnerStyle} ?: 'N/A'"></span>
                 </h2>
 
-                <p class="order-price" th:text="'₩' + ${order.totalPrice} ?: '$N/A'"></p>
+                <p class="order-price" th:text="${order.totalPrice} != null ? '₩' + ${order.totalPrice} : 'N/A'"></p>
 
                 <p class="delivery-label">DELIVERY TIME:</p>
-                <p class="delivery-value" th:text="${order.deliveryTime} ?: 'N/A'"></p>
+                <p class="delivery-value" th:text="${order.deliveryTime != null ? #temporals.format(order.deliveryTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a') : 'N/A'}"></p>
 
                 <p class="delivery-label">DELIVERY ADDRESS:</p>
                 <p class="delivery-value" th:text="${order.deliveryAddress} ?: 'N/A'"></p>

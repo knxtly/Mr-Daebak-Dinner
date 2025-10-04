@@ -131,6 +131,7 @@ a {
     color: red;
     font-size: 0.95em;
     margin: 0;
+    white-space: pre-line;
 }
 
 /* 로그인 버튼 */

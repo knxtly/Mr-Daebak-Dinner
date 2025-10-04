@@ -17,12 +17,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -48,26 +50,28 @@ public class CustomerController {
     @PostMapping("/customer/login")
     public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
                                 BindingResult bindingResult,
+                                Model model,
                                 RedirectAttributes redirectAttributes,
                                 HttpSession session,
                                 HttpServletRequest request) {
-
-        // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            if (bindingResult.getFieldError("loginId") != null) {
-                errorMessage.append("ID");
+            StringBuilder loginErrMsg = new StringBuilder();
+
+            // 원하는 출력 순서
+            List<String> fieldOrder = List.of("loginId", "password");
+
+            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
+            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
+                    .sorted(Comparator.comparingInt(
+                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
+                    ))
+                    .toList();
+            for (FieldError fieldError : sortedErrors) {
+                loginErrMsg.append(fieldError.getDefaultMessage()).append("\n");
             }
-            if (bindingResult.getFieldError("password") != null) {
-                if (!errorMessage.isEmpty()) {
-                    errorMessage.append(", ");
-                }
-                errorMessage.append("PW");
-            }
-            errorMessage.append("는 필수 요소입니다.");
-            redirectAttributes.addFlashAttribute("loginErrorMessage",
-                    errorMessage.toString());
-            return "redirect:/customer";
+
+            model.addAttribute("loginErrMsg", loginErrMsg.toString().trim());
+            return "customer/customer";
         }
 
         try {
@@ -80,8 +84,8 @@ public class CustomerController {
             session.setAttribute("loggedInCustomer", customerSessionDTO);
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
-            redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
-            return "redirect:/customer";
+            model.addAttribute("loginErrMsg", e.getMessage());
+            return "customer/customer";
         }
     }
 
@@ -89,36 +93,40 @@ public class CustomerController {
 
     // 회원가입 페이지 GET 요청
     @GetMapping("/customer/signup")
-    public String showSignUp() {
+    public String showSignUp(@ModelAttribute("customerSignUpDTO") CustomerSignUpDTO customerSignUpDTO) {
+        // 빈 DTO를 폼에 담아 렌더링
         return "customer/signup";
     }
 
     // 회원가입 페이지 POST 요청
     @PostMapping("/customer/signup")
-    public String signUp(@Valid @ModelAttribute CustomerSignUpDTO customerDTO,
+    public String signUp(@Valid @ModelAttribute("customerSignUpDTO") CustomerSignUpDTO customerSignUpDTO,
                          BindingResult bindingResult,
-                         RedirectAttributes redirectAttributes) {
+                         Model model) {
+        // valid check 실패
         if (bindingResult.hasErrors()) {
-            // 오류 메시지 이어붙이기
-            StringBuilder errorMessage = new StringBuilder();
-            bindingResult.getFieldErrors().forEach(fieldError -> {
-                errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
-            });
-
-            // redirectAttributes에 errorMessage 전달
-            redirectAttributes.addFlashAttribute("signUpErrorMessage",
-                    errorMessage.toString().trim());
-            return "redirect:/customer/signup";
+            if (bindingResult.hasFieldErrors("loginId")) {
+                model.addAttribute("signUpLoginIdErrMsg",
+                        bindingResult.getFieldError("loginId").getDefaultMessage());
+            }
+            if (bindingResult.hasFieldErrors("password")) {
+                model.addAttribute("signUpPasswordErrMsg",
+                        bindingResult.getFieldError("password").getDefaultMessage());
+            }
+            if (bindingResult.hasFieldErrors("name")) {
+                model.addAttribute("signUpNameErrMsg",
+                        bindingResult.getFieldError("name").getDefaultMessage());
+            }
+            return "customer/signup";
         }
 
-        try { // 입력값이 Valid하다면,
-            // 회원가입 시도
-            customerService.signUp(customerDTO);
+        try { // 입력값이 Valid하다면, 회원가입 시도
+            customerService.signUp(customerSignUpDTO);
             return "redirect:/customer";
         } catch (DuplicateLoginIdException | DataAccessException e) {
-            // 회원가입 실패하면 errorMessage 출력
-            redirectAttributes.addFlashAttribute("signUpErrorMessage", e.getMessage());
-            return "redirect:/customer/signup";
+            // 회원가입 실패하면 errMsg 출력
+            model.addAttribute("signUpErrMsg", e.getMessage());
+            return "customer/signup";
         }
     }
 

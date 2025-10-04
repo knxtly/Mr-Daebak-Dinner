@@ -67,7 +67,7 @@ input[type="submit"]:hover {
 }
 
 /* 에러 메시지 스타일 */
-div[th:if="${loginErrorMessage}"] p {
+div[th:if="${loginErrMsg}"] p {
     margin-top: 15px;
     font-weight: bold;
 }

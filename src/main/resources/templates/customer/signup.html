@@ -32,30 +32,39 @@
         </h2>
         <p class="signup-phrase">SIGNUP TODAY TO GET REGULAR DISCOUNT</p>
 
-        <form action="/customer/signup" method="post" class="signup-form">
+        <form action="/customer/signup" method="post" class="signup-form" th:object="${customerSignUpDTO}">
 
             <div class="input-group">
-                <input type="text" id="loginId" name="loginId" placeholder="ID(4~30글자)">
+                <input type="text" id="loginId" th:field="*{loginId}" placeholder="ID(4~30글자)">
+            </div>
+            <div th:if="${signUpLoginIdErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpLoginIdErrMsg}" class = "signup-exception-msg"></p>
             </div>
 
             <div class="input-group">
-                <input type="password" id="password" name="password" placeholder="PASSWORD(최소 4글자)">
+                <input type="password" id="password" th:field="*{password}" placeholder="PASSWORD(최소 4글자)">
+            </div>
+            <div th:if="${signUpPasswordErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpPasswordErrMsg}" class = "signup-exception-msg"></p>
             </div>
 
             <div class="input-group">
-                <input type="text" id="name" name="name" placeholder="NAME(최대 30글자)">
+                <input type="text" id="name" th:field="*{name}" placeholder="NAME(최대 30글자)">
+            </div>
+            <div th:if="${signUpNameErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpNameErrMsg}" class = "signup-exception-msg"></p>
             </div>
 
             <div class="input-group">
-                <input type="text" id="address" name="address" placeholder="ADDRESS">
+                <input type="text" id="address" th:field="*{address}" placeholder="ADDRESS">
             </div>
 
             <div class="input-group">
-                <input type="tel" id="contact" name="contact" placeholder="TEL">
+                <input type="tel" id="contact" th:field="*{contact}" placeholder="TEL">
             </div>
 
-            <div th:if="${signUpErrorMessage}" class = "signup-exception-container">
-                <p th:utext="${signUpErrorMessage}" class = "signup-exception-msg"></p>
+            <div th:if="${signUpErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpErrMsg}" class = "signup-exception-msg"></p>
             </div>
 
             <button type="submit" class="signup-btn-submit">SIGN UP</button>
