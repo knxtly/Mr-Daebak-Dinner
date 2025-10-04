@@ -9,9 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -36,14 +38,25 @@ public class OrderController {
                             RedirectAttributes redirectAttributes,
                             @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
 
-        if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시
-            StringBuilder orderErrorMsg = new StringBuilder();
-            bindingResult.getFieldErrors().forEach(fieldError -> {
-                orderErrorMsg.append(fieldError.getDefaultMessage()).append("<br>");
-            });
-            redirectAttributes.addFlashAttribute("orderErrorMessage",
-                    orderErrorMsg.toString().trim());
-            return "redirect:/customer/orders/new";
+        if (bindingResult.hasErrors()) {
+            StringBuilder orderErrMsg = new StringBuilder();
+
+            // 원하는 출력 순서
+            List<String> fieldOrder = List.of("dinnerKind", "dinnerStyle", "deliveryAddress", "cardNumber");
+
+            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
+            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
+                    .sorted(Comparator.comparingInt(
+                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
+                    ))
+                    .toList();
+
+            for (FieldError fieldError : sortedErrors) {
+                orderErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
+            }
+
+            redirectAttributes.addFlashAttribute("orderErrorMessage", orderErrMsg.toString().trim());
+            return "redirect:/customer/orders/new"; // TODO: invalid order 시 redirect때문에 화면이 올라가며 초기화
         }
 
         try {
@@ -53,7 +66,7 @@ public class OrderController {
         } catch (InsufficientInventoryException e) {
             redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
-            return "redirect:/customer/orders/new";
+            return "redirect:/customer/orders/new"; // TODO: 재고불충분 시 redirect때문에 화면이 올라가며 초기화됨
         }
         return "redirect:/customer/orders/success";
     }

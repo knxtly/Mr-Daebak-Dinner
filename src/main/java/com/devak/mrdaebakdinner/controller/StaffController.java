@@ -46,8 +46,6 @@ public class StaffController {
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes,
                              HttpSession session) {
-
-        // 유효성 검사(@Valid + BindingResult): PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("loginErrorMessage",
                     Objects.requireNonNull(bindingResult.getFieldError("password")).getDefaultMessage()
