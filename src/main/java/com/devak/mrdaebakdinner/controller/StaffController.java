@@ -44,13 +44,14 @@ public class StaffController {
     @PostMapping("/staff/login")
     public String loginStaff(@Valid @ModelAttribute StaffLoginDTO staffLoginDTO,
                              BindingResult bindingResult,
+                             Model model,
                              RedirectAttributes redirectAttributes,
                              HttpSession session) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("loginErrorMessage",
-                    Objects.requireNonNull(bindingResult.getFieldError("password")).getDefaultMessage()
+            model.addAttribute("loginErrMsg",
+                    bindingResult.getFieldError("password").getDefaultMessage()
             );
-            return "redirect:/staff";
+            return "staff/staff";
         }
 
         try {
@@ -63,8 +64,8 @@ public class StaffController {
             session.setAttribute("loggedInStaff", staffSessionDTO);
             return "redirect:/staff/chef";
         } catch (IncorrectPasswordException e) { // 로그인 실패
-            redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
-            return "redirect:/staff";
+            model.addAttribute("loginErrMsg", e.getMessage());
+            return "staff/staff";
         }
     }
 

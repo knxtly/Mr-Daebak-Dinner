@@ -50,6 +50,7 @@ public class CustomerController {
     @PostMapping("/customer/login")
     public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
                                 BindingResult bindingResult,
+                                Model model,
                                 RedirectAttributes redirectAttributes,
                                 HttpSession session,
                                 HttpServletRequest request) {
@@ -66,11 +67,11 @@ public class CustomerController {
                     ))
                     .toList();
             for (FieldError fieldError : sortedErrors) {
-                loginErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
+                loginErrMsg.append(fieldError.getDefaultMessage()).append("\n");
             }
 
-            redirectAttributes.addFlashAttribute("loginErrorMessage", loginErrMsg.toString().trim());
-            return "redirect:/customer";
+            model.addAttribute("loginErrMsg", loginErrMsg.toString().trim());
+            return "customer/customer";
         }
 
         try {
@@ -83,8 +84,8 @@ public class CustomerController {
             session.setAttribute("loggedInCustomer", customerSessionDTO);
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
-            redirectAttributes.addFlashAttribute("loginErrorMessage", e.getMessage());
-            return "redirect:/customer";
+            model.addAttribute("loginErrMsg", e.getMessage());
+            return "customer/customer";
         }
     }
 
