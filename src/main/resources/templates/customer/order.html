@@ -28,9 +28,9 @@
     <h1 class="page-title">NEW ORDER</h1>
     <p class="page-subtitle">메뉴와 서빙 스타일을 선택하고 배달 정보를 입력한 뒤 제출하세요.</p>
     <!-- 주문 폼 -->
-    <form id="orderForm" th:action="@{/customer/orders/new}" method="post" autocomplete="off" novalidate class="order-form-container">
+    <form id="orderForm" th:action="@{/customer/orders/new}" method="post" autocomplete="off" class="order-form-container">
 
-        <select id="menuSelect" name="dinnerKind" required class="hidden-select">
+        <select id="menuSelect" name="dinnerKind" class="hidden-select" required>
             <option value="" selected hidden>메뉴를 선택하세요</option>
             <option value="VALENTINE">Valentine dinner</option>
             <option value="FRENCH">French dinner</option>
