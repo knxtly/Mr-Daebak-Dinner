@@ -17,12 +17,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -51,22 +53,23 @@ public class CustomerController {
                                 RedirectAttributes redirectAttributes,
                                 HttpSession session,
                                 HttpServletRequest request) {
-
-        // 유효성 검사(@Valid + BindingResult): ID, PW가 입력되지 않았을 때 loginErrorMessage
         if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            if (bindingResult.getFieldError("loginId") != null) {
-                errorMessage.append("ID");
+            StringBuilder loginErrMsg = new StringBuilder();
+
+            // 원하는 출력 순서
+            List<String> fieldOrder = List.of("loginId", "password");
+
+            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
+            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
+                    .sorted(Comparator.comparingInt(
+                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
+                    ))
+                    .toList();
+            for (FieldError fieldError : sortedErrors) {
+                loginErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
             }
-            if (bindingResult.getFieldError("password") != null) {
-                if (!errorMessage.isEmpty()) {
-                    errorMessage.append(", ");
-                }
-                errorMessage.append("PW");
-            }
-            errorMessage.append("는 필수 요소입니다.");
-            redirectAttributes.addFlashAttribute("loginErrorMessage",
-                    errorMessage.toString());
+
+            redirectAttributes.addFlashAttribute("loginErrorMessage", loginErrMsg.toString().trim());
             return "redirect:/customer";
         }
 
@@ -99,16 +102,24 @@ public class CustomerController {
                          BindingResult bindingResult,
                          RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            // 오류 메시지 이어붙이기
-            StringBuilder errorMessage = new StringBuilder();
-            bindingResult.getFieldErrors().forEach(fieldError -> {
-                errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
-            });
+                StringBuilder signUpErrMsg = new StringBuilder();
 
-            // redirectAttributes에 errorMessage 전달
-            redirectAttributes.addFlashAttribute("signUpErrorMessage",
-                    errorMessage.toString().trim());
-            return "redirect:/customer/signup";
+            // 원하는 출력 순서
+            List<String> fieldOrder = List.of("loginId", "password", "name");
+
+            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
+            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
+                    .sorted(Comparator.comparingInt(
+                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
+                    ))
+                    .toList();
+
+            for (FieldError fieldError : sortedErrors) {
+                signUpErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
+            }
+
+            redirectAttributes.addFlashAttribute("signUpErrorMessage", signUpErrMsg.toString().trim());
+            return "redirect:/customer/signup"; // TODO: orderError시 화면이 올라가며 초기화되는 문제
         }
 
         try { // 입력값이 Valid하다면,
