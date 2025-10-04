@@ -27,10 +27,24 @@
 <main class="order-main">
     <h1 class="page-title">NEW ORDER</h1>
     <p class="page-subtitle">메뉴와 서빙 스타일을 선택하고 배달 정보를 입력한 뒤 제출하세요.</p>
-    <!-- 주문 폼 -->
-    <form id="orderForm" th:action="@{/customer/orders/new}" method="post" autocomplete="off" class="order-form-container">
 
-        <select id="menuSelect" name="dinnerKind" class="hidden-select" required>
+    <!-- 주문 폼 -->
+    <form id="orderForm" th:action="@{/customer/orders/new}" th:object="${orderDTO}" method="post"
+          autocomplete="off"
+          class="order-form-container">
+        <!-- 에러 메시지 -->
+        <div th:if="${orderErrorMessage}">
+            <p th:utext="${orderErrorMessage}" class="error-message"></p>
+        </div>
+        <div th:if="${itemErrorMessage}">
+            <p th:utext="${itemErrorMessage}" class="error-message"></p>
+            <ul>
+                <li th:each="item : ${insufficientItems}" th:text="${item}" style="color: darkred;"></li>
+            </ul>
+        </div>
+
+        <!-- 1. 디너 종류 선택 -->
+        <select id="menuSelect" th:field="*{dinnerKind}" class="hidden-select">
             <option value="" selected hidden>메뉴를 선택하세요</option>
             <option value="VALENTINE">Valentine dinner</option>
             <option value="FRENCH">French dinner</option>
@@ -73,11 +87,11 @@
                 </div>
             </div>
 
-            <!-- 서빙 스타일 선택 -->
+            <!-- 2. 서빙 스타일 선택 -->
             <div class="style-area">
                 <h2 class="selection-heading">2. 서빙 스타일 선택</h2>
                 <div class="style-select-wrapper">
-                    <select id="styleSelect" name="dinnerStyle" required>
+                    <select id="styleSelect" th:field="*{dinnerStyle}">
                         <option value="" selected hidden>스타일을 선택하세요</option>
                         <option value="SIMPLE">Simple</option>
                         <option value="GRAND">Grand</option>
@@ -87,66 +101,65 @@
             </div>
         </div>
 
-        <!-- 주문 아이템 -->
-        <fieldset class="order-items-fieldset">
+        <!-- 3. 주문 구성 -->
+        <fieldset class="order-items-fieldset" th:object="${orderItemDTO}">
             <legend class="fieldset-legend">3. 주문 구성 (옵션 설정)</legend>
             <div class="item-list-grid">
                 <div class="item-group">
                     <label for="wine">와인 (&#8361;43,000)</label>
-                    <input type="number" id="wine" name="orderItems[wine]" min="0" value="0">
+                    <input type="number" id="wine" th:field="*{wine}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="steak">스테이크 (&#8361;39,000)</label>
-                    <input type="number" id="steak" name="orderItems[steak]" min="0" value="0">
+                    <input type="number" id="steak" th:field="*{steak}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="coffee_cup">커피 (컵) (&#8361;6,000)</label>
-                    <input type="number" id="coffee_cup" name="orderItems[coffee_cup]" min="0" value="0">
+                    <input type="number" id="coffee_cup" th:field="*{coffee_cup}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="coffee_pot">커피 (포트) (&#8361;36,000)</label>
-                    <input type="number" id="coffee_pot" name="orderItems[coffee_pot]" min="0" value="0">
+                    <input type="number" id="coffee_pot" th:field="*{coffee_pot}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="salad">샐러드 (&#8361;23,000)</label>
-                    <input type="number" id="salad" name="orderItems[salad]" min="0" value="0">
+                    <input type="number" id="salad" th:field="*{salad}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="eggscramble">스크램블 에그 (&#8361;16,000)</label>
-                    <input type="number" id="eggscramble" name="orderItems[eggscramble]" min="0" value="0">
+                    <input type="number" id="eggscramble" th:field="*{eggscramble}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="bacon">베이컨 (&#8361;10,000)</label>
-                    <input type="number" id="bacon" name="orderItems[bacon]" min="0" value="0">
+                    <input type="number" id="bacon" th:field="*{bacon}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="bread">빵 (&#8361;7,000)</label>
-                    <input type="number" id="bread" name="orderItems[bread]" min="0" value="0">
+                    <input type="number" id="bread" th:field="*{bread}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="baguette">바게트 (&#8361;8,000)</label>
-                    <input type="number" id="baguette" name="orderItems[baguette]" min="0" value="0">
+                    <input type="number" id="baguette" th:field="*{baguette}" min="0">
                 </div>
                 <div class="item-group">
                     <label for="champagne">샴페인 (&#8361;98,000)</label>
-                    <input type="number" id="champagne" name="orderItems[champagne]" min="0" value="0">
+                    <input type="number" id="champagne" th:field="*{champagne}" min="0">
                 </div>
             </div>
         </fieldset>
 
-        <!-- 배달 주소 -->
+        <!-- 4. 배달 및 결제 정보 -->
         <section class="delivery-payment-info">
             <h2 class="selection-heading full-width-heading">4. 배달 및 결제 정보</h2>
 
             <div class="form-group">
                 <label for="deliveryAddress">배달 주소</label>
-                <input type="text" id="deliveryAddress" name="deliveryAddress" required/>
+                <input type="text" id="deliveryAddress" th:field="*{deliveryAddress}"/>
             </div>
 
-            <!-- 카드 번호 -->
             <div class="form-group">
                 <label for="cardNumber">카드 번호</label>
-                <input type="text" id="cardNumber" name="cardNumber" required/>
+                <input type="text" id="cardNumber" th:field="*{cardNumber}"/>
             </div>
         </section>
 
@@ -155,21 +168,9 @@
             <button type="submit" class="primary-btn">주문 제출</button>
             <a th:href="@{/customer/main}" class="tertiary-btn">이전</a>
         </div>
-
-        <!-- Order 에러 표시 -->
-        <div th:if="${orderErrorMessage}">
-            <p th:utext="${orderErrorMessage}" class="error-message"></p>
-        </div>
-        <!-- Item 에러 표시 -->
-        <div th:if="${itemErrorMessage}">
-            <p th:utext="${itemErrorMessage}" class="error-message"></p>
-            <ul>
-                <li th:each="item : ${insufficientItems}" th:text="${item}" style="color: darkred;"></li>
-            </ul>
-        </div>
     </form>
 
-    <!-- 음성 인식 폼 -->
+    <!-- 음성 인식 섹션 -->
     <section>
         <h2>음성 인식 주문</h2>
         <form id="voiceForm" action="javascript:void(0);" class="voiceform">

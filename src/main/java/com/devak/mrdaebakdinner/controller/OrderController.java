@@ -26,15 +26,22 @@ public class OrderController {
 
     // Customer: 주문 페이지 GET 요청
     @GetMapping("/customer/orders/new")
-    public String showOrderPage() {
+    public String showOrderPage(Model model) {
+        if (!model.containsAttribute("orderDTO")) {
+            model.addAttribute("orderDTO", new OrderDTO());
+        }
+        if (!model.containsAttribute("orderItemDTO")) {
+            model.addAttribute("orderItemDTO", new OrderItemDTO());
+        }
         return "customer/order";
     }
 
     // 주문 요청
     @PostMapping("/customer/orders/new")
-    public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
+    public String takeOrder(@Valid @ModelAttribute("orderDTO") OrderDTO orderDTO,
                             BindingResult bindingResult,
-                            @ModelAttribute OrderItemDTO orderItemDTO,
+                            @ModelAttribute("orderItemDTO") OrderItemDTO orderItemDTO,
+                            Model model,
                             RedirectAttributes redirectAttributes,
                             @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
 
@@ -55,8 +62,8 @@ public class OrderController {
                 orderErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
             }
 
-            redirectAttributes.addFlashAttribute("orderErrorMessage", orderErrMsg.toString().trim());
-            return "redirect:/customer/orders/new"; // TODO: invalid order 시 redirect때문에 화면이 올라가며 초기화
+            model.addAttribute("orderErrorMessage", orderErrMsg.toString().trim());
+            return "customer/order";
         }
 
         try {
@@ -64,9 +71,9 @@ public class OrderController {
             OrderHistoryDTO placedOrder = orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
             redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
         } catch (InsufficientInventoryException e) {
-            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
-            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
-            return "redirect:/customer/orders/new"; // TODO: 재고불충분 시 redirect때문에 화면이 올라가며 초기화됨
+            model.addAttribute("itemErrorMessage", e.getMessage());
+            model.addAttribute("insufficientItems", e.getInsufficientItems());
+            return "customer/order";
         }
         return "redirect:/customer/orders/success";
     }

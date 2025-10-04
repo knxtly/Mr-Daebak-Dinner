@@ -92,44 +92,40 @@ public class CustomerController {
 
     // 회원가입 페이지 GET 요청
     @GetMapping("/customer/signup")
-    public String showSignUp() {
+    public String showSignUp(@ModelAttribute("customerSignUpDTO") CustomerSignUpDTO customerSignUpDTO) {
+        // 빈 DTO를 폼에 담아 렌더링
         return "customer/signup";
     }
 
     // 회원가입 페이지 POST 요청
     @PostMapping("/customer/signup")
-    public String signUp(@Valid @ModelAttribute CustomerSignUpDTO customerDTO,
+    public String signUp(@Valid @ModelAttribute("customerSignUpDTO") CustomerSignUpDTO customerSignUpDTO,
                          BindingResult bindingResult,
-                         RedirectAttributes redirectAttributes) {
+                         Model model) {
+        // valid check 실패
         if (bindingResult.hasErrors()) {
-                StringBuilder signUpErrMsg = new StringBuilder();
-
-            // 원하는 출력 순서
-            List<String> fieldOrder = List.of("loginId", "password", "name");
-
-            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
-            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
-                    .sorted(Comparator.comparingInt(
-                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
-                    ))
-                    .toList();
-
-            for (FieldError fieldError : sortedErrors) {
-                signUpErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
+            if (bindingResult.hasFieldErrors("loginId")) {
+                model.addAttribute("signUpLoginIdErrMsg",
+                        bindingResult.getFieldError("loginId").getDefaultMessage());
             }
-
-            redirectAttributes.addFlashAttribute("signUpErrorMessage", signUpErrMsg.toString().trim());
-            return "redirect:/customer/signup"; // TODO: orderError시 화면이 올라가며 초기화되는 문제
+            if (bindingResult.hasFieldErrors("password")) {
+                model.addAttribute("signUpPasswordErrMsg",
+                        bindingResult.getFieldError("password").getDefaultMessage());
+            }
+            if (bindingResult.hasFieldErrors("name")) {
+                model.addAttribute("signUpNameErrMsg",
+                        bindingResult.getFieldError("name").getDefaultMessage());
+            }
+            return "customer/signup";
         }
 
-        try { // 입력값이 Valid하다면,
-            // 회원가입 시도
-            customerService.signUp(customerDTO);
+        try { // 입력값이 Valid하다면, 회원가입 시도
+            customerService.signUp(customerSignUpDTO);
             return "redirect:/customer";
         } catch (DuplicateLoginIdException | DataAccessException e) {
-            // 회원가입 실패하면 errorMessage 출력
-            redirectAttributes.addFlashAttribute("signUpErrorMessage", e.getMessage());
-            return "redirect:/customer/signup";
+            // 회원가입 실패하면 errMsg 출력
+            model.addAttribute("signUpErrMsg", e.getMessage());
+            return "customer/signup";
         }
     }
 
