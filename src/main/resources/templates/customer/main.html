@@ -47,7 +47,7 @@
                         <span class="order-detail" th:text="${order.dinnerStyle} ?: '-'"></span>
                     </h3>
                     <p class="order-price" th:text="${order.totalPrice} ?: '-'"></p>
-                    <p class="order-info" th:text="${order.deliveryTime} ?: '-'"></p>
+                    <p class="order-info" th:text="${order.deliveryTime != null ? #temporals.format(order.deliveryTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a') : '-'}"></p>
                     <p class="order-info" th:text="${order.deliveryAddress} ?: '-'"></p>
                 </div>
             </a>

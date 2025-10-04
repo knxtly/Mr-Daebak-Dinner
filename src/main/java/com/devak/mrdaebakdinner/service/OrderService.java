@@ -11,8 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -240,7 +240,7 @@ public class OrderService {
         OrderEntity oe = findOrder(orderId);
         // Status가 "DELIVERING"일 때만 "DELIVERED"으로 변경
         if (oe.getStatus() == OrderStatus.DELIVERING) {
-            oe.setDeliveryTime(ZonedDateTime.now(ZoneId.of("Asia/Seoul")));
+            oe.setDeliveryTime(OffsetDateTime.now(ZoneOffset.ofHours(9)));
             oe.setStatus(OrderStatus.DELIVERED);
         }
     }

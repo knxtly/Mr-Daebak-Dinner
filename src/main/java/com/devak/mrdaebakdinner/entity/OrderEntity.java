@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "orders") // order가 db에서 예약어라서 "orders" 쓰래
@@ -17,7 +17,7 @@ public class OrderEntity {
     private Long id;
 
     @Column(name = "order_time", nullable = false, updatable = false)
-    private ZonedDateTime orderTime;
+    private OffsetDateTime orderTime;
 
     @ManyToOne(fetch = FetchType.LAZY) // n:1관계. Entity 타입이어야 함
     @JoinColumn(name = "customer_id") // <필드명>_<참조 PK 컬럼명>
@@ -35,7 +35,7 @@ public class OrderEntity {
     private String deliveryAddress;
 
     @Column(name = "delivery_time")
-    private ZonedDateTime deliveryTime;
+    private OffsetDateTime deliveryTime;
 
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
@@ -56,7 +56,7 @@ public class OrderEntity {
             status = OrderStatus.ORDERED;
         }
         if (orderTime == null) {
-            orderTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+            orderTime = OffsetDateTime.now(ZoneOffset.ofHours(9));
         }
     }
 }

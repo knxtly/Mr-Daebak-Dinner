@@ -50,7 +50,7 @@
                     <td th:text="${order.customerLoginId}"></td>
                     <td th:text="${order.status}"></td>
                     <td th:text="${order.deliveryAddress}"></td>
-                    <td th:text="${#temporals.format(order.orderTime, 'h:mm a')}"></td>
+                    <td th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: '-'"></td>
                     <td><a th:href="@{/orders/detail/{orderId}(orderId=${order.id})}" class="detail-link">상세보기</a></td>
                     <td>
                         <form th:action="@{/staff/chef/start(orderId=${order.id})}" method="post" class="action-form">

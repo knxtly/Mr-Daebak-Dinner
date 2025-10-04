@@ -30,7 +30,7 @@
         <h1 class="page-title">주문 상세</h1>
         <hr class="title-divider">
 
-        <p class="order-date">ORDER DATE: <span th:text="${#temporals.format(order.orderTime, 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
+        <p class="order-date">ORDER DATE: <span th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
 
         <div class="order-detail-card">
             <div class="dinner-header">
@@ -39,14 +39,14 @@
             </div>
 
             <div class="detail-list">
-                <p><strong>Order time:</strong> <span th:text="${#temporals.format(order.orderTime, 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
+                <p><strong>Order time:</strong> <span th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
                 <p><strong>Customer id:</strong> <span th:text="${order.customerLoginId} ?: '-'"></span></p>
                 <p><strong>Dinner kind:</strong> <span th:text="${order.dinnerKind} ?: '-'"></span></p>
                 <p><strong>Dinner style:</strong> <span th:text="${order.dinnerStyle} ?: '-'"></span></p>
-                <p><strong>Delivery time:</strong> <span th:text="${order.deliveryTime} ?: '-'"></span></p>
+                <p><strong>Delivery time:</strong> <span th:text="${order.deliveryTime != null ? #temporals.format(order.deliveryTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a') : '-'}"></span></p>
                 <p><strong>Delivery address:</strong> <span th:text="${order.deliveryAddress} ?: '-'"></span></p>
                 <p><strong>Card number:</strong> <span th:text="${order.cardNumber} ?: '-'"></span></p>
-                <p><strong>Total price:</strong> <span th:text="'₩' + ${order.totalPrice} ?: '-'"></span></p>
+                <p><strong>Total price:</strong> <span th:text="${order.totalPrice} != null ? '₩' + ${order.totalPrice} : '-'"></span></p>
                 <p><strong>Status:</strong> <span th:text="${order.status} ?: '-'"></span></p>
             </div>
 
