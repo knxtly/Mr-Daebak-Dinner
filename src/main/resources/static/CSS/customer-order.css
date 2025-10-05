@@ -194,6 +194,11 @@ a {
     text-align: center;
 }
 
+/* 사진을 통해 클릭하므로 select는 클릭 못하게 */
+#menuSelect {
+    pointer-events: none;
+}
+
 /* 라디오 버튼 전체를 감싸는 컨테이너 */
 .radio-group-wrapper {
     width: 100%;
