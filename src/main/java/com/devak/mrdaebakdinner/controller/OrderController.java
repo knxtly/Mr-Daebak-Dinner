@@ -62,7 +62,7 @@ public class OrderController {
                 orderErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
             }
 
-            model.addAttribute("orderErrorMessage", orderErrMsg.toString().trim());
+            model.addAttribute("orderErrMsg", orderErrMsg.toString().trim());
             return "customer/order";
         }
 
@@ -71,7 +71,7 @@ public class OrderController {
             OrderHistoryDTO placedOrder = orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
             redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
         } catch (InsufficientInventoryException e) {
-            model.addAttribute("itemErrorMessage", e.getMessage());
+            model.addAttribute("itemErrMsg", e.getMessage());
             model.addAttribute("insufficientItems", e.getInsufficientItems());
             return "customer/order";
         }
@@ -102,21 +102,12 @@ public class OrderController {
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId,
-                              RedirectAttributes redirectAttributes,
+                              Model model,
                               @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
-        try {
-            OrderHistoryDTO placedOrder = orderService.placeOrder(
-                    orderService.buildOrderDTO(orderId),
-                    orderService.buildOrderItemDTO(orderId),
-                    customerSessionDTO
-            );
-            redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
-        } catch (InsufficientInventoryException e) {
-            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
-            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
-            return "redirect:/customer/orders/new";
-        }
-        return "redirect:/customer/orders/success";
+        // 주문정보(OrderDTO, OrderItemDTO)를 order.html로 보냄
+        model.addAttribute("orderDTO", orderService.buildOrderDTO(orderId));
+        model.addAttribute("orderItemDTO", orderService.buildOrderItemDTO(orderId));
+        return "customer/order";
     }
 
     /* ============ order Detail ============ */
