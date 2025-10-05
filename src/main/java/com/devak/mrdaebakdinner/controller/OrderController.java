@@ -62,7 +62,7 @@ public class OrderController {
                 orderErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
             }
 
-            model.addAttribute("orderErrorMessage", orderErrMsg.toString().trim());
+            model.addAttribute("orderErrMsg", orderErrMsg.toString().trim());
             return "customer/order";
         }
 
@@ -71,7 +71,7 @@ public class OrderController {
             OrderHistoryDTO placedOrder = orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
             redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
         } catch (InsufficientInventoryException e) {
-            model.addAttribute("itemErrorMessage", e.getMessage());
+            model.addAttribute("itemErrMsg", e.getMessage());
             model.addAttribute("insufficientItems", e.getInsufficientItems());
             return "customer/order";
         }
@@ -104,7 +104,7 @@ public class OrderController {
     public String takeReorder(@PathVariable Long orderId,
                               RedirectAttributes redirectAttributes,
                               @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
-        try {
+        try { // TODO: 바로 주문하지 않고 주문정보를 order.html로 보냄
             OrderHistoryDTO placedOrder = orderService.placeOrder(
                     orderService.buildOrderDTO(orderId),
                     orderService.buildOrderItemDTO(orderId),
@@ -112,7 +112,7 @@ public class OrderController {
             );
             redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
         } catch (InsufficientInventoryException e) {
-            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("itemErrMsg", e.getMessage());
             redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
             return "redirect:/customer/orders/new";
         }
