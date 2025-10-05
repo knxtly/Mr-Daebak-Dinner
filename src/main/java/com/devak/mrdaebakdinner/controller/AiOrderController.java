@@ -52,16 +52,16 @@ public class AiOrderController {
                     "properties", Map.of(
                             "menu", Map.of(
                                     "type", "string",
-                                    "enum", List.of("VALENTINE","FRENCH","ENGLISH","CHAMPAGNE")
+                                    "enum", List.of("VALENTINE", "FRENCH", "ENGLISH", "CHAMPAGNE")
                             ),
                             "style", Map.of(
                                     "type", "string",
-                                    "enum", List.of("SIMPLE","GRAND","DELUXE")
+                                    "enum", List.of("SIMPLE", "GRAND", "DELUXE")
                             ),
                             "items", Map.of(
                                     "type", "object",
                                     "properties", ITEM_KEYS.stream().collect(HashMap::new,
-                                            (m,k) -> m.put(k, Map.of(
+                                            (m, k) -> m.put(k, Map.of(
                                                     "type", "integer", "minimum", 0
                                             )),
                                             HashMap::putAll),
@@ -96,22 +96,21 @@ public class AiOrderController {
                                - ENGLISH: eggscramble 1, bacon 1, bread 1, steak 1
                                - CHAMPAGNE: champagne 1, baguette 4, coffee_pot 1, wine 1, steak 1
                             3. 서빙 스타일은 SIMPLE, GRAND, DELUXE입니다.
-                               - 사용자가 style을 지정하지 않은 경우, CHAMPAGNE은 'GRAND', 나머지는 'SIMPLE'로 설정하세요.
-                            4. item 추가 요청이 있으면 해당 아이템 수량을 사용자가 원하는 만큼만 늘리세요.
-                            5. item 추가 요청에서 수량이 지정되지 않은 경우 1개만 늘리세요.
+                            4. 사용자가 style을 지정하지 않은 경우, CHAMPAGNE은 'GRAND' 로, VALENTINE, FRENCH, ENGLISH는 'SIMPLE' 로 설정하세요.
+                               - "CHAMPAGNE" 디너는 "SIMPLE" 스타일과 함께 주문할 수 없습니다.
+                               - 만약 사용자가 CHAMPAGNE + SIMPLE을 요청하면, menu, style, items를 비우고 comment에 안내 문구를 작성하세요.
+                            5. item 추가 요청이 있으면 해당 아이템 수량을 사용자가 원하는 만큼만 늘리세요.
+                            6. item 추가 요청에서 수량이 지정되지 않은 경우 1개만 늘리세요.
                                - 아이템이 기본 세트에 없으면 새로 추가합니다.
-                            6. item 삭제 요청이 있으면 해당 아이템 수량을 사용자가 원하는 만큼만 줄이세요.
+                            7. item 삭제 요청이 있으면 해당 아이템 수량을 사용자가 원하는 만큼만 줄이세요.
                                - 수량이 명시되지 않은 경우 해당 key를 0으로 설정하세요.
                                - 기본 세트에 없는 아이템이면 변경하지 마세요.
-                            7. CHAMPAGNE 디너는 SIMPLE 스타일과 함께 주문할 수 없습니다.
-                               - 만약 사용자가 CHAMPAGNE + SIMPLE을 요청하면, menu, style, items를 비우고 comment에 안내 문구를 작성하세요.
                             8. 'bread'와 'baguette'는 다른 아이템입니다.
                             9. 추천 요청이 있으면, 기본 세트 위에서 items를 증감하여 JSON Schema에 맞게 반환하고, comment에 추천 이유를 작성하세요.
                             10. 모든 items 수량은 정수이며 0 이상이어야 합니다.
                             11. JSON Schema의 items는 반드시 ITEM_KEYS 모든 키를 포함하세요. 없는 키는 0으로 채웁니다.
-                            12. menu, style, items 외에 입력이 부적절하거나 없는 필드는 비워두고 comment에 안내 문구를 작성하세요.
-                            13. comment는 한국어로 작성합니다.
-                                - 예) "여자 친구와의 특별한 저녁을 위해 발렌타인 디너를 추천합니다. 와인과 스테이크가 포함되어 있어 로맨틱한 분위기를 연출할 수 있습니다."
+                            12. 입력이 부적절하거나 요청이 없는 필드는 비워두고 comment에 안내 문구를 작성하세요.
+                            13. comment 작성 예시: 여자 친구와의 특별한 저녁을 위해 발렌타인 디너를 추천합니다. 와인과 스테이크가 포함되어 있어 로맨틱한 분위기를 연출할 수 있습니다.
                             """;
             String userPrompt = "사용자 입력: " + userInput;
 
