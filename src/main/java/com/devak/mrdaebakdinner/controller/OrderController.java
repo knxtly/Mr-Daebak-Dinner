@@ -102,21 +102,12 @@ public class OrderController {
     // 재주문 요청
     @GetMapping("/customer/order/reorder/{orderId}")
     public String takeReorder(@PathVariable Long orderId,
-                              RedirectAttributes redirectAttributes,
+                              Model model,
                               @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
-        try { // TODO: 바로 주문하지 않고 주문정보를 order.html로 보냄
-            OrderHistoryDTO placedOrder = orderService.placeOrder(
-                    orderService.buildOrderDTO(orderId),
-                    orderService.buildOrderItemDTO(orderId),
-                    customerSessionDTO
-            );
-            redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
-        } catch (InsufficientInventoryException e) {
-            redirectAttributes.addFlashAttribute("itemErrMsg", e.getMessage());
-            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
-            return "redirect:/customer/orders/new";
-        }
-        return "redirect:/customer/orders/success";
+        // 주문정보(OrderDTO, OrderItemDTO)를 order.html로 보냄
+        model.addAttribute("orderDTO", orderService.buildOrderDTO(orderId));
+        model.addAttribute("orderItemDTO", orderService.buildOrderItemDTO(orderId));
+        return "customer/order";
     }
 
     /* ============ order Detail ============ */
