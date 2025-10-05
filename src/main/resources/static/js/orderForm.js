@@ -1,6 +1,5 @@
 (function(){
     const menuSelect = document.getElementById('menuSelect');
-    const styleSelect = document.getElementById('styleSelect');
     const resetBtn = document.getElementById('resetBtn');
     const menuCards = document.querySelectorAll('.menu-card');
 
@@ -38,8 +37,8 @@
         resetItems();
 
         // 2. 스타일 옵션과 값 초기화
-        Array.from(styleSelect.options).forEach(opt => opt.disabled = false); // 모든 스타일 활성화
-        styleSelect.value = 'SIMPLE'; // 스타일 선택 값 초기화
+        document.querySelectorAll('input[name="dinnerStyle"]').forEach(radio => radio.disabled = false); // 모든 스타일 활성화
+        document.querySelector('#styleSimple').checked = true; // 'Simple'을 기본으로 선택
 
         // 3. 메뉴별 기본 아이템 값 설정
         switch(selectedValue){
@@ -67,10 +66,8 @@
                 items.steak.value = 1;
 
                 // CHAMPAGNE 메뉴의 특수 로직: SIMPLE 스타일 비활성화
-                Array.from(styleSelect.options).forEach(opt => {
-                    if(opt.value === 'SIMPLE') opt.disabled = true;
-                });
-                if(styleSelect.value === 'SIMPLE') styleSelect.value = 'GRAND';
+                document.querySelector('#styleSimple').disabled = true;
+                document.querySelector('#styleGrand').checked = true;
                 break;
         }
     }
@@ -95,8 +92,10 @@
     // reset 시 옵션과 아이템 재설정
     resetBtn.addEventListener('click', () => {
         resetItems();
-        Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
-        styleSelect.value = '';
+        document.querySelectorAll('input[name="dinnerStyle"]').forEach(radio => {
+            radio.disabled = false;
+            radio.checked = false;
+        });
         menuSelect.value = '';
 
         // 초기화 시 카드 선택 표시 제거
@@ -153,7 +152,11 @@
 
             // JSON => menu, style 반영
             if (data.menu !== undefined && data.menu !== null) menuSelect.value = data.menu;
-            if (data.style !== undefined && data.style !== null) styleSelect.value = data.style;
+            if (data.style) {
+                // data.style 값(예: "SIMPLE")과 일치하는 value를 가진 라디오 버튼을 찾아서 체크
+                const styleRadio = document.querySelector(`input[name="dinnerStyle"][value="${data.style.toUpperCase()}"]`);
+                if (styleRadio) styleRadio.checked = true;
+            }
 
             // JSON => item 반영
             resetItems();

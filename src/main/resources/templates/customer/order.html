@@ -44,14 +44,6 @@
         </div>
 
         <!-- 1. 디너 종류 선택 -->
-        <select id="menuSelect" th:field="*{dinnerKind}" class="hidden-select">
-            <option value="" selected hidden>메뉴를 선택하세요</option>
-            <option value="VALENTINE">Valentine dinner</option>
-            <option value="FRENCH">French dinner</option>
-            <option value="ENGLISH">English dinner</option>
-            <option value="CHAMPAGNE">Champagne Feast dinner</option>
-        </select>
-
         <div class="top-selection-row">
             <div class="menu-area">
                 <h2 class="selection-heading">1. 디너 종류 선택</h2>
@@ -60,43 +52,84 @@
                         <img th:src="@{/images/Valentine_Dinner.png}" alt="Valentine dinner" class="menu-image">
                         <div class="card-info">
                             <h3>VALENTINE</h3>
-                            <p>로맨틱한 밤을 위한 스페셜 디너 세트</p>
+                            <p>사랑하는 연인을 위한 가장 완벽한 선택.<br>섬세한 큐피드와 하트 장식으로 포인트를 준 플레이트 위에서 펼쳐지는 와인과 스테이크의 우아한 조화.</p>
                         </div>
                     </div>
                     <div class="menu-card" data-menu-value="FRENCH">
                         <img th:src="@{/images/French_Dinner.png}" alt="French dinner" class="menu-image">
                         <div class="card-info">
                             <h3>FRENCH</h3>
-                            <p>클래식하고 우아한 정통 프랑스 코스</p>
+                            <p>프렌치 다이닝의 정수.<br>샐러드로 시작해서 스테이크, 와인, 커피로 이어지는 미식의 절정.</p>
                         </div>
                     </div>
                     <div class="menu-card" data-menu-value="ENGLISH">
                         <img th:src="@{/images/English_Dinner.png}" alt="English dinner" class="menu-image">
                         <div class="card-info">
                             <h3>ENGLISH</h3>
-                            <p>따뜻하고 풍성한 브런치 스타일의 디너</p>
+                            <p>영국의 맛을 대표하는 4가지 메뉴의 조화.<br>부드러운 에그 스크램블, 베이컨, 빵, 풍미 깊은 스테이크.</p>
                         </div>
                     </div>
                     <div class="menu-card" data-menu-value="CHAMPAGNE">
                         <img th:src="@{/images/Champagne_Dinner.png}" alt="Champagne Feast dinner" class="menu-image">
                         <div class="card-info">
                             <h3>CHAMPAGNE</h3>
-                            <p>샴페인과 함께하는 화려한 파티 만찬</p>
+                            <p>두 분을 위한 완벽한 축하 테이블.<br>샴페인 1병, 바삭한 바게트 빵 4개, 와인, 메인 스테이크, 그리고 커피 1포트까지.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 2. 서빙 스타일 선택 -->
-            <div class="style-area">
-                <h2 class="selection-heading">2. 서빙 스타일 선택</h2>
-                <div class="style-select-wrapper">
-                    <select id="styleSelect" th:field="*{dinnerStyle}">
-                        <option value="" selected hidden>스타일을 선택하세요</option>
-                        <option value="SIMPLE">Simple</option>
-                        <option value="GRAND">Grand</option>
-                        <option value="DELUXE">Deluxe</option>
-                    </select>
+            <div class="selections-wrapper">
+                <div class="kind-selection-area">
+                    <h2 class="selection-heading">선택된 디너</h2>
+                    <div class="kind-select-wrapper">
+                        <select id="menuSelect" th:field="*{dinnerKind}">
+                            <option value="" selected hidden>위 사진을 클릭하여 메뉴를 선택하세요</option>
+                            <option value="VALENTINE">Valentine dinner</option>
+                            <option value="FRENCH">French dinner</option>
+                            <option value="ENGLISH">English dinner</option>
+                            <option value="CHAMPAGNE">Champagne Feast dinner</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="style-area">
+                    <h2 class="selection-heading">2. 서빙 스타일 선택</h2>
+
+                    <div class="radio-group-wrapper" role="radiogroup" aria-labelledby="style-heading">
+
+                        <div class="radio-option">
+                            <input type="radio" th:field="*{dinnerStyle}" id="styleSimple" th:value="'SIMPLE'">
+                            <label for="styleSimple">
+                                <span class="radio-label-title">Simple</span>
+                                <p class="radio-description">
+                                    플라스틱 식기와 종이 냅킨, 플라스틱 와인잔이 제공되는 기본 서비스입니다.
+                                </p>
+                            </label>
+                        </div>
+
+                        <div class="radio-option">
+                            <input type="radio" th:field="*{dinnerStyle}" id="styleGrand" th:value="'GRAND'">
+                            <label for="styleGrand">
+                                <span class="radio-label-title">Grand</span>
+                                <p class="radio-description">
+                                    도자기 식기와 면 냅킨, 플라스틱 와인잔이 나무 쟁반에 제공되어 격식 있는 분위기를 연출합니다.
+                                </p>
+                            </label>
+                        </div>
+
+                        <div class="radio-option">
+                            <input type="radio" th:field="*{dinnerStyle}" id="styleDeluxe" th:value="'DELUXE'">
+                            <label for="styleDeluxe">
+                                <span class="radio-label-title">Deluxe</span>
+                                <p class="radio-description">
+                                    작은 꽃병과 유리 와인잔이 추가되어, 린넨 냅킨과 함께 나무 쟁반에 제공되는 서비스입니다.
+                                </p>
+                            </label>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
