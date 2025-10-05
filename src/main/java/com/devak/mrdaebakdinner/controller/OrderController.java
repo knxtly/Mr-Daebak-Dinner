@@ -9,9 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -24,26 +26,44 @@ public class OrderController {
 
     // Customer: 주문 페이지 GET 요청
     @GetMapping("/customer/orders/new")
-    public String showOrderPage() {
+    public String showOrderPage(Model model) {
+        if (!model.containsAttribute("orderDTO")) {
+            model.addAttribute("orderDTO", new OrderDTO());
+        }
+        if (!model.containsAttribute("orderItemDTO")) {
+            model.addAttribute("orderItemDTO", new OrderItemDTO());
+        }
         return "customer/order";
     }
 
     // 주문 요청
     @PostMapping("/customer/orders/new")
-    public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
+    public String takeOrder(@Valid @ModelAttribute("orderDTO") OrderDTO orderDTO,
                             BindingResult bindingResult,
-                            @ModelAttribute OrderItemDTO orderItemDTO,
+                            @ModelAttribute("orderItemDTO") OrderItemDTO orderItemDTO,
+                            Model model,
                             RedirectAttributes redirectAttributes,
                             @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
 
-        if (bindingResult.hasErrors()) { // Valid체크에서 오류가 있을 시
-            StringBuilder orderErrorMsg = new StringBuilder();
-            bindingResult.getFieldErrors().forEach(fieldError -> {
-                orderErrorMsg.append(fieldError.getDefaultMessage()).append("<br>");
-            });
-            redirectAttributes.addFlashAttribute("orderErrorMessage",
-                    orderErrorMsg.toString().trim());
-            return "redirect:/customer/orders/new";
+        if (bindingResult.hasErrors()) {
+            StringBuilder orderErrMsg = new StringBuilder();
+
+            // 원하는 출력 순서
+            List<String> fieldOrder = List.of("dinnerKind", "dinnerStyle", "deliveryAddress", "cardNumber");
+
+            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
+            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
+                    .sorted(Comparator.comparingInt(
+                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
+                    ))
+                    .toList();
+
+            for (FieldError fieldError : sortedErrors) {
+                orderErrMsg.append(fieldError.getDefaultMessage()).append("<br>");
+            }
+
+            model.addAttribute("orderErrorMessage", orderErrMsg.toString().trim());
+            return "customer/order";
         }
 
         try {
@@ -51,9 +71,9 @@ public class OrderController {
             OrderHistoryDTO placedOrder = orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
             redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
         } catch (InsufficientInventoryException e) {
-            redirectAttributes.addFlashAttribute("itemErrorMessage", e.getMessage());
-            redirectAttributes.addFlashAttribute("insufficientItems", e.getInsufficientItems());
-            return "redirect:/customer/orders/new";
+            model.addAttribute("itemErrorMessage", e.getMessage());
+            model.addAttribute("insufficientItems", e.getInsufficientItems());
+            return "customer/order";
         }
         return "redirect:/customer/orders/success";
     }

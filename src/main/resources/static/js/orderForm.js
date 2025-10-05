@@ -2,7 +2,16 @@
     const menuSelect = document.getElementById('menuSelect');
     const styleSelect = document.getElementById('styleSelect');
     const resetBtn = document.getElementById('resetBtn');
-    const menuCards = document.querySelectorAll('.menu-card'); // class = menu-card인 모든 요소 저장
+    const menuCards = document.querySelectorAll('.menu-card');
+
+    const voiceBtn = document.getElementById('voiceBtn');
+    const voiceInput = document.getElementById('voiceText');
+    const voiceForm = document.getElementById('voiceForm');
+    const voiceMessage = document.getElementById('voiceMessage');
+
+    let recognition = null;
+    let recognizing = false;
+    let interimTranscript = "";
 
     // 아이템 input들을 객체로 캐싱
     const items = {
@@ -18,19 +27,19 @@
         champagne: document.getElementById('champagne')
     };
 
-    // 모든 아이템 수량 0으로 초기화
+    // 모든 아이템 수량 0으로 초기화하는 함수
     function resetItems() {
         Object.values(items).forEach(input => input.value = 0);
     }
 
     // 메뉴 선택 시 스타일/아이템 초기화 및 기본값 반영 로직
     function updateMenuSelection(selectedValue) {
-        // 1. 모든 아이템 수량 초기화 (가장 중요한 요구사항)
+        // 1. 모든 아이템 수량 초기화
         resetItems();
 
-        // 2. 스타일 옵션과 값 초기화 (가장 중요한 요구사항)
+        // 2. 스타일 옵션과 값 초기화
         Array.from(styleSelect.options).forEach(opt => opt.disabled = false); // 모든 스타일 활성화
-        styleSelect.value = ''; // 스타일 선택 값 초기화
+        styleSelect.value = 'SIMPLE'; // 스타일 선택 값 초기화
 
         // 3. 메뉴별 기본 아이템 값 설정
         switch(selectedValue){
@@ -59,10 +68,9 @@
 
                 // CHAMPAGNE 메뉴의 특수 로직: SIMPLE 스타일 비활성화
                 Array.from(styleSelect.options).forEach(opt => {
-                    if(opt.value === 'SIMPLE'){
-                        opt.disabled = true;
-                    }
+                    if(opt.value === 'SIMPLE') opt.disabled = true;
                 });
+                if(styleSelect.value === 'SIMPLE') styleSelect.value = 'GRAND';
                 break;
         }
     }
@@ -93,5 +101,80 @@
 
         // 초기화 시 카드 선택 표시 제거
         menuCards.forEach(c => c.classList.remove('selected'));
+    });
+
+    // 음성 인식 버튼
+    voiceBtn.addEventListener('click', () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) { alert("브라우저가 음성인식을 지원하지 않습니다."); return; }
+        if (recognizing) { recognition.stop(); recognizing = false; return; }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = "ko-KR";
+        recognition.interimResults = true;
+        recognizing = true;
+        interimTranscript = "";
+        const originalText = "음성 인식";
+        voiceBtn.textContent = "말하는 중... (클릭 시 종료)";
+        recognition.start();
+
+        recognition.onresult = (event) => {
+            let finalTranscript = "";
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+                else interimTranscript = event.results[i][0].transcript;
+            }
+            voiceInput.value = finalTranscript || interimTranscript;
+        };
+
+        recognition.onend = () => {
+            recognizing = false;
+            voiceBtn.textContent = originalText;
+            if (interimTranscript && !voiceInput.value) voiceInput.value = interimTranscript;
+            voiceMessage.textContent = "인식 종료. 필요 시 텍스트를 수정 후 적용 버튼을 누르세요.";
+        };
+    });
+
+    // 적용 버튼 (AI → JSON → Form 반영)
+    voiceForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = voiceInput.value.trim();
+        if (!text) { voiceMessage.textContent = "텍스트가 비어 있습니다."; return; }
+        voiceMessage.textContent = "AI 파싱 중...";
+
+        try {
+            const response = await fetch("/customer/ai-parse-order", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ text })
+            });
+            const data = await response.json();
+            if (data.error) { voiceMessage.textContent = "Error: " + data.error; return; }
+
+            // JSON => menu, style 반영
+            if (data.menu !== undefined && data.menu !== null) menuSelect.value = data.menu;
+            if (data.style !== undefined && data.style !== null) styleSelect.value = data.style;
+
+            // JSON => item 반영
+            resetItems();
+            if (data.items && typeof data.items === "object") {
+                Object.keys(items).forEach(key => {
+                    let val = parseInt(data.items[key]);
+                    items[key].value = isNaN(val) || val < 0 ? 0 : val;
+                });
+            }
+
+            // JSON => deliveryAddress, cardNumber 반영
+            document.getElementById("deliveryAddress").value = data.deliveryAddress || "";
+            document.getElementById("cardNumber").value = data.cardNumber || "";
+
+            voiceMessage.textContent = "주문 폼이 자동으로 채워졌습니다.";
+            if (data.comment) { // comment가 있으면 추가 표시
+                voiceMessage.innerHTML += "<br>Comment: " + (data.comment ?? "");
+            }
+
+        } catch (err) {
+            voiceMessage.textContent = "오류: " + err.message;
+        }
     });
 })();

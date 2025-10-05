@@ -41,8 +41,8 @@
                 <input type="password" id="password" name="password" placeholder="PASSWORD">
             </div>
 
-            <div th:if="${loginErrorMessage}" class = "login-exception-container">
-                <p th:text="${loginErrorMessage}" class = "login-exception-msg"></p>
+            <div th:if="${loginErrMsg}" class = "login-exception-container">
+                <p th:text="${loginErrMsg}" class = "login-exception-msg"></p>
             </div>
 
             <button type="submit" class="login-btn-submit">LOG IN</button>

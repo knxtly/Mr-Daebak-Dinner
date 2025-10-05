@@ -26,7 +26,7 @@
 <main class="container">
     <div class="order-detail-title">ORDER DETAIL</div>
     <div class="divider"></div>
-    <div class="order-date">ORDER DATE: <span th:text="${#temporals.format(order.orderTime, 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></div>
+    <div class="order-date">ORDER DATE: <span th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></div>
 
     <div class="dinner-info-box">
         <div class="dinner-title"><span th:text="${order.dinnerKind} ?: '-'"></span></div>
@@ -35,7 +35,7 @@
         <table class="detail-table">
             <tr>
                 <td>order time</td>
-                <td th:text="${#temporals.format(order.orderTime, 'yyyy, MMM d @ h:mm a')} ?: '-'"></td>
+                <td th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: '-'"></td>
             </tr>
             <tr>
                 <td>Dinner kind</td>
@@ -51,11 +51,11 @@
             </tr>
             <tr>
                 <td>Delivery time</td>
-                <td th:text="${order.deliveryTime} ?: '-'"></td>
+                <td th:text="${order.deliveryTime != null ? #temporals.format(order.deliveryTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a') : '-'}"></td>
             </tr>
             <tr>
                 <td>Total price</td>
-                <td th:text="'₩' + ${order.totalPrice} ?: '-'"></td>
+                <td th:text="${order.totalPrice} != null ? '₩' + ${order.totalPrice} : '-'"></td>
             </tr>
             <tr>
                 <td>Card number</td>
