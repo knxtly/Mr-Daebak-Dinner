@@ -14,7 +14,7 @@ import lombok.ToString;
 public class CustomerSignUpDTO {
     @NotBlank(message = "로그인 ID는 필수 입력값입니다.")
     @Size(min = 4, max = 30, message = "로그인 ID는 4~30자여야 합니다.")
-    private String loginId; // 외부 비즈니스용 ID
+    private String loginId;
 
     @NotBlank(message = "PW는 필수 입력값입니다.")
     @Size(min = 4, message = "PW는 4자 이상이어야 합니다.")
