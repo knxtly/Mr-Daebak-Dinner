@@ -82,17 +82,26 @@ public class OrderService {
                                       CustomerSessionDTO customerSessionDTO) {
         // 주문한 customer 찾기
         CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 고객이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("고객 정보가 없습니다."));
 
-        // 주문될 orderEntity 생성
-        OrderEntity order = OrderMapper.toOrderEntity(orderDTO, customerEntity);
+        // CHAMPAGNE + SIMPLE 스타일은 거절
+        if (OrderDnrKind.CHAMPAGNE == orderDTO.getDinnerKind()
+                && OrderDnrStyle.SIMPLE == orderDTO.getDinnerStyle()) {
+            throw new IllegalArgumentException("샴페인 축제 디너와 SIMPLE 스타일은 같이 주문할 수 없습니다.");
+        }
+        // 사실상 없는 주문 (모든 아이템 0개) 거절
+        if (orderItemDTO.getOrderItems()
+                .values()
+                .stream()
+                .mapToInt(Integer::intValue)
+                .sum() == 0) {
+            throw new IllegalArgumentException("모든 아이템이 0개인 주문을 요청할 수 없습니다.");
+        }
 
-        // OrderItem 조사해서 담을 변수
-        List<OrderItemEntity> orderItemEntityList = new ArrayList<>();
-        // 부족한 재고의 이름을 모은 리스트
-        List<String> insufficientItems = new ArrayList<>();
-        // 총 가격(totalPrice)을 담을 변수
-        int totalPrice = 0;
+        OrderEntity order = OrderMapper.toOrderEntity(orderDTO, customerEntity);    // 주문될 orderEntity 생성
+        List<OrderItemEntity> orderItemEntityList = new ArrayList<>();  // OrderItem 조사해서 담을 변수
+        List<String> insufficientItems = new ArrayList<>(); // 부족한 재고의 이름을 모은 리스트
+        int totalPrice = 0; // 총 가격(totalPrice)을 담을 변수
 
         // OrderItemDTO 내부 (주문한 item) 반복
         for (Map.Entry<String, Integer> entry : orderItemDTO.getOrderItems().entrySet()) {

@@ -33,11 +33,11 @@
           autocomplete="off"
           class="order-form-container">
         <!-- 에러 메시지 -->
-        <div th:if="${orderErrorMessage}">
-            <p th:utext="${orderErrorMessage}" class="error-message"></p>
+        <div th:if="${orderErrMsg}">
+            <p th:utext="${orderErrMsg}" class="error-message"></p>
         </div>
-        <div th:if="${itemErrorMessage}">
-            <p th:utext="${itemErrorMessage}" class="error-message"></p>
+        <div th:if="${itemErrMsg}">
+            <p th:utext="${itemErrMsg}" class="error-message"></p>
             <ul>
                 <li th:each="item : ${insufficientItems}" th:text="${item}" style="color: darkred;"></li>
             </ul>
