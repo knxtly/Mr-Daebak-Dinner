@@ -195,4 +195,21 @@
            voiceMessage.textContent = "오류: " + err.message;
        }
     });
+
+    // 페이지 로드 시 기존 선택된 메뉴를 시각적으로 복원
+    document.addEventListener('DOMContentLoaded', () => {
+        const initiallySelectedMenu = menuSelect.value;
+
+        if (initiallySelectedMenu) {
+            // 기존 selectMenu() 함수는 아이템 수량을 초기화하므로,
+            // 여기서는 기존 입력값을 유지하기 위해 시각적인 부분(.selected 클래스 추가)만 처리합니다.
+            menuCards.forEach(card => {
+                if (card.dataset.menuValue === initiallySelectedMenu) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+        }
+    });
 })();
