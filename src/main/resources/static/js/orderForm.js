@@ -188,7 +188,7 @@
 
            voiceMessage.textContent = "주문 폼이 자동으로 채워졌습니다.";
            if (data.comment) { // comment가 있으면 추가 표시
-               voiceMessage.innerHTML += "<br>Comment: " + (data.comment ?? "");
+               voiceMessage.textContent = "Comment: " + (data.comment ?? "");
            }
 
        } catch (err) {

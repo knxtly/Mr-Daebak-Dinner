@@ -70,12 +70,18 @@ public class OrderController {
             // 주문처리
             OrderHistoryDTO placedOrder = orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
             redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
+            return "redirect:/customer/orders/success";
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("loginErrMsg", e.getMessage());
+            return "redirect:/customer/login";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("orderErrMsg", e.getMessage());
+            return "customer/order";
         } catch (InsufficientInventoryException e) {
             model.addAttribute("itemErrMsg", e.getMessage());
             model.addAttribute("insufficientItems", e.getInsufficientItems());
             return "customer/order";
         }
-        return "redirect:/customer/orders/success";
     }
 
     @GetMapping("/customer/orders/success")

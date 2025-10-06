@@ -51,9 +51,7 @@ public class CustomerController {
     public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
                                 BindingResult bindingResult,
                                 Model model,
-                                RedirectAttributes redirectAttributes,
-                                HttpSession session,
-                                HttpServletRequest request) {
+                                HttpSession session) {
         if (bindingResult.hasErrors()) {
             StringBuilder loginErrMsg = new StringBuilder();
 
