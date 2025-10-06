@@ -22,7 +22,7 @@
             <a th:href="@{/staff/inventory}" class="nav-item">Inventory</a>
             <hr>
             <a th:href="@{/staff/logout}" class="nav-item logout-link">Logout</a>
-            <a th:href="@{/}" class="nav-item index-link">Go to Index Page</a>
+            <a th:href="@{/}" class="nav-item index-link">Customer Page</a>
         </nav>
     </aside>
 
@@ -52,8 +52,8 @@
 
             <div class="item-list">
                 <p><strong>--- Items Ordered ---</strong></p>
-                <div th:each="entry : ${orderItem.orderItems}" class="order-item-row">
-                    <span th:text="${entry.key}"></span>
+                <div th:each="entry : ${orderItem.orderItems}" th:if="${entry.value > 0}" class="order-item-row">
+                    <span th:text="#{'item.' + ${entry.key}}"></span>
                     <span class="quantity" th:text="${entry.value}"></span>
                 </div>
             </div>

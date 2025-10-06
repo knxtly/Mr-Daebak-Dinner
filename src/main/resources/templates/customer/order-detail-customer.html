@@ -76,8 +76,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="entry : ${orderItem.orderItems}">
-                    <td th:text="${entry.key}"></td>
+                <tr th:each="entry : ${orderItem.orderItems}" th:if="${entry.value > 0}">
+                    <td th:text="#{'item.' + ${entry.key}}"></td>
                     <td th:text="${entry.value}"></td>
                 </tr>
                 </tbody>

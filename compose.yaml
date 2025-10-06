@@ -29,6 +29,9 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+    # messages.properties 적용 위해 추가
+    environment:
+      - JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
     # 로컬 시 활성화
     env_file:
       - .env

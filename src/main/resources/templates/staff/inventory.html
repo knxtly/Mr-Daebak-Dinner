@@ -22,7 +22,7 @@
             <a th:href="@{/staff/inventory}" class="nav-item active">Inventory</a>
             <hr>
             <a th:href="@{/staff/logout}" class="nav-item logout-link">Logout</a>
-            <a th:href="@{/}" class="nav-item index-link">Go to Index Page</a>
+            <a th:href="@{/}" class="nav-item index-link">Customer Page</a>
         </nav>
     </aside>
 
@@ -40,7 +40,7 @@
             <tbody>
             <tr th:each="inv : ${inventoryList}">
                 <td th:text="${inv.itemId}"></td>
-                <td th:text="${inv.itemName}"></td>
+                <td th:text="#{'item.' + ${inv.itemName}}"></td>
                 <td th:text="${inv.quantity}"></td>
                 <td class="management-cell">
                     <form method="post" class="inventory-form">

@@ -1,6 +1,5 @@
 (function(){
     const menuSelect = document.getElementById('menuSelect');
-    const styleSelect = document.getElementById('styleSelect');
     const resetBtn = document.getElementById('resetBtn');
     const menuCards = document.querySelectorAll('.menu-card');
 
@@ -38,8 +37,8 @@
         resetItems();
 
         // 2. 스타일 옵션과 값 초기화
-        Array.from(styleSelect.options).forEach(opt => opt.disabled = false); // 모든 스타일 활성화
-        styleSelect.value = 'SIMPLE'; // 스타일 선택 값 초기화
+        document.querySelectorAll('input[name="dinnerStyle"]').forEach(radio => radio.disabled = false); // 모든 스타일 활성화
+        document.querySelector('#styleSimple').checked = true; // 'Simple'을 기본으로 선택
 
         // 3. 메뉴별 기본 아이템 값 설정
         switch(selectedValue){
@@ -67,36 +66,47 @@
                 items.steak.value = 1;
 
                 // CHAMPAGNE 메뉴의 특수 로직: SIMPLE 스타일 비활성화
-                Array.from(styleSelect.options).forEach(opt => {
-                    if(opt.value === 'SIMPLE') opt.disabled = true;
-                });
-                if(styleSelect.value === 'SIMPLE') styleSelect.value = 'GRAND';
+                document.querySelector('#styleSimple').disabled = true;
+                document.querySelector('#styleGrand').checked = true;
                 break;
         }
+    }
+
+    function selectMenu(menuValue) {
+        if (!menuValue) return; // 메뉴 값이 없으면 아무것도 하지 않음
+
+        const upperMenuValue = menuValue.toUpperCase();
+
+        // 1. 시각적 활성화/비활성화
+        menuCards.forEach(card => {
+            if (card.dataset.menuValue === upperMenuValue) {
+                card.classList.add('selected');
+            } else {
+                card.classList.remove('selected');
+            }
+        });
+
+        // 2. 숨겨진 <select> 값 업데이트 (폼 제출을 위해 필수)
+        menuSelect.value = upperMenuValue;
+
+        // 3. 아이템/스타일 초기화 및 기본값 설정 로직 실행
+        updateMenuSelection(upperMenuValue);
     }
 
     // --- 메뉴 카드 클릭 이벤트 핸들러 ---
     menuCards.forEach(card => {
         card.addEventListener('click', () => {
             const menuValue = card.getAttribute('data-menu-value');
-
-            // 1. 시각적 활성화/비활성화
-            menuCards.forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-
-            // 2. 숨겨진 <select> 값 업데이트 (폼 제출을 위해 필수)
-            menuSelect.value = menuValue;
-
-            // 3. 아이템/스타일 초기화 및 기본값 설정 로직 실행
-            updateMenuSelection(menuValue);
+            selectMenu(menuValue); // 새로 만든 함수 호출
         });
     });
-
     // reset 시 옵션과 아이템 재설정
     resetBtn.addEventListener('click', () => {
         resetItems();
-        Array.from(styleSelect.options).forEach(opt => opt.disabled = false);
-        styleSelect.value = '';
+        document.querySelectorAll('input[name="dinnerStyle"]').forEach(radio => {
+            radio.disabled = false;
+            radio.checked = false;
+        });
         menuSelect.value = '';
 
         // 초기화 시 카드 선택 표시 제거
@@ -142,39 +152,64 @@
         if (!text) { voiceMessage.textContent = "텍스트가 비어 있습니다."; return; }
         voiceMessage.textContent = "AI 파싱 중...";
 
-        try {
-            const response = await fetch("/customer/ai-parse-order", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ text })
+        // ... voiceForm submit 이벤트 리스너 내부 try 블록
+       try {
+           const response = await fetch("/customer/ai-parse-order", {
+               method: "POST",
+               headers: {"Content-Type": "application/json"},
+               body: JSON.stringify({ text })
+           });
+           const data = await response.json();
+           if (data.error) { voiceMessage.textContent = "Error: " + data.error; return; }
+
+           // JSON => menu, style 반영
+           if (data.menu) {
+                   selectMenu(data.menu);
+           }
+           if (data.style) {
+               const styleRadio = document.querySelector(`input[name="dinnerStyle"][value="${data.style.toUpperCase()}"]`);
+               if (styleRadio) styleRadio.checked = true;
+           }
+
+           // JSON => item 반영
+           // selectmenu가 이미 아이템 초기화 수행하므로 resetItems() 제거
+           if (data.items && typeof data.items === "object") {
+               Object.keys(data.items).forEach(key => {
+                   if (items[key]) { // 우리 item 목록에 있는 키일 경우에만
+                       let val = parseInt(data.items[key]);
+                       items[key].value = isNaN(val) || val < 0 ? 0 : val;
+                   }
+               });
+           }
+
+           // JSON => deliveryAddress, cardNumber 반영
+           document.getElementById("deliveryAddress").value = data.deliveryAddress || "";
+           document.getElementById("cardNumber").value = data.cardNumber || "";
+
+           voiceMessage.textContent = "주문 폼이 자동으로 채워졌습니다.";
+           if (data.comment) { // comment가 있으면 추가 표시
+               voiceMessage.innerHTML += "<br>Comment: " + (data.comment ?? "");
+           }
+
+       } catch (err) {
+           voiceMessage.textContent = "오류: " + err.message;
+       }
+    });
+
+    // 페이지 로드 시 기존 선택된 메뉴를 시각적으로 복원
+    document.addEventListener('DOMContentLoaded', () => {
+        const initiallySelectedMenu = menuSelect.value;
+
+        if (initiallySelectedMenu) {
+            // 기존 selectMenu() 함수는 아이템 수량을 초기화하므로,
+            // 여기서는 기존 입력값을 유지하기 위해 시각적인 부분(.selected 클래스 추가)만 처리합니다.
+            menuCards.forEach(card => {
+                if (card.dataset.menuValue === initiallySelectedMenu) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
             });
-            const data = await response.json();
-            if (data.error) { voiceMessage.textContent = "Error: " + data.error; return; }
-
-            // JSON => menu, style 반영
-            if (data.menu !== undefined && data.menu !== null) menuSelect.value = data.menu;
-            if (data.style !== undefined && data.style !== null) styleSelect.value = data.style;
-
-            // JSON => item 반영
-            resetItems();
-            if (data.items && typeof data.items === "object") {
-                Object.keys(items).forEach(key => {
-                    let val = parseInt(data.items[key]);
-                    items[key].value = isNaN(val) || val < 0 ? 0 : val;
-                });
-            }
-
-            // JSON => deliveryAddress, cardNumber 반영
-            document.getElementById("deliveryAddress").value = data.deliveryAddress || "";
-            document.getElementById("cardNumber").value = data.cardNumber || "";
-
-            voiceMessage.textContent = "주문 폼이 자동으로 채워졌습니다.";
-            if (data.comment) { // comment가 있으면 추가 표시
-                voiceMessage.innerHTML += "<br>Comment: " + (data.comment ?? "");
-            }
-
-        } catch (err) {
-            voiceMessage.textContent = "오류: " + err.message;
         }
     });
 })();

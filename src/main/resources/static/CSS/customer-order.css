@@ -95,15 +95,7 @@ a {
     gap: 30px;
 }
 
-/* 숨겨진 드롭다운 (JS가 값 설정을 위해 사용) */
-.hidden-select {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-    visibility: hidden;
-}
-
-/* --- TOP ROW: 디너 종류 (카드)와 서빙 스타일 (드롭다운) 수평 배치 --- */
+/* --- TOP ROW: 디너 종류 (카드)와 서빙 스타일 (드롭다운) 수직 배치 --- */
 .top-selection-row {
     display: flex;
     gap: 30px;
@@ -114,14 +106,6 @@ a {
 
 .menu-area {
     flex: 3; /* 메뉴 영역이 3배 더 넓게 공간 차지 */
-}
-
-.style-area {
-    flex: 1; /* 스타일 영역은 좁게 공간 차지 */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* 내부 요소를 중앙에 배치 */
-    padding-top: 50px; /* 메뉴 카드와 높이를 시각적으로 맞추기 위한 여백 */
 }
 
 .selection-heading {
@@ -183,11 +167,25 @@ a {
 }
 
 /* --- 서빙 스타일 선택 영역 --- */
-.style-select-wrapper {
+.selections-wrapper {
+    max-width: 300px;
+    min-width: 200px;
+    flex-shrink: 0;
+}
+
+.kind-selection-area {
+    flex: 1; /* 스타일 영역은 좁게 공간 차지 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 내부 요소를 중앙에 배치 */
+    padding-top: 50px; /* 메뉴 카드와 높이를 시각적으로 맞추기 위한 여백 */
+}
+
+.kind-select-wrapper {
     width: 100%;
 }
 
-.style-select-wrapper select {
+.kind-select-wrapper select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -196,6 +194,55 @@ a {
     text-align: center;
 }
 
+/* 사진을 통해 클릭하므로 select는 클릭 못하게 */
+#menuSelect {
+    pointer-events: none;
+}
+
+/* 라디오 버튼 전체를 감싸는 컨테이너 */
+.radio-group-wrapper {
+    width: 100%;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* 개별 라디오 버튼 옵션 (input + label + p) */
+.radio-option {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.radio-option:last-child {
+    border-bottom: none; /* 마지막 옵션의 밑줄은 제거 */
+}
+
+.radio-option:hover {
+    background-color: #f9f9f9;
+}
+
+/* 라디오 버튼과 라벨 정렬 */
+.radio-option input[type="radio"] {
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.radio-option label {
+    font-weight: bold;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+/* 라디오 버튼 설명 텍스트 */
+.radio-description {
+    font-size: 14px;
+    color: #555;
+    margin-top: 8px;
+    margin-left: 24px; /* 라디오 버튼 너비만큼 들여쓰기 */
+    line-height: 1.6;
+}
 
 /* --- 3. 주문 구성 (옵션) 섹션 --- */
 .order-items-fieldset {
