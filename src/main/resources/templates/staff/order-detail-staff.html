@@ -52,8 +52,8 @@
 
             <div class="item-list">
                 <p><strong>--- Items Ordered ---</strong></p>
-                <div th:each="entry : ${orderItem.orderItems}" class="order-item-row">
-                    <span th:text="${entry.key}"></span>
+                <div th:each="entry : ${orderItem.orderItems}" th:if="${entry.value > 0}" class="order-item-row">
+                    <span th:text="#{'item.' + ${entry.key}}"></span>
                     <span class="quantity" th:text="${entry.value}"></span>
                 </div>
             </div>
