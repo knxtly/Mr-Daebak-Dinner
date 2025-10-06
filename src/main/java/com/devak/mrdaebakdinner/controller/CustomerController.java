@@ -14,13 +14,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +33,8 @@ public class CustomerController {
 
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
-    public String showCustomerInterface(HttpSession session) {
+    public String showCustomerInterface(@ModelAttribute CustomerLoginDTO customerLoginDTO,
+                                        HttpSession session) {
         // 이미 customer session이 있으면 바로 main화면으로
         if (session.getAttribute("loggedInCustomer") != null) {
             return "redirect:/customer/main";
@@ -50,32 +49,24 @@ public class CustomerController {
                                 Model model,
                                 HttpSession session) {
         if (bindingResult.hasErrors()) {
-            StringBuilder loginErrMsg = new StringBuilder();
-
-            // 원하는 출력 순서
-            List<String> fieldOrder = List.of("loginId", "password");
-
-            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
-            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
-                    .sorted(Comparator.comparingInt(
-                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
-                    ))
-                    .toList();
-            for (FieldError fieldError : sortedErrors) {
-                loginErrMsg.append(fieldError.getDefaultMessage()).append("\n");
+            if (bindingResult.hasFieldErrors("password")) {
+                model.addAttribute("loginErrMsg",
+                        bindingResult.getFieldError("password").getDefaultMessage());
+                if (bindingResult.hasFieldErrors("loginId")) {
+                    model.addAttribute("loginErrMsg",
+                            bindingResult.getFieldError("loginId").getDefaultMessage());
+                }
             }
-
-            model.addAttribute("loginErrMsg", loginErrMsg.toString().trim());
             return "customer/customer";
         }
 
         try {
+            // 로그인 시도
+            CustomerSessionDTO customerSessionDTO = customerService.login(customerLoginDTO);
             // Staff 세션 있으면 삭제
             if (session.getAttribute("loggedInStaff") != null) {
                 session.removeAttribute("loggedInStaff");
             }
-            // 로그인 시도
-            CustomerSessionDTO customerSessionDTO = customerService.login(customerLoginDTO);
             session.setAttribute("loggedInCustomer", customerSessionDTO);
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
