@@ -32,15 +32,14 @@ services:
     # messages.properties 적용 위해 추가
     environment:
       - JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-    # 로컬 시 활성화
-    env_file:
-      - .env
     # 배포 시 활성화(+Render Dashboard에서 주입)
-#    environment:
 #      - SPRING_DATASOURCE_URL
 #      - SPRING_DATASOURCE_USERNAME
 #      - SPRING_DATASOURCE_PASSWORD
 #      - OPENAI_API_KEY
+    # 로컬 시 활성화
+    env_file:
+      - .env
     # 개발 중 코드 실시간 반영
 #    volumes:
 #      - ./src:/app/src
