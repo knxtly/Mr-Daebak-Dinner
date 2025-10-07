@@ -24,10 +24,18 @@ public class OrderController {
 
     /* ============ Take order ============ */
 
-    // Customer: 주문 페이지 GET 요청
+    // 주문 페이지 GET 요청
     @GetMapping("/customer/orders/new")
     public String showOrderPage(@ModelAttribute OrderDTO orderDTO,
                                 @ModelAttribute OrderItemDTO orderItemDTO) {
+        return "customer/order";
+    }
+
+    // 주문 reset 요청
+    @GetMapping("/customer/orders/new/reset")
+    public String resetOrder(Model model) {
+        model.addAttribute("orderDTO", new OrderDTO());
+        model.addAttribute("orderItemDTO", new OrderItemDTO());
         return "customer/order";
     }
 

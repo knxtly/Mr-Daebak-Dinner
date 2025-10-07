@@ -85,7 +85,7 @@
                     <h2 class="selection-heading">선택된 디너</h2>
                     <div class="kind-select-wrapper">
                         <select id="menuSelect" th:field="*{dinnerKind}">
-                            <option value="" selected hidden>위 사진을 클릭하여 메뉴를 선택하세요</option>
+                            <option value="" selected hidden>사진을 클릭하여 메뉴를 선택하세요</option>
                             <option value="VALENTINE">Valentine dinner</option>
                             <option value="FRENCH">French dinner</option>
                             <option value="ENGLISH">English dinner</option>
@@ -187,17 +187,18 @@
 
             <div class="form-group">
                 <label for="deliveryAddress">배달 주소</label>
-                <input type="text" id="deliveryAddress" th:field="*{deliveryAddress}" required/>
+                <input type="text" id="deliveryAddress" th:field="*{deliveryAddress}" /><!-- TODO: required -->
             </div>
 
             <div class="form-group">
                 <label for="cardNumber">카드 번호</label>
-                <input type="text" id="cardNumber" th:field="*{cardNumber}" required/>
+                <input type="text" id="cardNumber" th:field="*{cardNumber}" /><!-- TODO: required -->
             </div>
         </section>
 
         <div class="form-actions">
-            <button type="reset" id="resetBtn" class="secondary-btn">초기화</button>
+            <button type="button" id="resetBtn" class="secondary-btn"
+                onclick="window.location.href='/customer/orders/new/reset'">초기화</button>
             <button type="submit" class="primary-btn">주문 제출</button>
             <a th:href="@{/customer/main}" class="tertiary-btn">이전</a>
         </div>

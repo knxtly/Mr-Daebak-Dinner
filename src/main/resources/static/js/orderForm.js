@@ -1,6 +1,5 @@
 (function(){
     const menuSelect = document.getElementById('menuSelect');
-    const resetBtn = document.getElementById('resetBtn');
     const menuCards = document.querySelectorAll('.menu-card');
 
     const voiceBtn = document.getElementById('voiceBtn');
@@ -26,53 +25,67 @@
         champagne: document.getElementById('champagne')
     };
 
+    // 모든 스타일 available, check 해제
+    function resetStyle() {
+        document.querySelectorAll('input[name="dinnerStyle"]').forEach(
+            radio => {
+                radio.disabled = false;
+                radio.checked = false;
+        });
+    }
+
     // 모든 아이템 수량 0으로 초기화하는 함수
     function resetItems() {
         Object.values(items).forEach(input => input.value = 0);
     }
 
-    // 메뉴 선택 시 스타일/아이템 초기화 및 기본값 반영 로직
-    function updateMenuSelection(selectedValue) {
-        // 1. 모든 아이템 수량 초기화
-        resetItems();
-
-        // 2. 스타일 옵션과 값 초기화
-        document.querySelectorAll('input[name="dinnerStyle"]').forEach(radio => radio.disabled = false); // 모든 스타일 활성화
+    // 메뉴 선택 시 스타일/아이템 초기화 및 기본값 설정
+    function updateMenuSelection(selectedValue, applyDefaultItems) {
+        // 1. 스타일 옵션과 값 초기화
+        resetStyle();
         document.querySelector('#styleSimple').checked = true; // 'Simple'을 기본으로 선택
 
-        // 3. 메뉴별 기본 아이템 값 설정
-        switch(selectedValue){
-            case 'VALENTINE':
-                items.wine.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'FRENCH':
-                items.coffee_cup.value = 1;
-                items.wine.value = 1;
-                items.salad.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'ENGLISH':
-                items.eggscramble.value = 1;
-                items.bacon.value = 1;
-                items.bread.value = 1;
-                items.steak.value = 1;
-                break;
-            case 'CHAMPAGNE':
-                items.champagne.value = 1;
-                items.baguette.value = 4;
-                items.coffee_pot.value = 1;
-                items.wine.value = 1;
-                items.steak.value = 1;
+        // 2. CHAMPAGNE 메뉴의 특수 로직: SIMPLE 스타일 비활성화
+        if (selectedValue === 'CHAMPAGNE') {
+            document.querySelector('#styleSimple').disabled = true;
+            document.querySelector('#styleGrand').checked = true;
+        }
 
-                // CHAMPAGNE 메뉴의 특수 로직: SIMPLE 스타일 비활성화
-                document.querySelector('#styleSimple').disabled = true;
-                document.querySelector('#styleGrand').checked = true;
-                break;
+        // 3. 아이템 초기화 및 기본값 설정
+        if (applyDefaultItems) {
+            // 모든 아이템 수량 초기화
+            resetItems();
+
+            // 메뉴별 기본 아이템 값 설정
+            switch(selectedValue){
+                case 'VALENTINE':
+                    items.wine.value = 1;
+                    items.steak.value = 1;
+                    break;
+                case 'FRENCH':
+                    items.coffee_cup.value = 1;
+                    items.wine.value = 1;
+                    items.salad.value = 1;
+                    items.steak.value = 1;
+                    break;
+                case 'ENGLISH':
+                    items.eggscramble.value = 1;
+                    items.bacon.value = 1;
+                    items.bread.value = 1;
+                    items.steak.value = 1;
+                    break;
+                case 'CHAMPAGNE':
+                    items.champagne.value = 1;
+                    items.baguette.value = 4;
+                    items.coffee_pot.value = 1;
+                    items.wine.value = 1;
+                    items.steak.value = 1;
+            }
         }
     }
 
-    function selectMenu(menuValue) {
+    // 메뉴 선택 함수
+    function selectMenu(menuValue, applyDefaultItems) {
         if (!menuValue) return; // 메뉴 값이 없으면 아무것도 하지 않음
 
         const upperMenuValue = menuValue.toUpperCase();
@@ -86,31 +99,19 @@
             }
         });
 
-        // 2. 숨겨진 <select> 값 업데이트 (폼 제출을 위해 필수)
+        // 2. <select> 값 업데이트 (폼 제출을 위해 필수)
         menuSelect.value = upperMenuValue;
 
-        // 3. 아이템/스타일 초기화 및 기본값 설정 로직 실행
-        updateMenuSelection(upperMenuValue);
+        // 3. 스타일/아이템 초기화 및 기본값 설정
+        updateMenuSelection(upperMenuValue, applyDefaultItems);
     }
 
-    // --- 메뉴 카드 클릭 이벤트 핸들러 ---
+    // 메뉴 카드 클릭 이벤트 핸들러
     menuCards.forEach(card => {
         card.addEventListener('click', () => {
             const menuValue = card.getAttribute('data-menu-value');
-            selectMenu(menuValue); // 새로 만든 함수 호출
+            selectMenu(menuValue, true); // 메뉴 선택 함수 호출 & default item구성 반영
         });
-    });
-    // reset 시 옵션과 아이템 재설정
-    resetBtn.addEventListener('click', () => {
-        resetItems();
-        document.querySelectorAll('input[name="dinnerStyle"]').forEach(radio => {
-            radio.disabled = false;
-            radio.checked = false;
-        });
-        menuSelect.value = '';
-
-        // 초기화 시 카드 선택 표시 제거
-        menuCards.forEach(c => c.classList.remove('selected'));
     });
 
     // 음성 인식 버튼
@@ -196,20 +197,9 @@
        }
     });
 
-    // 페이지 로드 시 기존 선택된 메뉴를 시각적으로 복원
+    // 페이지 로드 시 기존 선택된 메뉴를 복원
     document.addEventListener('DOMContentLoaded', () => {
-        const initiallySelectedMenu = menuSelect.value;
-
-        if (initiallySelectedMenu) {
-            // 기존 selectMenu() 함수는 아이템 수량을 초기화하므로,
-            // 여기서는 기존 입력값을 유지하기 위해 시각적인 부분(.selected 클래스 추가)만 처리합니다.
-            menuCards.forEach(card => {
-                if (card.dataset.menuValue === initiallySelectedMenu) {
-                    card.classList.add('selected');
-                } else {
-                    card.classList.remove('selected');
-                }
-            });
-        }
+        // initiallySelectedMenu 다시 선택 & default item구성 반영 X
+        selectMenu(menuSelect.value, false);
     });
 })();
