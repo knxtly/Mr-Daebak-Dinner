@@ -24,23 +24,26 @@ public class OrderController {
 
     /* ============ Take order ============ */
 
-    // Customer: 주문 페이지 GET 요청
+    // 주문 페이지 GET 요청
     @GetMapping("/customer/orders/new")
-    public String showOrderPage(Model model) {
-        if (!model.containsAttribute("orderDTO")) {
-            model.addAttribute("orderDTO", new OrderDTO());
-        }
-        if (!model.containsAttribute("orderItemDTO")) {
-            model.addAttribute("orderItemDTO", new OrderItemDTO());
-        }
+    public String showOrderPage(@ModelAttribute OrderDTO orderDTO,
+                                @ModelAttribute OrderItemDTO orderItemDTO) {
+        return "customer/order";
+    }
+
+    // 주문 reset 요청
+    @GetMapping("/customer/orders/new/reset")
+    public String resetOrder(Model model) {
+        model.addAttribute("orderDTO", new OrderDTO());
+        model.addAttribute("orderItemDTO", new OrderItemDTO());
         return "customer/order";
     }
 
     // 주문 요청
     @PostMapping("/customer/orders/new")
-    public String takeOrder(@Valid @ModelAttribute("orderDTO") OrderDTO orderDTO,
+    public String takeOrder(@Valid @ModelAttribute OrderDTO orderDTO,
                             BindingResult bindingResult,
-                            @ModelAttribute("orderItemDTO") OrderItemDTO orderItemDTO,
+                            @ModelAttribute OrderItemDTO orderItemDTO,
                             Model model,
                             RedirectAttributes redirectAttributes,
                             @SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO) {
@@ -70,12 +73,18 @@ public class OrderController {
             // 주문처리
             OrderHistoryDTO placedOrder = orderService.placeOrder(orderDTO, orderItemDTO, customerSessionDTO);
             redirectAttributes.addFlashAttribute("placedOrder", placedOrder);
+            return "redirect:/customer/orders/success";
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("loginErrMsg", e.getMessage());
+            return "redirect:/customer/login";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("orderErrMsg", e.getMessage());
+            return "customer/order";
         } catch (InsufficientInventoryException e) {
             model.addAttribute("itemErrMsg", e.getMessage());
             model.addAttribute("insufficientItems", e.getInsufficientItems());
             return "customer/order";
         }
-        return "redirect:/customer/orders/success";
     }
 
     @GetMapping("/customer/orders/success")

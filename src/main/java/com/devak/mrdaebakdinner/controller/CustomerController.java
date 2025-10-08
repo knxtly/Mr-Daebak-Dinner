@@ -1,31 +1,26 @@
 package com.devak.mrdaebakdinner.controller;
 
-import com.devak.mrdaebakdinner.dto.CustomerLoginDTO;
-import com.devak.mrdaebakdinner.dto.CustomerSessionDTO;
-import com.devak.mrdaebakdinner.dto.CustomerSignUpDTO;
-import com.devak.mrdaebakdinner.dto.OrderHistoryDTO;
+import com.devak.mrdaebakdinner.dto.*;
 import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
 import com.devak.mrdaebakdinner.exception.DuplicateLoginIdException;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
 import com.devak.mrdaebakdinner.service.CustomerService;
 import com.devak.mrdaebakdinner.service.OrderService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,7 +33,8 @@ public class CustomerController {
 
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
-    public String showCustomerInterface(HttpSession session) {
+    public String showCustomerInterface(@ModelAttribute CustomerLoginDTO customerLoginDTO,
+                                        HttpSession session) {
         // 이미 customer session이 있으면 바로 main화면으로
         if (session.getAttribute("loggedInCustomer") != null) {
             return "redirect:/customer/main";
@@ -51,36 +47,26 @@ public class CustomerController {
     public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
                                 BindingResult bindingResult,
                                 Model model,
-                                RedirectAttributes redirectAttributes,
-                                HttpSession session,
-                                HttpServletRequest request) {
+                                HttpSession session) {
         if (bindingResult.hasErrors()) {
-            StringBuilder loginErrMsg = new StringBuilder();
-
-            // 원하는 출력 순서
-            List<String> fieldOrder = List.of("loginId", "password");
-
-            // fieldOrder 순서대로 정렬. 없는 필드면 맨 뒤로
-            List<FieldError> sortedErrors = bindingResult.getFieldErrors().stream()
-                    .sorted(Comparator.comparingInt(
-                            e -> !fieldOrder.contains(e.getField()) ? Integer.MAX_VALUE : fieldOrder.indexOf(e.getField())
-                    ))
-                    .toList();
-            for (FieldError fieldError : sortedErrors) {
-                loginErrMsg.append(fieldError.getDefaultMessage()).append("\n");
+            if (bindingResult.hasFieldErrors("password")) {
+                model.addAttribute("loginErrMsg",
+                        bindingResult.getFieldError("password").getDefaultMessage());
+                if (bindingResult.hasFieldErrors("loginId")) {
+                    model.addAttribute("loginErrMsg",
+                            bindingResult.getFieldError("loginId").getDefaultMessage());
+                }
             }
-
-            model.addAttribute("loginErrMsg", loginErrMsg.toString().trim());
             return "customer/customer";
         }
 
         try {
+            // 로그인 시도
+            CustomerSessionDTO customerSessionDTO = customerService.login(customerLoginDTO);
             // Staff 세션 있으면 삭제
             if (session.getAttribute("loggedInStaff") != null) {
                 session.removeAttribute("loggedInStaff");
             }
-            // 로그인 시도
-            CustomerSessionDTO customerSessionDTO = customerService.login(customerLoginDTO);
             session.setAttribute("loggedInCustomer", customerSessionDTO);
             return "redirect:/customer/main";
         } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
@@ -93,29 +79,34 @@ public class CustomerController {
 
     // 회원가입 페이지 GET 요청
     @GetMapping("/customer/signup")
-    public String showSignUp(@ModelAttribute("customerSignUpDTO") CustomerSignUpDTO customerSignUpDTO) {
-        // 빈 DTO를 폼에 담아 렌더링
+    public String showSignUp(@ModelAttribute CustomerSignUpDTO customerSignUpDTO) {
         return "customer/signup";
     }
 
     // 회원가입 페이지 POST 요청
     @PostMapping("/customer/signup")
-    public String signUp(@Valid @ModelAttribute("customerSignUpDTO") CustomerSignUpDTO customerSignUpDTO,
+    public String signUp(@Valid @ModelAttribute CustomerSignUpDTO customerSignUpDTO,
                          BindingResult bindingResult,
                          Model model) {
         // valid check 실패
         if (bindingResult.hasErrors()) {
             if (bindingResult.hasFieldErrors("loginId")) {
                 model.addAttribute("signUpLoginIdErrMsg",
-                        bindingResult.getFieldError("loginId").getDefaultMessage());
+                        bindingResult.getFieldErrors("loginId").stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.joining("<br>")));
             }
             if (bindingResult.hasFieldErrors("password")) {
                 model.addAttribute("signUpPasswordErrMsg",
-                        bindingResult.getFieldError("password").getDefaultMessage());
+                        bindingResult.getFieldErrors("password").stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.joining("<br>")));
             }
             if (bindingResult.hasFieldErrors("name")) {
                 model.addAttribute("signUpNameErrMsg",
-                        bindingResult.getFieldError("name").getDefaultMessage());
+                        bindingResult.getFieldErrors("name").stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.joining("<br>")));
             }
             return "customer/signup";
         }

@@ -31,18 +31,16 @@
             <div class="title-line"></div>
         </h2>
 
-        <form action="/customer/login" method="post" class="login-form">
+        <form action="/customer/login" method="post" class="login-form" th:object="${customerLoginDTO}">
 
             <div class="input-group">
-                <input type="text" id="loginId" name="loginId" placeholder="ID">
+                <input type="text" th:field="*{loginId}" placeholder="ID" required>
             </div>
-
             <div class="input-group">
-                <input type="password" id="password" name="password" placeholder="PASSWORD">
+                <input type="password" th:field="*{password}" placeholder="PASSWORD" required>
             </div>
-
-            <div th:if="${loginErrMsg}" class = "login-exception-container">
-                <p th:text="${loginErrMsg}" class = "login-exception-msg"></p>
+            <div th:if="${loginErrMsg}" class="login-exception-container">
+                <p th:text="${loginErrMsg}" class="login-exception-msg"></p>
             </div>
 
             <button type="submit" class="login-btn-submit">LOG IN</button>

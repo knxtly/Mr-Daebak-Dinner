@@ -11,8 +11,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class CustomerLoginDTO {
-    @NotBlank(message = "ID는 필수 요소입니다.")
-    private String loginId; // 외부 비즈니스용 ID
-    @NotBlank(message = "PW는 필수 요소입니다.")
+    @NotBlank(message = "아이디를 입력해주세요.")
+    private String loginId;
+    @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 }

@@ -35,21 +35,21 @@
         <form action="/customer/signup" method="post" class="signup-form" th:object="${customerSignUpDTO}">
 
             <div class="input-group">
-                <input type="text" id="loginId" th:field="*{loginId}" placeholder="ID(4~30글자)">
+                <input type="text" id="loginId" th:field="*{loginId}" placeholder="ID(4~30글자)" required>
             </div>
             <div th:if="${signUpLoginIdErrMsg}" class = "signup-exception-container">
                 <p th:utext="${signUpLoginIdErrMsg}" class = "signup-exception-msg"></p>
             </div>
 
             <div class="input-group">
-                <input type="password" id="password" th:field="*{password}" placeholder="PASSWORD(최소 4글자)">
+                <input type="password" id="password" th:field="*{password}" placeholder="PASSWORD(최소 4글자)" required>
             </div>
             <div th:if="${signUpPasswordErrMsg}" class = "signup-exception-container">
                 <p th:utext="${signUpPasswordErrMsg}" class = "signup-exception-msg"></p>
             </div>
 
             <div class="input-group">
-                <input type="text" id="name" th:field="*{name}" placeholder="NAME(최대 30글자)">
+                <input type="text" id="name" th:field="*{name}" placeholder="NAME(최대 30글자)" required>
             </div>
             <div th:if="${signUpNameErrMsg}" class = "signup-exception-container">
                 <p th:utext="${signUpNameErrMsg}" class = "signup-exception-msg"></p>
@@ -71,7 +71,7 @@
         </form>
 
         <div class="link-container">
-            <a href="/customer" class="login-link">이전</a>
+            <a href="/customer" class="login-link">Login</a>
             <a href="/" class="index-link">Go to Index Page</a>
         </div>
     </div>

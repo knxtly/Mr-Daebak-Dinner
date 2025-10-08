@@ -80,9 +80,12 @@ public class OrderService {
     public OrderHistoryDTO placeOrder(OrderDTO orderDTO,
                                       OrderItemDTO orderItemDTO,
                                       CustomerSessionDTO customerSessionDTO) {
-        // 주문한 customer 찾기
+        // 주문한 customer 검증
+        if (customerSessionDTO == null) {
+            throw new IllegalStateException("로그인 세션이 없습니다. 다시 로그인해주세요");
+        }
         CustomerEntity customerEntity = customerRepository.findByLoginId(customerSessionDTO.getLoginId())
-                .orElseThrow(() -> new IllegalArgumentException("고객 정보가 없습니다."));
+                .orElseThrow(() -> new IllegalStateException("고객 정보가 없습니다."));
 
         // CHAMPAGNE + SIMPLE 스타일은 거절
         if (OrderDnrKind.CHAMPAGNE == orderDTO.getDinnerKind()
