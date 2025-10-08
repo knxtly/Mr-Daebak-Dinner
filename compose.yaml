@@ -12,8 +12,8 @@ services:
       timeout: 5s
       retries: 5
     # 데이터 저장 시
-  #    volumes:
-  #      - ./postgres-data:/var/lib/postgresql/data
+#    volumes:
+#      - ./postgres-data:/var/lib/postgresql/data
 
   app:
     build: .
