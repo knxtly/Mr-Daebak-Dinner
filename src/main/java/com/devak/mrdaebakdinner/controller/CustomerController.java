@@ -1,15 +1,15 @@
 package com.devak.mrdaebakdinner.controller;
 
-import com.devak.mrdaebakdinner.dto.CustomerDTO;
-import com.devak.mrdaebakdinner.entity.CustomerEntity;
+import com.devak.mrdaebakdinner.dto.*;
 import com.devak.mrdaebakdinner.exception.CustomerNotFoundException;
-import com.devak.mrdaebakdinner.exception.DatabaseException;
 import com.devak.mrdaebakdinner.exception.DuplicateLoginIdException;
 import com.devak.mrdaebakdinner.exception.IncorrectPasswordException;
 import com.devak.mrdaebakdinner.service.CustomerService;
+import com.devak.mrdaebakdinner.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,102 +17,138 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final OrderService orderService;
+
+    /* ============ Login ============ */
 
     // customer 기본화면 (로그인 화면)
     @GetMapping("/customer")
-    public String showCustomerInterface() {
+    public String showCustomerInterface(@ModelAttribute CustomerLoginDTO customerLoginDTO,
+                                        HttpSession session) {
+        // 이미 customer session이 있으면 바로 main화면으로
+        if (session.getAttribute("loggedInCustomer") != null) {
+            return "redirect:/customer/main";
+        }
         return "customer/customer";
     }
 
     // 로그인 요청
     @PostMapping("/customer/login")
-    public String login(@ModelAttribute CustomerDTO customerDTO,
-                        RedirectAttributes redirectAttributes,
-                        HttpSession session) {
-        // ID, PW가 입력되지 않았을 때 errorMessage
-        if (customerDTO.getLoginId() == null || customerDTO.getLoginId().isBlank() ||
-                customerDTO.getPassword() == null || customerDTO.getPassword().isBlank()) {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "올바른 ID와 PW를 입력해주세요");
-            return "redirect:/customer";
+    public String loginCustomer(@Valid @ModelAttribute CustomerLoginDTO customerLoginDTO,
+                                BindingResult bindingResult,
+                                Model model,
+                                HttpSession session) {
+        if (bindingResult.hasErrors()) {
+            if (bindingResult.hasFieldErrors("password")) {
+                model.addAttribute("loginErrMsg",
+                        bindingResult.getFieldError("password").getDefaultMessage());
+                if (bindingResult.hasFieldErrors("loginId")) {
+                    model.addAttribute("loginErrMsg",
+                            bindingResult.getFieldError("loginId").getDefaultMessage());
+                }
+            }
+            return "customer/customer";
         }
 
         try {
-            CustomerDTO loginResult = customerService.login(customerDTO);
-            // 로그인 성공: 세션에 사용자 정보 저장
-            session.setAttribute("loggedInCustomer", loginResult);
-            // 로그인 성공했을 때 고객의 이전주문내역을 바로 보여주라고 요청한다면,
-            // return "redirect:/customer/orders/history"
+            // 로그인 시도
+            CustomerSessionDTO customerSessionDTO = customerService.login(customerLoginDTO);
+            // Staff 세션 있으면 삭제
+            if (session.getAttribute("loggedInStaff") != null) {
+                session.removeAttribute("loggedInStaff");
+            }
+            session.setAttribute("loggedInCustomer", customerSessionDTO);
             return "redirect:/customer/main";
-        } catch (IncorrectPasswordException | CustomerNotFoundException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/customer";
+        } catch (IncorrectPasswordException | CustomerNotFoundException e) { // 로그인 실패
+            model.addAttribute("loginErrMsg", e.getMessage());
+            return "customer/customer";
         }
     }
 
+    /* ============ SignUp ============ */
+
     // 회원가입 페이지 GET 요청
     @GetMapping("/customer/signup")
-    public String showSignUp() {
+    public String showSignUp(@ModelAttribute CustomerSignUpDTO customerSignUpDTO) {
         return "customer/signup";
     }
 
     // 회원가입 페이지 POST 요청
     @PostMapping("/customer/signup")
-    public String signUp(@Valid @ModelAttribute CustomerDTO customerDTO,
+    public String signUp(@Valid @ModelAttribute CustomerSignUpDTO customerSignUpDTO,
                          BindingResult bindingResult,
-                         RedirectAttributes redirectAttributes) {
-        // 유효성 검사(@Valid + BindingResult)
+                         Model model) {
+        // valid check 실패
         if (bindingResult.hasErrors()) {
-            // 오류 메시지 이어붙이기
-            StringBuilder errorMessage = new StringBuilder();
-            bindingResult.getFieldErrors().forEach(fieldError -> {
-                errorMessage.append(fieldError.getDefaultMessage()).append("<br>");
-            });
-
-            // redirectAttributes에 errorMessage 전달
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    errorMessage.toString().trim());
-            return "redirect:/customer/signup";
+            if (bindingResult.hasFieldErrors("loginId")) {
+                model.addAttribute("signUpLoginIdErrMsg",
+                        bindingResult.getFieldErrors("loginId").stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.joining("<br>")));
+            }
+            if (bindingResult.hasFieldErrors("password")) {
+                model.addAttribute("signUpPasswordErrMsg",
+                        bindingResult.getFieldErrors("password").stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.joining("<br>")));
+            }
+            if (bindingResult.hasFieldErrors("name")) {
+                model.addAttribute("signUpNameErrMsg",
+                        bindingResult.getFieldErrors("name").stream()
+                                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                .collect(Collectors.joining("<br>")));
+            }
+            return "customer/signup";
         }
 
-        try { // 입력값이 Valid하다면,
-            // 회원가입 시도
-            customerService.signUp(customerDTO);
+        try { // 입력값이 Valid하다면, 회원가입 시도
+            customerService.signUp(customerSignUpDTO);
             return "redirect:/customer";
         } catch (DuplicateLoginIdException | DataAccessException e) {
-            // 회원가입 실패하면 errorMessage 출력
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/customer/signup";
+            // 회원가입 실패하면 errMsg 출력
+            model.addAttribute("signUpErrMsg", e.getMessage());
+            return "customer/signup";
         }
     }
+
+    /* ============ Main ============ */
 
     // 메인 페이지 GET 요청
     @GetMapping("/customer/main")
-    public String showCustomerMain(HttpSession session, Model model) {
-        // session에 로그인 정보 있는지 확인
-        CustomerDTO loggedInCustomer = (CustomerDTO) session.getAttribute("loggedInCustomer");
+    public String showCustomerMain(@SessionAttribute("loggedInCustomer") CustomerSessionDTO customerSessionDTO,
+                                   HttpSession session,
+                                   Model model) {
+        // 최신 고객정보 조회
+        CustomerSessionDTO freshCustomer = orderService.getFreshCustomerSessionDTO(customerSessionDTO.getLoginId());
+        session.setAttribute("loggedInCustomer", freshCustomer); // 세션 갱신: 주문 후 VIP 반영
 
-        // 세션정보 없으면 로그인 페이지(/customer)로 GET요청
-        if (loggedInCustomer == null) {
-            return "redirect:/customer";
-        }
-        // 세션정보 있으면 Model에 담아서 활용
-        model.addAttribute("loggedInCustomer", loggedInCustomer);
+        model.addAttribute("loggedInCustomer", customerSessionDTO);
+
+        // 고객의 loginId로 order목록을 찾아서 보여주는 로직
+        List<OrderHistoryDTO> orderList =
+                orderService.findOrderHistoryByLoginId(customerSessionDTO.getLoginId());
+        // "orderList"라는 속성으로 전달
+        model.addAttribute("orderList", orderList);
         return "customer/main";
     }
+
+    /* ============ Logout ============ */
 
     // 로그아웃 요청
     @GetMapping("/customer/logout")
     public String customerLogout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/customer";
+        session.removeAttribute("loggedInCustomer");
+        return "redirect:/";
     }
 
 }

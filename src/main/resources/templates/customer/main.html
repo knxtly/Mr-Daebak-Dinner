@@ -2,18 +2,61 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
+    <link rel="stylesheet" th:href="@{/CSS/customer-main.css}">
 </head>
 <body>
-<h1>Main Page</h1>
-<div th:if="${loggedInCustomer}">
-    ID: <span th:text="${loggedInCustomer.loginId}" style="color: blue;"></span><br>
-    Hi <span th:text="${loggedInCustomer.name}" style="color: blue;"></span>!<br>
-    User Information: <p th:text="${loggedInCustomer}"></p>
-</div>
-<a href="/customer/orders/new">주문하기</a><br>
-<a href="/customer/orders/history">이전주문조회</a><br>
-<a href="/customer/logout">로그아웃</a>
+
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="/" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="#">SIGNUP</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer/logout" class="logout-btn">로그아웃</a>
+        <a href="#" class="mypg-btn">마이페이지</a>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="main-image-container">
+        <img th:src="@{/images/mainimage.png}" alt="스테이크 사진" class="steak-image">
+        <div class="image-overlay">
+            <h1 class="main-text">IMPACT YOUR LOVED ONES BY SPENDING SPECIAL DAYS PEACEFULLY AT HOME</h1>
+            <a href = "/customer/orders/new">
+                <button class="order-button">주문하기</button>
+            </a>
+        </div>
+    </div>
+    <section class="previous-orders">
+        <h2 class="section-title">
+            <a href = "/customer/orders/history">PREVIOUS ORDERS →</a>
+        </h2>
+        <div class="orders-container">
+            <a th:each="order : ${orderList}" th:href="@{/orders/detail/{orderId}(orderId=${order.id})}" class="order-link">
+                <div class="order-item">
+                    <p class="order-date" th:text="${order.orderTime} ?: '-'"></p>
+                    <h3 class="order-name">
+                        <span th:text="${order.dinnerKind} ?: '-'"></span>
+                        <span class="order-detail" th:text="${order.dinnerStyle} ?: '-'"></span>
+                    </h3>
+                    <p class="order-price" th:text="${order.totalPrice} ?: '-'"></p>
+                    <p class="order-info" th:text="${order.deliveryTime != null ? #temporals.format(order.deliveryTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a') : '-'}"></p>
+                    <p class="order-info" th:text="${order.deliveryAddress} ?: '-'"></p>
+                </div>
+            </a>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+</footer>
+
 </body>
 </html>

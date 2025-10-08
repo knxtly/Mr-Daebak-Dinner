@@ -2,10 +2,14 @@ services:
   db:
     image: postgres
     container_name: myDatabaseContainer
-    environment:
-      - POSTGRES_DB=mydb
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+    # 로컬 시 활성화
+    env_file:
+      - .env
+    # 배포 시 활성화(+Render Dashboard에서 주입)
+#    environment:
+#      - POSTGRES_DB
+#      - POSTGRES_USER
+#      - POSTGRES_PASSWORD
     ports:
       - "5432:5432"
     healthcheck:
@@ -13,6 +17,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    # 회원목록, 주문목록 등 저장 시
 #    volumes:
 #      - ./postgres-data:/var/lib/postgresql/data
 
@@ -22,17 +27,23 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mydb
-      - SPRING_DATASOURCE_USERNAME=myuser
-      - SPRING_DATASOURCE_PASSWORD=mypassword
     ports:
       - "8080:8080"
-
-    # ==========코드수정 시 즉시반영 위한 볼륨=========
+    # messages.properties 적용 위해 추가
+    environment:
+      - JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+    # 배포 시 활성화(+Render Dashboard에서 주입)
+#      - SPRING_DATASOURCE_URL
+#      - SPRING_DATASOURCE_USERNAME
+#      - SPRING_DATASOURCE_PASSWORD
+#      - OPENAI_API_KEY
+    # 로컬 시 활성화
+    env_file:
+      - .env
+    # 개발 중 코드 실시간 반영
 #    volumes:
 #      - ./src:/app/src
 #      - ./build.gradle:/app/build.gradle
 #      - ./settings.gradle:/app/settings.gradle
 #      - ./gradle:/app/gradle
-#    command: ./gradlew bootRun # jar 대신 bootRun: 실시간 반영
+#    command: java -jar build/libs/*.jar

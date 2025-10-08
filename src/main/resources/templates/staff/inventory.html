@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | Mr. Daebak Dinner</title>
+    <link rel="stylesheet" th:href="@{/CSS/inventory.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/staff" class="navbar-brand">MR.DAEBAKDINNER STAFF INTERFACE</a>
+</nav>
+
+<div class="layout-container">
+
+    <aside class="sidebar">
+        <h2 class="sidebar-title">Staff Menu</h2>
+        <nav class="sidebar-nav">
+            <a th:href="@{/staff/chef}" class="nav-item">Chef</a>
+            <a th:href="@{/staff/delivery}" class="nav-item">Delivery</a>
+            <a th:href="@{/staff/inventory}" class="nav-item active">Inventory</a>
+            <hr>
+            <a th:href="@{/staff/logout}" class="nav-item logout-link">Logout</a>
+            <a th:href="@{/}" class="nav-item index-link">Customer Page</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1>재고 목록</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>Item ID</th>
+                <th>이름</th>
+                <th>재고 수량</th>
+                <th>재고 관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="inv : ${inventoryList}">
+                <td th:text="${inv.itemId}"></td>
+                <td th:text="#{'item.' + ${inv.itemName}}"></td>
+                <td th:text="${inv.quantity}"></td>
+                <td class="management-cell">
+                    <form method="post" class="inventory-form">
+                        <button type="submit" class="decrease-btn"
+                                th:attr="formaction=@{/staff/inventory/decrease(itemId=${inv.itemId})}">
+                            -
+                        </button>
+                        <input type="number" name="amount" value="1" min="1" required />
+                        <button type="submit" class="increase-btn"
+                                th:attr="formaction=@{/staff/inventory/increase(itemId=${inv.itemId})}">
+                            +
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </main>
+</div>
+
+</body>
+</html>

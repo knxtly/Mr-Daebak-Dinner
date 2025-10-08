@@ -2,23 +2,79 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup | Mr. Daebak Dinner</title>
+    <link rel="stylesheet" th:href="@{/CSS/customer-signup.css}">
 </head>
+
 <body>
-<h1>Sign Up</h1>
-<form action="/customer/signup" method="post">
-    ID: <input type="text" name="loginId" placeholder="4 ~ 30글자"><br>
-    PW: <input type="password" name="password" placeholder="최소 4글자"><br>
-    Name: <input type="text" name="name" placeholder="최대 30글자"><br>
-    Address: <input type="text" name="address"><br>
-    Tel: <input type="tel" name="contact"><br>
-    <input type="submit" value="Sign up!">
-</form>
-<div th:if="${errorMessage}">
-    <p th:utext="${errorMessage}" style="color: red;"></p>
-</div>
-<a href="/customer">이전</a><br>
-<a href="/">Go to Index Page</a>
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="/" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="#">SIGNUP</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer" class="login-btn">로그인</a>
+        <a href="/customer/signup" class="signup-btn">회원가입</a>
+    </div>
+</header>
+
+<main class="signup-section">
+    <div class="signup-container">
+        <h2 class="signup-title">
+            SIGNUP
+            <div class="title-line"></div>
+        </h2>
+        <p class="signup-phrase">SIGNUP TODAY TO GET REGULAR DISCOUNT</p>
+
+        <form action="/customer/signup" method="post" class="signup-form" th:object="${customerSignUpDTO}">
+
+            <div class="input-group">
+                <input type="text" id="loginId" th:field="*{loginId}" placeholder="ID(4~30글자)" required>
+            </div>
+            <div th:if="${signUpLoginIdErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpLoginIdErrMsg}" class = "signup-exception-msg"></p>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" th:field="*{password}" placeholder="PASSWORD(최소 4글자)" required>
+            </div>
+            <div th:if="${signUpPasswordErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpPasswordErrMsg}" class = "signup-exception-msg"></p>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="name" th:field="*{name}" placeholder="NAME(최대 30글자)" required>
+            </div>
+            <div th:if="${signUpNameErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpNameErrMsg}" class = "signup-exception-msg"></p>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="address" th:field="*{address}" placeholder="ADDRESS">
+            </div>
+
+            <div class="input-group">
+                <input type="tel" id="contact" th:field="*{contact}" placeholder="TEL">
+            </div>
+
+            <div th:if="${signUpErrMsg}" class = "signup-exception-container">
+                <p th:utext="${signUpErrMsg}" class = "signup-exception-msg"></p>
+            </div>
+
+            <button type="submit" class="signup-btn-submit">SIGN UP</button>
+        </form>
+
+        <div class="link-container">
+            <a href="/customer" class="login-link">Login</a>
+            <a href="/" class="index-link">Go to Index Page</a>
+        </div>
+    </div>
+</main>
 </body>
 </html>

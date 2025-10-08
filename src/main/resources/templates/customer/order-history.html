@@ -1,13 +1,64 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>My Orders | Mr. Daebak Dinner</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Previous Orders | Mr. Daebak Dinner</title>
+    <link rel="stylesheet" th:href="@{/CSS/customer-order-history.css}">
 </head>
 <body>
-<h1>My Orders</h1>
-<!--TODO: Thymeleaf이용해서 고객의 주문목록 보여주는 로직 ${orderList}로 받아옴-->
-<a href="/customer/main">메인으로</a>
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="/" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="#">SIGNUP</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer/logout" class="logout-btn">로그아웃</a>
+        <a href="#" class="mypg-btn">마이페이지</a>
+    </div>
+</header>
+
+<main class="container">
+    <div class="content-wrapper">
+        <h1 class="page-main-title">
+            PREVIOUS ORDERS
+            <div class="title-line"></div>
+        </h1>
+
+        <div class="order-grid">
+            <div th:each="order : ${orderList}"
+                 class="order-card"
+                 th:onclick="|location.href='@{/orders/detail/{orderId}(orderId=${order.id})}'|">
+
+                <p class="order-date-time" th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: 'N/A'"></p>
+
+                <h2 class="dinner-info">
+                    <span class="dinner-kind" th:text="${order.dinnerKind} ?: 'N/A'"></span>
+                    <span class="dinner-style" th:text="${order.dinnerStyle} ?: 'N/A'"></span>
+                </h2>
+
+                <p class="order-price" th:text="${order.totalPrice} != null ? '₩' + ${order.totalPrice} : 'N/A'"></p>
+
+                <p class="delivery-label">DELIVERY TIME:</p>
+                <p class="delivery-value" th:text="${order.deliveryTime != null ? #temporals.format(order.deliveryTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a') : 'N/A'}"></p>
+
+                <p class="delivery-label">DELIVERY ADDRESS:</p>
+                <p class="delivery-value" th:text="${order.deliveryAddress} ?: 'N/A'"></p>
+
+                <p class="delivery-label">ORDER STATUS:</p>
+                <p class="delivery-value" th:text="${order.status} ?: 'N/A'"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-link">
+        <a href="/customer/main" class="main-link">메인으로</a>
+    </div>
+</main>
 </body>
 </html>

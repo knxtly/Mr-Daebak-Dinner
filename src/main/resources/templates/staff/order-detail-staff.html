@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Detail | Mr. Daebak Dinner</title>
+    <link rel="stylesheet" th:href="@{/CSS/staff-order-detail.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/staff" class="navbar-brand">MR.DAEBAKDINNER STAFF INTERFACE</a>
+</nav>
+
+<div class="layout-container">
+
+    <aside class="sidebar">
+        <h2 class="sidebar-title">Staff Menu</h2>
+        <nav class="sidebar-nav">
+            <a th:href="@{/staff/chef}" class="nav-item">Chef</a>
+            <a th:href="@{/staff/delivery}" class="nav-item">Delivery</a>
+            <a th:href="@{/staff/inventory}" class="nav-item">Inventory</a>
+            <hr>
+            <a th:href="@{/staff/logout}" class="nav-item logout-link">Logout</a>
+            <a th:href="@{/}" class="nav-item index-link">Customer Page</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <h1 class="page-title">주문 상세</h1>
+        <hr class="title-divider">
+
+        <p class="order-date">ORDER DATE: <span th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
+
+        <div class="order-detail-card">
+            <div class="dinner-header">
+                <h2 th:text="${order.dinnerKind} ?: '-'"></h2>
+                <p class="dinner-style" th:text="${order.dinnerStyle} ?: '-'"></p>
+            </div>
+
+            <div class="detail-list">
+                <p><strong>Order time:</strong> <span th:text="${#temporals.format(order.orderTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a')} ?: '-'"></span></p>
+                <p><strong>Customer id:</strong> <span th:text="${order.customerLoginId} ?: '-'"></span></p>
+                <p><strong>Dinner kind:</strong> <span th:text="${order.dinnerKind} ?: '-'"></span></p>
+                <p><strong>Dinner style:</strong> <span th:text="${order.dinnerStyle} ?: '-'"></span></p>
+                <p><strong>Delivery time:</strong> <span th:text="${order.deliveryTime != null ? #temporals.format(order.deliveryTime.atZoneSameInstant(T(java.time.ZoneId).of('Asia/Seoul')), 'yyyy, MMM d @ h:mm a') : '-'}"></span></p>
+                <p><strong>Delivery address:</strong> <span th:text="${order.deliveryAddress} ?: '-'"></span></p>
+                <p><strong>Card number:</strong> <span th:text="${order.cardNumber} ?: '-'"></span></p>
+                <p><strong>Total price:</strong> <span th:text="${order.totalPrice} != null ? '₩' + ${order.totalPrice} : '-'"></span></p>
+                <p><strong>Status:</strong> <span th:text="${order.status} ?: '-'"></span></p>
+            </div>
+
+            <div class="item-list">
+                <p><strong>--- Items Ordered ---</strong></p>
+                <div th:each="entry : ${orderItem.orderItems}" th:if="${entry.value > 0}" class="order-item-row">
+                    <span th:text="#{'item.' + ${entry.key}}"></span>
+                    <span class="quantity" th:text="${entry.value}"></span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

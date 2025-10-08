@@ -2,14 +2,29 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff</title>
-    <link rel="stylesheet" th:href="@{style.css}">
+    <link rel="stylesheet" th:href="@{/CSS/staff.css}">
 </head>
 <body>
-<h1>Staff Interface</h1>
-<a href="/staff/chef">요리직원</a><br>
-<a href="/staff/delivery">배달직원</a><br>
-<a href="/staff/inventory">재고조회</a>
-<a href="/">Go to Index Page</a>
+
+<nav class="navbar">
+    <a href="/staff" class="navbar-brand">MR.DAEBAKDINNER STAFF INTERFACE</a>
+</nav>
+
+<div class="container">
+    <h1>Staff Interface</h1>
+    <form action="/staff/login" method="post">
+        <label for="password">PW:</label>
+        <input type="password" id="password" name="password"><br>
+        <input type="submit" value="로그인">
+    </form>
+    <div th:if="${loginErrMsg}">
+        <p th:text="${loginErrMsg}" style="color: red;"></p>
+    </div>
+    <div class="index-button">
+        <a href="/" class="index-link">Customer Page</a>
+    </div>
+</div>
 </body>
 </html>

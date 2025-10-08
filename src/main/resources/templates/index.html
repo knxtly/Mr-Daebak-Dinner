@@ -1,15 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Index Page</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index | Mr. Daebak Dinner</title>
+    <link rel="stylesheet" th:href="@{/CSS/index.css}">
 </head>
+
 <body>
-<h1>Index Page!</h1>
-<div class="link-container">
-    <a href="/customer" class="btn">Customer</a>
-    <a href="/staff" class="btn">Staff</a>
-</div>
+<header class="navbar">
+    <div class="navbar-left">
+        <a href="/" class="logo">MR.DAEBAKDINNER</a>
+    </div>
+    <nav class="navbar-center">
+        <a href="#">SIGNUP</a>
+        <a href="#">ABOUT US</a>
+        <a href="#">MENU</a>
+        <a href="#">DELIVERY</a>
+    </nav>
+    <div class="navbar-right">
+        <a href="/customer" class="login-btn">로그인</a>
+        <a href="/customer/signup" class="signup-btn">회원가입</a>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="main-image-container">
+        <img th:src="@{/images/mainimage.png}" alt="스테이크 사진" class="steak-image">
+        <div class="image-overlay">
+            <h1 class="main-text">IMPACT YOUR LOVED ONES BY SPENDING SPECIAL DAYS PEACEFULLY AT HOME</h1>
+            <a href = "/customer">
+                <button class="login-button">로그인</button>
+            </a>
+        </div>
+    </div>
+    <section class="menu-section">
+        <h2 class="menu-heading">메뉴 소개</h2>
+        <div class="menu-items">
+            <div class="menu-item">
+                <img th:src="@{/images/Valentine_Dinner.png}" alt="발렌타인 디너 사진" class="menu-image">
+                <h3>Valentine dinner</h3>
+                <p>사랑하는 사람과 함께하는 특별한 저녁</p>
+            </div>
+            <div class="menu-item">
+                <img th:src="@{/images/French_Dinner.png}" alt="프렌치 디너 사진" class="menu-image">
+                <h3>French dinner</h3>
+                <p>정통 프랑스 요리의 진수</p>
+            </div>
+            <div class="menu-item">
+                <img th:src="@{/images/English_Dinner.png}" alt="잉글리시 디너 사진" class="menu-image">
+                <h3>English dinner</h3>
+                <p>클래식한 영국식 정찬</p>
+            </div>
+            <div class="menu-item">
+                <img th:src="@{/images/Champagne_Dinner.png}" alt="샴페인 디너 사진" class="menu-image">
+                <h3>Champagne Feast dinner</h3>
+                <p>축배를 들기에 완벽한 메뉴</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <a href="/staff" class="staff-btn">Staff</a>
+</footer>
+
 </body>
 </html>
